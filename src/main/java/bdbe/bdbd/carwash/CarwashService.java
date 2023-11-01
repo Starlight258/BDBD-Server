@@ -20,6 +20,7 @@ import bdbe.bdbd.optime.OptimeJPARepository;
 import bdbe.bdbd.review.ReviewJPARepository;
 import bdbe.bdbd.member.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 //@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class CarwashService {
     private final CarwashJPARepository carwashJPARepository;
     private final KeywordJPARepository keywordJPARepository;
@@ -99,6 +101,7 @@ public class CarwashService {
 
         // 이미지 업로드
         try {
+            log.info("image upload start");
             List<FileResponse.SimpleFileResponseDTO> uploadedFiles = fileUploadUtil.uploadFiles(images, carwash.getId());
             // Uploaded file metadata can now be accessed through uploadedFiles list.
         } catch (Exception e) {

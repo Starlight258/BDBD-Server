@@ -36,6 +36,7 @@ public class AWSConfig {
     @Bean
     @Profile("!prod")
     public AmazonS3 amazonS3Client() {
+        log.info("Initializing AmazonS3 client for not 'prod' profile.");
         AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         return AmazonS3ClientBuilder
                 .standard()

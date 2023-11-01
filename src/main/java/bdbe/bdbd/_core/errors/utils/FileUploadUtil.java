@@ -9,6 +9,7 @@ import bdbe.bdbd.file.FileResponse;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+@Slf4j
 @Service
 public class FileUploadUtil {
 
@@ -80,17 +81,20 @@ public class FileUploadUtil {
     public FileResponse.SimpleFileResponseDTO uploadFile(MultipartFile multipartFile, Long carwashId) throws Exception {
         Carwash carwash = carwashRepository.findById(carwashId)
                 .orElseThrow(() -> new NotFoundError("Carwash not found"));
-
+        log.info("start to convert file");
         File file = convertMultiPartToFile(multipartFile);
+        log.info("start to generate fileName");
         String fileName = generateFileName(multipartFile);
 
         try {
+            log.info("start to upload file");
             uploadFileToS3Bucket(fileName, file);
         } catch (SdkClientException e) {
             logger.error("File upload failed: {}", e.getMessage());
             throw e;
         }
 
+        log.info("start to make file entity");
 
         bdbe.bdbd.file.File newFile = bdbe.bdbd.file.File.builder()
                 .name(fileName)
@@ -100,7 +104,7 @@ public class FileUploadUtil {
                 .carwash(carwash)
                 .build();
         newFile = fileRepository.save(newFile);
-
+        log.info("start to delete file");
         file.delete();  // 로컬 파일 삭제
 
         return new FileResponse.SimpleFileResponseDTO(
