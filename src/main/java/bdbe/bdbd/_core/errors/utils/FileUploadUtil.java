@@ -74,6 +74,7 @@ public class FileUploadUtil {
      * @param file     업로드 될 파일 객체, 로컬 파일 시스템에 임시로 저장된 후 S3 버킷에 업로드된다.
      */
     private void uploadFileToS3Bucket(String fileName, File file) {
+        logger.info("upload start");
         amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file));
         logger.info("File uploaded to S3 bucket: {}", fileName);
     }
@@ -106,7 +107,7 @@ public class FileUploadUtil {
         newFile = fileRepository.save(newFile);
         log.info("start to delete file");
         file.delete();  // 로컬 파일 삭제
-
+        log.info("start to make file entity");
         return new FileResponse.SimpleFileResponseDTO(
                 newFile,
                 newFile.getCarwash().getId()
@@ -128,28 +129,31 @@ public class FileUploadUtil {
 
         List<FileResponse.SimpleFileResponseDTO> fileResponseList = new ArrayList<>();
         for (MultipartFile multipartFile : multipartFiles) {
+            log.info("start to convert file");
             File file = convertMultiPartToFile(multipartFile);
+            log.info("start to generate fileName");
             String fileName = generateFileName(multipartFile);
 
             try {
+                log.info("start to upload file");
                 uploadFileToS3Bucket(fileName, file);
             } catch (SdkClientException e) {
                 logger.error("File upload failed: {}", e.getMessage());
                 throw e;
             }
-
+            log.info("start to make file entity");
             FileRequest.FileDTO fileDTO = new FileRequest.FileDTO();
             fileDTO.setName(fileName);
             fileDTO.setUrl(amazonS3.getUrl(bucketName, fileName).toExternalForm());
             fileDTO.setPath(file.getPath());
             fileDTO.setUploadedAt(LocalDateTime.now());
             fileDTO.setCarwash(carwash);
-
+            log.info("start to make file entity");
             bdbe.bdbd.file.File newFile = fileDTO.toEntity();
             newFile = fileRepository.save(newFile);
-
+            log.info("start to delete file");
             file.delete();  // 로컬 파일 삭제
-
+            log.info("start to response dto");
             FileResponse.SimpleFileResponseDTO fileResponse = new FileResponse.SimpleFileResponseDTO(
                     newFile,
                     newFile.getCarwash().getId()
