@@ -124,9 +124,10 @@ public class FileUploadUtil {
      * @throws Exception 파일 업로드 및 메타데이터 저장 중에 예외가 발생하면 던짐
      */
     public List<FileResponse.SimpleFileResponseDTO> uploadFiles(MultipartFile[] multipartFiles, Long carwashId) throws Exception {
+        logger.info("start!");
         Carwash carwash = carwashRepository.findById(carwashId)
                 .orElseThrow(() -> new NotFoundError("Carwash not found"));
-
+        logger.info("file list");
         List<FileResponse.SimpleFileResponseDTO> fileResponseList = new ArrayList<>();
         for (MultipartFile multipartFile : multipartFiles) {
             log.info("start to convert file");
