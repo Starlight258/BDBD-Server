@@ -16,7 +16,7 @@ public class ReviewRequest {
     public static class SaveDTO {
         private Long carwashId;
         private Long reservationId;
-        private List<Long> keywordList;
+        private List<Long> keywordIdList;
         private double rate;
         private String comment;
 
