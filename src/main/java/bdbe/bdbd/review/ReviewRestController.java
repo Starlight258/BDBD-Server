@@ -19,7 +19,6 @@ public class ReviewRestController {
 
     @PostMapping("/reviews") //리뷰 등록
     public ResponseEntity<?> createReview (@RequestBody @Valid ReviewRequest.SaveDTO saveDTO, Errors errors, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        System.out.println("saveDTO:"+saveDTO.toString());
         reviewService.createReview(saveDTO, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(null));
     }
