@@ -31,7 +31,7 @@ public class OwnerRestController {
    //  (기능4) 회원가입
     @PostMapping("/join")
     public ResponseEntity<?> joinOwner(@RequestBody @Valid MemberRequest.JoinDTO requestDTO, Errors errors) {
-        requestDTO.setRole(MemberRole.ROLE_OWNER);
+//        requestDTO.setRole(MemberRole.ROLE_OWNER);
         ownerService.join(requestDTO);
         return ResponseEntity.ok().body(ApiUtils.success(null));
     }
