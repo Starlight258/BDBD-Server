@@ -74,9 +74,15 @@ public class FileUploadUtil {
      * @param file     업로드 될 파일 객체, 로컬 파일 시스템에 임시로 저장된 후 S3 버킷에 업로드된다.
      */
     private void uploadFileToS3Bucket(String fileName, File file) {
-        logger.info("upload start");
-        amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file));
-        logger.info("File uploaded to S3 bucket: {}", fileName);
+        try {
+            logger.info("Starting upload to S3 bucket: {}", fileName);
+            amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file));
+            logger.info("File successfully uploaded to S3 bucket: {}", fileName);
+        } catch (SdkClientException e) {
+            // 예외의 메시지와 스택 트레이스를 로그에 남김
+            logger.error("File upload to S3 bucket failed: {}", e.getMessage(), e);
+            throw e;  // 예외를 다시 던져서 호출자가 알 수 있도록 함
+        }
     }
 
     public FileResponse.SimpleFileResponseDTO uploadFile(MultipartFile multipartFile, Long carwashId) throws Exception {
