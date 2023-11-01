@@ -61,7 +61,7 @@ public class MemberRestController {
             throw new BadRequestError(errorMessage);
         }
         MemberResponse.LoginResponse response = memberService.login(requestDTO);
-        return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(response));
+        return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(null));
     }
 
 

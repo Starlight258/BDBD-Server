@@ -44,7 +44,7 @@ public class OwnerRestController {
             throw new BadRequestError(errorMessage);
         }
         MemberResponse.LoginResponse response = ownerService.login(requestDTO);
-        return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(response));
+        return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(null));
     }
     // 로그아웃 사용안함 - 프론트에서 JWT 토큰을 브라우저의 localstorage에서 삭제하면 됨.
 
