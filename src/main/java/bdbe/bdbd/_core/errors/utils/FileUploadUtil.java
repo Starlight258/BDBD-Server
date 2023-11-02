@@ -9,6 +9,7 @@ import bdbe.bdbd.file.FileResponse;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,6 +103,11 @@ public class FileUploadUtil {
         }
 
         log.info("start to make file entity");
+        try (S3Object s3Object = amazonS3.getObject(bucketName, fileName)) {
+            System.out.println(s3Object.toString());
+        } catch (Exception e) {
+            System.out.println("Unable to get object from Amazon S3: " + e);
+        }
 
         bdbe.bdbd.file.File newFile = bdbe.bdbd.file.File.builder()
                 .name(fileName)
