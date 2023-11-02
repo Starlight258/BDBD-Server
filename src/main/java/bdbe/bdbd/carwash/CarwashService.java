@@ -1,9 +1,9 @@
 package bdbe.bdbd.carwash;
 
 
-import bdbe.bdbd._core.errors.utils.AwsS3Service;
 import bdbe.bdbd._core.errors.utils.FileUploadUtil;
 import bdbe.bdbd._core.errors.utils.Haversine;
+import bdbe.bdbd._core.errors.utils.S3ProxyUploadService;
 import bdbe.bdbd.bay.BayJPARepository;
 import bdbe.bdbd.carwash.CarwashResponse.updateCarwashDetailsResponseDTO;
 import bdbe.bdbd.file.File;
@@ -51,7 +51,7 @@ public class CarwashService {
     private final FileUploadUtil fileUploadUtil;
     private final FileJPARepository fileJPARepository;
     private final MemberJPARepository memberJPARepository;
-    private final AwsS3Service awsS3Service;
+    private final S3ProxyUploadService s3ProxyUploadService;
 
     public List<CarwashResponse.FindAllDTO> findAll(int page) {
         // Pageable 검증
@@ -107,7 +107,7 @@ public class CarwashService {
         try {
             List<MultipartFile> multipartFileList = Arrays.asList(images);
             log.info("image upload start");
-            List<String> strings = awsS3Service.uploadImage(multipartFileList);
+            List<String> strings = s3ProxyUploadService.uploadFiles(multipartFileList);
             for (String string : strings) {
                 log.info(string);
             }
