@@ -68,6 +68,7 @@ public class ReservationRestController {
     )
     {
         ReservationResponse.findLatestOneResponseDTO dto = reservationService.fetchLatestReservation(userDetails.getMember());
+        System.out.println(dto.toString());
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
 

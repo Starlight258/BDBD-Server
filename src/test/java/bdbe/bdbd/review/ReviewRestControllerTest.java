@@ -98,7 +98,7 @@ public class ReviewRestControllerTest {
 
         ReviewRequest.SaveDTO dto = new ReviewRequest.SaveDTO();
         dto.setCarwashId(carwash.getId());
-        dto.setKeywordList(keywordIds);
+        dto.setKeywordIdList(keywordIds);
         dto.setReservationId(reservation.getId());
         dto.setRate(5);
         dto.setComment("좋네요");

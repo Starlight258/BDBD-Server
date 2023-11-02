@@ -45,11 +45,8 @@ public class ReviewService {
 
         Review savedReview = reviewJPARepository.save(review);
         // 리뷰 키워드 저장
-        List<Long> keywordIdList = dto.getKeywordList();
-        System.out.println("keywordIdList:");
-        for (Long aLong : keywordIdList) {
-            System.out.println(aLong);
-        }
+        List<Long> keywordIdList = dto.getKeywordIdList();
+
         keywordIdList.stream()
                 .map(id -> {
                     Keyword keyword = keywordJPARepository.findById(id)
