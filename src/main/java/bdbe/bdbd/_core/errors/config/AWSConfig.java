@@ -51,11 +51,11 @@ public class AWSConfig {
         log.info("Initializing AmazonS3 client for 'prod' profile.");
 
         ClientConfiguration clientConfiguration = new ClientConfiguration();
-        // 연결 타임아웃 시간을 10초로 설정
-        clientConfiguration.setConnectionTimeout(10000);  // 10,000 ms = 10 s
+        // 연결 타임아웃 시간을 60초로 설정
+        clientConfiguration.setConnectionTimeout(60000);  // 10,000 ms = 10 s
 
-        // 소켓 타임아웃 시간을 10초로 설정
-        clientConfiguration.setSocketTimeout(10000);  // 10,000 ms = 10 s
+        // 소켓 타임아웃 시간을 60초로 설정
+        clientConfiguration.setSocketTimeout(60000);  // 10,000 ms = 10 s
         if (!StringUtils.isEmpty(proxyHost) && proxyPort > 0) {
             log.info("Setting up proxy: Host = {}, Port = {}", proxyHost, proxyPort);
             clientConfiguration.setProxyHost(proxyHost);
