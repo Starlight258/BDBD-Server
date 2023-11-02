@@ -18,20 +18,23 @@ import org.springframework.util.StringUtils;
 @Slf4j
 public class AWSConfig {
 
-    @Value("${cloud.aws.credentials.access-key}")
+    @Value("${cloud.aws.credentials.accessKey}")
     private String accessKey;
 
-    @Value("${cloud.aws.credentials.secret-key}")
+    @Value("${cloud.aws.credentials.secretKey}")
     private String secretKey;
 
     @Value("${cloud.aws.region.static}")
     private String region;
 
-    @Value("${proxy.host:}")
+    @Value("krmp-proxy.9rum.cc")
     private String proxyHost;
 
-    @Value("${proxy.port:0}")
+    @Value("3128")
     private int proxyPort;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
 
 
     @Bean
