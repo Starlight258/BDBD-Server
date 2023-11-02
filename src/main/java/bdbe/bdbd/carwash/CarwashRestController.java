@@ -28,11 +28,13 @@ public class CarwashRestController {
         return ResponseEntity.ok(apiResult);
     }
 
-    @PostMapping(value = "/owner/carwashes/register")
+    @PostMapping(value = "/carwashes/register/{user_id}")
     public ResponseEntity<?> save(@RequestPart("carwash") CarwashRequest.SaveDTO saveDTOs,
                                   @RequestPart("images") MultipartFile[] images,
-                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
-        carwashService.save(saveDTOs, images, userDetails.getMember());
+                                  @PathVariable("user_id") Long userId
+                                  ) {
+//                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
+        carwashService.save(saveDTOs, images, userId);
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
