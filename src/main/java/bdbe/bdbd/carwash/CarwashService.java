@@ -3,7 +3,7 @@ package bdbe.bdbd.carwash;
 
 import bdbe.bdbd._core.errors.utils.FileUploadUtil;
 import bdbe.bdbd._core.errors.utils.Haversine;
-import bdbe.bdbd._core.errors.utils.S3ProxyUploadService;
+import bdbe.bdbd.file.S3ProxyUploadService;
 import bdbe.bdbd.bay.BayJPARepository;
 import bdbe.bdbd.carwash.CarwashResponse.updateCarwashDetailsResponseDTO;
 import bdbe.bdbd.file.File;
@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -103,21 +104,76 @@ public class CarwashService {
         }
         carwashKeywordJPARepository.saveAll(carwashKeywordList);
 
-        // 이미지 업로드
-        try {
-            List<MultipartFile> multipartFileList = Arrays.asList(images);
-            log.info("image upload start");
-            List<String> strings = s3ProxyUploadService.uploadFiles(multipartFileList);
-            for (String string : strings) {
-                log.info(string);
-            }
-//            List<FileResponse.SimpleFileResponseDTO> uploadedFiles = fileUploadUtil.uploadFiles(images, carwash.getId());
-            // Uploaded file metadata can now be accessed through uploadedFiles list.
-        } catch (Exception e) {
-            logger.info("file upload error : "+ e.getMessage());
-        }
+        uploadAndSaveFiles(images, carwash);
+
+//        // 이미지 업로드
+//        try {
+//            List<MultipartFile> multipartFileList = Arrays.asList(images);
+//            log.info("image upload start");
+//            List<String> imageUrls = s3ProxyUploadService.uploadFiles(multipartFileList);
+//
+//            // 파일 저장
+//            List<bdbe.bdbd.file.File> files = new ArrayList<>();
+//            for (String imageUrl : imageUrls) {
+//                bdbe.bdbd.file.File newFile = bdbe.bdbd.file.File.builder()
+//                        .name(imageUrl.substring(imageUrl.lastIndexOf("/") + 1))
+//                        .url(imageUrl)
+//                        .uploadedAt(LocalDateTime.now())
+//                        .carwash(carwash)
+//                        .build();
+//                files.add(newFile);
+//            }
+//            fileJPARepository.saveAll(files);
+//        } catch (Exception e) {
+//            logger.info("file upload error : " + e.getMessage());
+//        }
+
     } //변경감지, 더티체킹, flush, 트랜잭션 종료
 
+    @Transactional
+    public void uploadAndSaveFiles(MultipartFile[] images, Carwash carwash) {
+        try {
+            // 이미지 업로드
+            List<String> imageUrls = uploadFiles(Arrays.asList(images));
+
+            // 파일 정보 저장
+            saveFileEntities(imageUrls, carwash);
+
+        } catch (Exception e) {
+            logger.error("File upload and save failed: " + e.getMessage(), e);
+            throw new RuntimeException("File upload and save failed", e);
+        }
+    }
+
+    private List<String> uploadFiles(List<MultipartFile> files) {
+        try {
+            logger.info("Image upload start");
+            return s3ProxyUploadService.uploadFiles(files);
+        } catch (Exception e) {
+            logger.error("File upload failed: " + e.getMessage(), e);
+            throw new RuntimeException("File upload failed", e);
+        }
+    }
+
+    private void saveFileEntities(List<String> imageUrls, Carwash carwash) {
+        try {
+            List<bdbe.bdbd.file.File> files = new ArrayList<>();
+            for (String imageUrl : imageUrls) {
+                bdbe.bdbd.file.File newFile = bdbe.bdbd.file.File.builder()
+                        .name(imageUrl.substring(imageUrl.lastIndexOf("/") + 1))
+                        .url(imageUrl)
+                        .uploadedAt(LocalDateTime.now())
+                        .carwash(carwash)
+                        .build();
+                files.add(newFile);
+            }
+            fileJPARepository.saveAll(files);
+            logger.info("File entities saved successfully");
+        } catch (Exception e) {
+            logger.error("Saving file entities failed: " + e.getMessage(), e);
+            throw new RuntimeException("Saving file entities failed", e);
+        }
+    }
 
     public List<CarwashRequest.CarwashDistanceDTO> findNearbyCarwashesByUserLocation(CarwashRequest.UserLocationDTO userLocation) {
         List<Carwash> carwashes = carwashJPARepository.findCarwashesWithin10Kilometers(userLocation.getLatitude(), userLocation.getLongitude());
