@@ -6,6 +6,8 @@ import bdbe.bdbd.bay.Bay;
 import bdbe.bdbd.bay.BayJPARepository;
 import bdbe.bdbd.carwash.Carwash;
 import bdbe.bdbd.carwash.CarwashJPARepository;
+import bdbe.bdbd.file.File;
+import bdbe.bdbd.file.FileJPARepository;
 import bdbe.bdbd.keyword.reviewKeyword.ReviewKeywordJPARepository;
 import bdbe.bdbd.location.Location;
 import bdbe.bdbd.location.LocationJPARepository;
@@ -40,6 +42,7 @@ public class ReservationService {
     private final BayJPARepository bayJPARepository;
     private final LocationJPARepository locationJPARepository;
     private final OptimeJPARepository optimeJPARepository;
+    private final FileJPARepository fileJPARepository;
     private final ReviewJPARepository reviewJPARepository;
     private final ReviewKeywordJPARepository reviewKeywordJPARepository;
 
@@ -155,7 +158,8 @@ public class ReservationService {
         // 세차장이 위치한 위치 찾기
         Location location = locationJPARepository.findById(carwash.getLocation().getId())
                 .orElseThrow(() -> new NoSuchElementException("no location found"));
-        return new ReservationResponse.findLatestOneResponseDTO(reservation, bay, carwash, location);
+        List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwash.getId());
+        return new ReservationResponse.findLatestOneResponseDTO(reservation, bay, carwash, location, carwashImages);
     }
 
     public ReservationResponse.fetchCurrentStatusReservationDTO fetchCurrentStatusReservation(Member sessionMember) {
