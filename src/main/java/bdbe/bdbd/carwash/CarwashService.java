@@ -106,28 +106,6 @@ public class CarwashService {
 
         uploadAndSaveFiles(images, carwash);
 
-//        // 이미지 업로드
-//        try {
-//            List<MultipartFile> multipartFileList = Arrays.asList(images);
-//            log.info("image upload start");
-//            List<String> imageUrls = s3ProxyUploadService.uploadFiles(multipartFileList);
-//
-//            // 파일 저장
-//            List<bdbe.bdbd.file.File> files = new ArrayList<>();
-//            for (String imageUrl : imageUrls) {
-//                bdbe.bdbd.file.File newFile = bdbe.bdbd.file.File.builder()
-//                        .name(imageUrl.substring(imageUrl.lastIndexOf("/") + 1))
-//                        .url(imageUrl)
-//                        .uploadedAt(LocalDateTime.now())
-//                        .carwash(carwash)
-//                        .build();
-//                files.add(newFile);
-//            }
-//            fileJPARepository.saveAll(files);
-//        } catch (Exception e) {
-//            logger.info("file upload error : " + e.getMessage());
-//        }
-
     } //변경감지, 더티체킹, flush, 트랜잭션 종료
 
     @Transactional
