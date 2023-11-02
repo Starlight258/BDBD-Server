@@ -47,7 +47,7 @@ public class ReservationService {
     private final ReviewKeywordJPARepository reviewKeywordJPARepository;
 
     @Transactional
-    public void save(ReservationRequest.SaveDTO dto, Long carwashId, Long bayId, Member sessionMember) {
+    public Reservation save(ReservationRequest.SaveDTO dto, Long carwashId, Long bayId, Member sessionMember) {
         Carwash carwash = findCarwashById(carwashId);
         Optime optime = findOptime(carwash, dto.getStartTime());
 
@@ -56,6 +56,7 @@ public class ReservationService {
 
         Reservation reservation = dto.toReservationEntity(carwash, bay, sessionMember);
         reservationJPARepository.save(reservation);
+        return reservation;
     }
 
     @Transactional
