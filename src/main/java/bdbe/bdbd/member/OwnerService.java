@@ -125,10 +125,7 @@ public class OwnerService {
 
             Date today = java.sql.Date.valueOf(LocalDate.now());
             List<Reservation> reservationList = reservationJPARepository.findTodaysReservationsByCarwashId(carwash.getId(), today);
-            for (Reservation reservation : reservationList) {
-                System.out.println("reservation id : " + reservation.getId());
-                System.out.println("start time  : " + reservation.getStartTime());
-            }
+
             List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwash.getId());
             File carwashImage = carwashImages.stream().findFirst().orElse(null);
             OwnerResponse.CarwashManageDTO dto = new OwnerResponse.CarwashManageDTO(carwash, bayList, optimeList, reservationList, carwashImage);
