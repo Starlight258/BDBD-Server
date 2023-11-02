@@ -292,7 +292,7 @@ public class CarwashRestControllerTest {
         Long keywordId = keywordJPARepository.findByType(KeywordType.CARWASH).get(0).getId();
         updateCarwashDetailsDTO.setKeywordId(Arrays.asList(1L));
 
-        MockMultipartFile updatedtoFile = new MockMultipartFile("updatedto", "", "application/json", om.writeValueAsBytes(updateCarwashDetailsDTO));
+        MockMultipartFile updatedtoFile = new MockMultipartFile("updateData", "", "application/json", om.writeValueAsBytes(updateCarwashDetailsDTO));
 
         String requestBody = om.writeValueAsString(updateCarwashDetailsDTO);
         System.out.println("요청 데이터 : " + requestBody);
