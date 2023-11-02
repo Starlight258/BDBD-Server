@@ -127,7 +127,8 @@ public class OwnerService {
             List<Reservation> reservationList = reservationJPARepository.findTodaysReservationsByCarwashId(carwash.getId(), today);
 
             List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwash.getId());
-            OwnerResponse.CarwashManageDTO dto = new OwnerResponse.CarwashManageDTO(carwash, bayList, optimeList, reservationList, carwashImages);
+            File carwashImage = carwashImages.stream().findFirst().orElse(null);
+            OwnerResponse.CarwashManageDTO dto = new OwnerResponse.CarwashManageDTO(carwash, bayList, optimeList, reservationList, carwashImage);
             response.addCarwashManageDTO(dto);
         }
 
@@ -146,7 +147,8 @@ public class OwnerService {
         List<Reservation> reservationList = reservationJPARepository.findTodaysReservationsByCarwashId(carwash.getId(), today);
 
         List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwash.getId());
-        OwnerResponse.CarwashManageDTO dto = new OwnerResponse.CarwashManageDTO(carwash, bayList, optimeList, reservationList, carwashImages);
+        File carwashImage = carwashImages.stream().findFirst().orElse(null);
+        OwnerResponse.CarwashManageDTO dto = new OwnerResponse.CarwashManageDTO(carwash, bayList, optimeList, reservationList, carwashImage);
 
         return dto;
     }

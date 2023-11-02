@@ -182,6 +182,10 @@ public class ReservationService {
             Carwash carwash = carwashJPARepository.findById(bay.getCarwash().getId())
                     .orElseThrow(() -> new EntityNotFoundException("Carwash not found"));
 
+            List<File> fileList = carwash.getFileList();
+            if (!fileList.isEmpty()) {
+                File file = fileList.get(0);
+            }
             LocalDateTime startDateTime = reservation.getStartTime();
             LocalDate reservationDate = startDateTime.toLocalDate();
             LocalDateTime endDateTime = reservation.getEndTime();
@@ -212,8 +216,19 @@ public class ReservationService {
                 .stream()
                 .filter(r -> !r.isDeleted())
                 .collect(Collectors.toList());
+        List<ReservationResponse.RecentReservation> recentReservations = new ArrayList<>();
+        for (Reservation reservation : reservationList) {
+            Bay bay = bayJPARepository.findById(reservation.getBay().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Bay not found"));
+            Carwash carwash = carwashJPARepository.findById(bay.getCarwash().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Carwash not found"));
+            List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwash.getId());
+            File carwashImage = carwashImages.stream().findFirst().orElse(null);
 
-        return new ReservationResponse.fetchRecentReservationDTO(reservationList);
+            recentReservations.add(new ReservationResponse.RecentReservation(reservation, carwashImage));
+        }
+
+        return new ReservationResponse.fetchRecentReservationDTO(recentReservations);
     }
 
 }
