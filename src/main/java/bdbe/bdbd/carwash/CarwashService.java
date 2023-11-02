@@ -104,7 +104,11 @@ public class CarwashService {
         }
         carwashKeywordJPARepository.saveAll(carwashKeywordList);
 
-        uploadAndSaveFiles(images, carwash);
+        if (images != null && images.length > 0) {
+            uploadAndSaveFiles(images, carwash);
+        }
+
+//        uploadAndSaveFiles(images, carwash);
 
     } //변경감지, 더티체킹, flush, 트랜잭션 종료
 
@@ -334,12 +338,7 @@ public class CarwashService {
             response.updateKeywordPart(updateKeywordIds);
 
             if (images != null && images.length > 0) {
-                try {
-                    List<FileResponse.SimpleFileResponseDTO> uploadedFiles = fileUploadUtil.uploadFiles(images, carwash.getId());
-                } catch (Exception e) {
-                    logger.error("Error uploading files: ", e);
-                    throw new FileUploadException("Could not upload files", e);
-                }
+                uploadAndSaveFiles(images, carwash);
             }
             return response;
         }

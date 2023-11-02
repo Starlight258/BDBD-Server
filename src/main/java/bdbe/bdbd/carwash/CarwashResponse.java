@@ -3,6 +3,7 @@ package bdbe.bdbd.carwash;
 import bdbe.bdbd.location.Location;
 import bdbe.bdbd.optime.Optime;
 import bdbe.bdbd.file.File;
+import bdbe.bdbd.reservation.ReservationResponse;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -219,12 +220,15 @@ public class CarwashResponse {
         private CarwashResponse.updateOperatingTimeDTO optime;
         private List<Long> keywordId;
         private String description;
-        //        private List<String> images; -> 서비스에서 직접 처리
+        private List<ReservationResponse.ImageDTO> images;
         public void updateCarwashPart(Carwash carwash) {
             this.id = carwash.getId();
             this.name = carwash.getName();
             this.price = carwash.getPrice();
             this.tel = carwash.getTel();
+            this.images = carwash.getFileList().stream()
+                    .map(ReservationResponse.ImageDTO::new)
+                    .collect(Collectors.toList());
         }
 
         public void updateOptimePart(Optime weekdayOptime, Optime weekendOptime) {
