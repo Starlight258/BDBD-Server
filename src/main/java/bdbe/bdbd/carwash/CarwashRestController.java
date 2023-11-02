@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -62,12 +63,13 @@ public class CarwashRestController {
         CarwashRequest.UserLocationDTO userLocation = new CarwashRequest.UserLocationDTO();
         userLocation.setLatitude(latitude);
         userLocation.setLongitude(longitude);
+        List<CarwashRequest.CarwashDistanceDTO> carwashList = new ArrayList<>();
         CarwashRequest.CarwashDistanceDTO carwash = carwashService.findNearestCarwashByUserLocation(userLocation);
         if (carwash != null) {
-            return ResponseEntity.ok(ApiUtils.success(carwash));
-        } else {
-            return ResponseEntity.ok(ApiUtils.success(null));
+            carwashList.add(carwash);
         }
+
+        return ResponseEntity.ok(ApiUtils.success(carwashList));
     }
 
     @GetMapping("/carwashes/{carwash_id}/info")
