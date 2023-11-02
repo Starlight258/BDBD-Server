@@ -37,10 +37,10 @@ public class MemberRestControllerTest {
         mockUserDTO.setUsername("mockuser");
         mockUserDTO.setEmail("mock@naver.com");
         mockUserDTO.setPassword("asdf1234!");
-        mockUserDTO.setRole(MemberRole.ROLE_USER);
+//        mockUserDTO.setRole(MemberRole.ROLE_USER);
         mockUserDTO.setTel("010-1234-5678");
 
-        Member mockMember = mockUserDTO.toEntity(passwordEncoder.encode(mockUserDTO.getPassword()));
+        Member mockMember = mockUserDTO.toUserEntity(passwordEncoder.encode(mockUserDTO.getPassword()));
 
         memberJPARepository.save(mockMember);
     }
@@ -73,7 +73,7 @@ public class MemberRestControllerTest {
         requestDTO.setUsername("imnewuser");
         requestDTO.setEmail("newuser@naver.com");
         requestDTO.setPassword("asdf1234!");
-        requestDTO.setRole(MemberRole.ROLE_USER);
+//        requestDTO.setRole(MemberRole.ROLE_USER);
 //        requestDTO.setCredit(0);
         requestDTO.setTel("010-1234-5678");
 
@@ -119,7 +119,7 @@ public class MemberRestControllerTest {
         requestDTO.setUsername("imnewuser");
         requestDTO.setEmail(email);
         requestDTO.setPassword("asdf1234!");
-        requestDTO.setRole(MemberRole.ROLE_USER);
+//        requestDTO.setRole(MemberRole.ROLE_USER);
 //        requestDTO.setCredit(0);
         requestDTO.setTel("010-1234-5678");
 
@@ -145,7 +145,7 @@ public class MemberRestControllerTest {
         requestDTO.setUsername("imnewuser");
         requestDTO.setEmail(email);
         requestDTO.setPassword("asdf1234!");
-        requestDTO.setRole(MemberRole.ROLE_USER);
+//        requestDTO.setRole(MemberRole.ROLE_USER);
 //        requestDTO.setCredit(0);
         requestDTO.setTel("010-1234-5678");
 
@@ -171,7 +171,7 @@ public class MemberRestControllerTest {
         requestDTO.setUsername("imnewuser");
         requestDTO.setEmail(email);
         requestDTO.setPassword("asdf1234");
-        requestDTO.setRole(MemberRole.ROLE_USER);
+//        requestDTO.setRole(MemberRole.ROLE_USER);
 //        requestDTO.setCredit(0);
         requestDTO.setTel("010-1234-5678");
 

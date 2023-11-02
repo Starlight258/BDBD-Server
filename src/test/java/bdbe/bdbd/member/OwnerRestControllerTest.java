@@ -51,10 +51,10 @@ public class OwnerRestControllerTest {
         mockOwnerDTO.setUsername("aaamockowner");
         mockOwnerDTO.setEmail("aaamockowner@naver.com");
         mockOwnerDTO.setPassword("asdf1234!");
-        mockOwnerDTO.setRole(MemberRole.ROLE_OWNER);
+//        mockOwnerDTO.setRole(MemberRole.ROLE_OWNER);
         mockOwnerDTO.setTel("010-1234-5678");
 
-        Member mockOwner = mockOwnerDTO.toEntity(passwordEncoder.encode(mockOwnerDTO.getPassword()));
+        Member mockOwner = mockOwnerDTO.toOwnerEntity(passwordEncoder.encode(mockOwnerDTO.getPassword()));
 
         memberJPARepository.save(mockOwner);
 
@@ -62,10 +62,10 @@ public class OwnerRestControllerTest {
         mockUserDTO.setUsername("aaauserRoleUser");
         mockUserDTO.setEmail("aaauserRoleUser@naver.com");
         mockUserDTO.setPassword("aaaa1111!");
-        mockUserDTO.setRole(MemberRole.ROLE_USER);
+//        mockUserDTO.setRole(MemberRole.ROLE_USER);
         mockUserDTO.setTel("010-1234-5678");
 
-        Member mockUserWithMemberRole = mockUserDTO.toEntity(passwordEncoder.encode(mockUserDTO.getPassword()));
+        Member mockUserWithMemberRole = mockUserDTO.toUserEntity(passwordEncoder.encode(mockUserDTO.getPassword()));
 
         memberJPARepository.save(mockUserWithMemberRole);
     }
@@ -95,7 +95,7 @@ public class OwnerRestControllerTest {
         requestDTO.setUsername("aaamockowner");
         requestDTO.setEmail("aaamockowner@nate.com");
         requestDTO.setPassword("asdf1234!");
-        requestDTO.setRole(MemberRole.ROLE_OWNER);
+//        requestDTO.setRole(MemberRole.ROLE_OWNER);
         requestDTO.setTel("010-1234-5678");
 
 
