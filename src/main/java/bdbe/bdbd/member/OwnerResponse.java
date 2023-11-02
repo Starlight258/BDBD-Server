@@ -23,13 +23,13 @@ public class OwnerResponse {
     @ToString
     public static class SaleResponseDTO {
         private List<CarwashListDTO> carwashList;  // 세차장 목록
-        private List<ReservationCarwashDTO> response; // 매출 정보
+        private List<ReservationCarwashDTO> reservationList; // 매출 정보
 
         public SaleResponseDTO(List<Carwash> carwashList, List<Reservation> reservationList) {
             this.carwashList = carwashList.stream()
                     .map(CarwashListDTO::new)
                     .collect(Collectors.toList());
-            this.response = reservationList.stream()
+            this.reservationList = reservationList.stream()
                     .map(ReservationCarwashDTO::new)
                     .collect(Collectors.toList());
         }

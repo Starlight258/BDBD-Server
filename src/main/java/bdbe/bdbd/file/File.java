@@ -22,7 +22,7 @@ public class File {
 
     @ManyToOne
     @JoinColumn(name = "c_id")
-    private Carwash carwash; //
+    private Carwash carwash;
 
 
     protected File() {

@@ -30,7 +30,7 @@ public class MemberRestController {
     //(기능4) 회원가입
     @PostMapping("/join")
     public ResponseEntity<?> joinUser(@RequestBody @Valid MemberRequest.JoinDTO requestDTO, Errors errors) {
-        requestDTO.setRole(MemberRole.ROLE_USER);
+//        requestDTO.setRole(MemberRole.ROLE_USER);
         memberService.join(requestDTO);
         return ResponseEntity.ok().body(ApiUtils.success(null));
     }
@@ -61,7 +61,7 @@ public class MemberRestController {
             throw new BadRequestError(errorMessage);
         }
         MemberResponse.LoginResponse response = memberService.login(requestDTO);
-        return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(response));
+        return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(null));
     }
 
 
