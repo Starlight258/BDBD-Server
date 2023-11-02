@@ -28,11 +28,9 @@ public class CarwashRestController {
         return ResponseEntity.ok(apiResult);
     }
 
-    @PostMapping(value = "/carwashes/register/{user_id}")
+    @PostMapping(value = "/owner/carwashes/register")
     public ResponseEntity<?> save(@RequestPart("carwash") CarwashRequest.SaveDTO saveDTOs,
                                   @RequestPart("images") MultipartFile[] images,
-//                                  @PathVariable("user_id") Long userId
-//                                  ) {
                                   @AuthenticationPrincipal CustomUserDetails userDetails) {
         carwashService.save(saveDTOs, images, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(null));

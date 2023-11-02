@@ -1,4 +1,4 @@
-package bdbe.bdbd._core.errors.utils;
+package bdbe.bdbd.file;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -30,7 +30,6 @@ public class S3ProxyUploadService {
             @Value("3128") int proxyPort,
             @Value("${cloud.aws.s3.bucket}") String bucketName) {
 
-        System.out.println("accessKey:" + accessKey);
         log.info("accessKey:" + accessKey);
         BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKey, secretKey);
         AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard()
@@ -54,18 +53,19 @@ public class S3ProxyUploadService {
         try {
             String keyName = "uploads/" + file.getOriginalFilename();
             s3Client.putObject(bucketName, keyName, file.getInputStream(), null);
-            return "File uploaded successfully!";
+            return s3Client.getUrl(bucketName, keyName).toExternalForm();
         } catch (IOException e) {
             e.printStackTrace();
-            return "File upload failed!";
+            return null;
         }
     }
+
 
     public List<String> uploadFiles(List<MultipartFile> files) {
         List<String> uploadResults = new ArrayList<>();
         for (MultipartFile file : files) {
             String result = uploadFile(file);
-            uploadResults.add(result + " - " + file.getOriginalFilename());
+            uploadResults.add(result);
         }
         return uploadResults;
     }
