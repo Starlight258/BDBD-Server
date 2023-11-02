@@ -1,6 +1,7 @@
 package bdbe.bdbd.carwash;
 
 
+import bdbe.bdbd._core.errors.utils.AwsS3Service;
 import bdbe.bdbd._core.errors.utils.FileUploadUtil;
 import bdbe.bdbd._core.errors.utils.Haversine;
 import bdbe.bdbd.bay.BayJPARepository;
@@ -50,6 +51,7 @@ public class CarwashService {
     private final FileUploadUtil fileUploadUtil;
     private final FileJPARepository fileJPARepository;
     private final MemberJPARepository memberJPARepository;
+    private final AwsS3Service awsS3Service;
 
     public List<CarwashResponse.FindAllDTO> findAll(int page) {
         // Pageable 검증
@@ -78,10 +80,8 @@ public class CarwashService {
     }
 
     @Transactional
-    public void save(CarwashRequest.SaveDTO saveDTO, MultipartFile[] images, Long userId) {
+    public void save(CarwashRequest.SaveDTO saveDTO, MultipartFile[] images, Member sessionMember) {
         // 별점은 리뷰에서 계산해서 넣어주기
-        Member sessionMember = memberJPARepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("user is not found"));
         // 지역
         Location location = saveDTO.toLocationEntity();
         locationJPARepository.save(location);
@@ -105,8 +105,13 @@ public class CarwashService {
 
         // 이미지 업로드
         try {
+            List<MultipartFile> multipartFileList = Arrays.asList(images);
             log.info("image upload start");
-            List<FileResponse.SimpleFileResponseDTO> uploadedFiles = fileUploadUtil.uploadFiles(images, carwash.getId());
+            List<String> strings = awsS3Service.uploadImage(multipartFileList);
+            for (String string : strings) {
+                log.info(string);
+            }
+//            List<FileResponse.SimpleFileResponseDTO> uploadedFiles = fileUploadUtil.uploadFiles(images, carwash.getId());
             // Uploaded file metadata can now be accessed through uploadedFiles list.
         } catch (Exception e) {
             logger.info("file upload error : "+ e.getMessage());
