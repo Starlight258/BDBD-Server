@@ -44,7 +44,7 @@ public class OwnerService {
         String encodedPassword = passwordEncoder.encode(requestDTO.getPassword());
 
         try {
-            memberJPARepository.save(requestDTO.toEntity(encodedPassword));
+            memberJPARepository.save(requestDTO.toOwnerEntity(encodedPassword));
         } catch (Exception e) {
             throw new InternalServerError("unknown server error");
         }

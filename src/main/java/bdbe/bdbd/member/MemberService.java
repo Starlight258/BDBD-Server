@@ -26,7 +26,7 @@ public class MemberService {
         String encodedPassword = passwordEncoder.encode(requestDTO.getPassword());
 
         try {
-            memberJPARepository.save(requestDTO.toEntity(encodedPassword));
+            memberJPARepository.save(requestDTO.toUserEntity(encodedPassword));
         } catch (Exception e) {
             throw new InternalServerError("unknown server error");
         }

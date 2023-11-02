@@ -32,9 +32,9 @@ public class MemberRequest {
 //        @NotNull
 //        private Long locationId;
 
-        @Enumerated(EnumType.STRING)
-        @NotNull
-        private MemberRole role;
+//        @Enumerated(EnumType.STRING)
+//        @NotNull
+//        private MemberRole role;
 
 //        //notNUll 설정 불가 by int
 //        private int credit = 0;
@@ -54,12 +54,22 @@ public class MemberRequest {
 //                    .role(String.valueOf(UserRole.ROLE_USER))
 //                    .build();
 //        }
-        public Member toEntity(String encodedPassword) {
+        public Member toUserEntity(String encodedPassword) {
             return Member.builder()
                     .email(email)
                     .password(encodedPassword)
                     .username(username)
-                    .role(role)
+                    .role(MemberRole.ROLE_USER)
+                    .tel(tel)
+                    .build();
+        }
+
+        public Member toOwnerEntity(String encodedPassword) {
+            return Member.builder()
+                    .email(email)
+                    .password(encodedPassword)
+                    .username(username)
+                    .role(MemberRole.ROLE_OWNER)
                     .tel(tel)
                     .build();
         }
