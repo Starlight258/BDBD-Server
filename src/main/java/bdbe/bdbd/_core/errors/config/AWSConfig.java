@@ -5,6 +5,7 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +48,7 @@ public class AWSConfig {
 
     @Bean
     @Profile("prod")
-    public AmazonS3 amazonS3ClientProd() {
+    public AmazonS3Client amazonS3ClientProd() {
         log.info("Initializing AmazonS3 client for 'prod' profile.");
 
         ClientConfiguration clientConfiguration = new ClientConfiguration();
@@ -64,11 +65,11 @@ public class AWSConfig {
             log.warn("Proxy settings are empty or incorrect. Proxy will not be used.");
         }
 
-        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         log.info("AWS Credentials: AccessKey = {}, SecretKey is {} characters long.",
                 accessKey, secretKey.length());
 
-        AmazonS3 amazonS3Client = AmazonS3ClientBuilder
+        AmazonS3Client amazonS3Client = (AmazonS3Client) AmazonS3ClientBuilder
                 .standard()
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
                 .withClientConfiguration(clientConfiguration)
