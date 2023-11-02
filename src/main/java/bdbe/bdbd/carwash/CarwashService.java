@@ -14,6 +14,7 @@ import bdbe.bdbd.keyword.carwashKeyword.CarwashKeyword;
 import bdbe.bdbd.keyword.carwashKeyword.CarwashKeywordJPARepository;
 import bdbe.bdbd.location.Location;
 import bdbe.bdbd.location.LocationJPARepository;
+import bdbe.bdbd.member.MemberJPARepository;
 import bdbe.bdbd.optime.DayType;
 import bdbe.bdbd.optime.Optime;
 import bdbe.bdbd.optime.OptimeJPARepository;
@@ -48,6 +49,7 @@ public class CarwashService {
     private final BayJPARepository bayJPARepository;
     private final FileUploadUtil fileUploadUtil;
     private final FileJPARepository fileJPARepository;
+    private final MemberJPARepository memberJPARepository;
 
     public List<CarwashResponse.FindAllDTO> findAll(int page) {
         // Pageable 검증
@@ -76,8 +78,10 @@ public class CarwashService {
     }
 
     @Transactional
-    public void save(CarwashRequest.SaveDTO saveDTO, MultipartFile[] images, Member sessionMember) {
+    public void save(CarwashRequest.SaveDTO saveDTO, MultipartFile[] images, Long userId) {
         // 별점은 리뷰에서 계산해서 넣어주기
+        Member sessionMember = memberJPARepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("user is not found"));
         // 지역
         Location location = saveDTO.toLocationEntity();
         locationJPARepository.save(location);
