@@ -57,6 +57,9 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
             log.error("토큰 검증 실패", sve);
         } catch (TokenExpiredException tee) {
             log.error("토큰 만료됨", tee);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Failed to get an access token\n" +
+                    "JWT has expired");
         }
         catch (Exception e) {
                 log.error("예상치 못한 오류가 발생했습니다", e);

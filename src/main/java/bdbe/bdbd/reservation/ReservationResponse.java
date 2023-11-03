@@ -14,6 +14,7 @@ import javax.persistence.Column;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -67,15 +68,15 @@ public class ReservationResponse {
     public static class findLatestOneResponseDTO {
         private ReservationDTO reservation;
         private CarwashDTO carwash;
-        public findLatestOneResponseDTO(Reservation reservation, Bay bay, Carwash carwash, Location location, List<File> carwashImages) {
+        public findLatestOneResponseDTO(Reservation reservation, Bay bay, Carwash carwash, Location location, File carwashImage) {
             ReservationDTO reservationDTO = new ReservationDTO();
-
             TimeDTO timeDTO = new TimeDTO();
             timeDTO.start = reservation.getStartTime();
             timeDTO.end = reservation.getEndTime();
             reservationDTO.time = timeDTO;
             reservationDTO.price = reservation.getPrice();
             reservationDTO.bayNo = bay.getBayNum();
+            reservationDTO.reservationId = reservation.getId();
             this.reservation = reservationDTO;
 
             CarwashDTO carwashDTO = new CarwashDTO();
@@ -84,9 +85,7 @@ public class ReservationResponse {
             locationDTO.latitude = location.getLatitude();
             locationDTO.longitude = location.getLongitude();
             carwashDTO.location = locationDTO;
-            carwashDTO.carwashImages = carwashImages.stream()
-                    .map(ImageDTO::new)
-                    .collect(Collectors.toList());
+            carwashDTO.carwashImages = (carwashImage != null) ? Collections.singletonList(new ImageDTO(carwashImage)) : Collections.emptyList();
             this.carwash = carwashDTO;
         }
     }
@@ -94,6 +93,7 @@ public class ReservationResponse {
     @Setter
     @ToString
     public static class ReservationDTO {
+        private Long reservationId;
         private TimeDTO time;
         private int price;
         private int bayNo; // 예약된 베이 번호
