@@ -45,6 +45,9 @@ public class PayService {
     private ReservationService reservationService;
 
     @Autowired
+    private RestTemplate restTemplate;
+
+    @Autowired
     private CarwashJPARepository carwashJpaRepository;
 
     public ResponseEntity<String> requestPaymentReady(PayRequest.PayReadyRequestDTO requestDto, ReservationRequest.SaveDTO saveDTO, Long carwashId) {
@@ -68,7 +71,7 @@ public class PayService {
         dto.setTotal_amount(totalAmount);
 //        dto.setVat_amount(vatAmount);
 
-        RestTemplate restTemplate = new RestTemplate();
+//        RestTemplate restTemplate = new RestTemplate();
 
 
         HttpHeaders headers = new HttpHeaders();
@@ -100,6 +103,7 @@ public class PayService {
 
         return restTemplate.postForEntity(url, request, String.class);
     }
+
     @Transactional
     public ResponseEntity<ReservationResponse.findLatestOneResponseDTO> requestPaymentApproval(
             PayRequest.PayApprovalRequestDTO requestDto,
@@ -108,7 +112,7 @@ public class PayService {
             Member member,  // 변수 이름 변경
             ReservationRequest.SaveDTO saveDTO) {
 
-        RestTemplate restTemplate = new RestTemplate();
+//        RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
