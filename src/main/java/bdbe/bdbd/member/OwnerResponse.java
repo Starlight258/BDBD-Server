@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,10 +102,12 @@ public class OwnerResponse {
         private Long id;
         private String name;
         private String url;
+        private LocalDateTime uploadedAt;
         public FileDTO(File file) {
             this.id = file.getId();
             this.name = file.getName();
             this.url = file.getUrl();
+            this.uploadedAt = file.getUploadedAt();
         }
     }
 
@@ -128,9 +131,9 @@ public class OwnerResponse {
         private String name;
         private OperationTimeDTO optime;
         private List<BayReservationDTO> bays = new ArrayList<>();
-        private List<FileDTO> imageFiles;
+        private FileDTO image;
 
-        public CarwashManageDTO(Carwash carwash, List<Bay> bayList, List<Optime> optimeList, List<Reservation> reservationList, List<File> files) {
+        public CarwashManageDTO(Carwash carwash, List<Bay> bayList, List<Optime> optimeList, List<Reservation> reservationList, File file) {
             this.id = carwash.getId();
             this.name = carwash.getName();
             this.optime = new OperationTimeDTO(optimeList);
@@ -138,8 +141,9 @@ public class OwnerResponse {
                 BayReservationDTO bayReservationDTO = new BayReservationDTO(bay, reservationList);
                 this.bays.add(bayReservationDTO);
             }
-            this.imageFiles = files.stream().map(FileDTO::new).collect(Collectors.toList());
+            this.image = (file != null) ? new FileDTO(file) : null;
         }
+
     }
 
     @Getter

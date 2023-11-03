@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface FileJPARepository extends JpaRepository<File, Long> {
     List<File> findByCarwash_Id(Long carwashId);
 
+    Optional<File> findFirstByCarwashIdOrderByUploadedAtAsc(Long carwashId);
+
 }

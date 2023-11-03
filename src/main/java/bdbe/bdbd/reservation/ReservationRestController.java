@@ -61,16 +61,16 @@ public class ReservationRestController {
 
     }
 
-    // 결제 후 예약 내역 조회
-    @GetMapping("/reservations")
-    public ResponseEntity<?> fetchLatestReservation(
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    )
-    {
-        ReservationResponse.findLatestOneResponseDTO dto = reservationService.fetchLatestReservation(userDetails.getMember());
-        System.out.println(dto.toString());
-        return ResponseEntity.ok(ApiUtils.success(dto));
-    }
+//    // 결제 후 예약 내역 조회
+//    @GetMapping("/reservations")
+//    public ResponseEntity<?> fetchLatestReservation(
+//            @AuthenticationPrincipal CustomUserDetails userDetails
+//    )
+//    {
+//        ReservationResponse.findLatestOneResponseDTO dto = reservationService.fetchLatestReservation();
+//        System.out.println(dto.toString());
+//        return ResponseEntity.ok(ApiUtils.success(dto));
+//    }
 
     // 현재 시간 기준 예약 내역 조회
     @GetMapping("/reservations/current-status")
