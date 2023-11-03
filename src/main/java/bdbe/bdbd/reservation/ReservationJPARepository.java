@@ -20,6 +20,12 @@ public interface ReservationJPARepository extends JpaRepository<Reservation, Lon
 
     Optional<Reservation> findTopByMemberIdOrderByIdDesc(Long memberId); // 해당 member의 가장 최근 예약 id(가장 큰 예약 id) 하나 찾기
 
+    @Query("select r from Reservation r " +
+            "join fetch r.member m " +
+            "join fetch r.bay b " +
+            "where b.id = :bayId")
+    List<Reservation> findByBay_IdWithJoins(@Param("bayId") Long bayId);
+
     List<Reservation> findByBay_Id(Long bayId); // 베이의 예약 목록 찾기
 
     List<Reservation> findByMemberId(Long memberId); // member의 예약 목록 찾기

@@ -91,18 +91,12 @@ public class OwnerService {
         return new OwnerResponse.SaleResponseDTO(carwashList, reservationList);
     }
 
-//    public OwnerResponse.SaleResponseDTO findBayReservation(Long bayId, Member sessionMember) {
-//        validateBayOwnership(bayId, sessionMember);
-//
-//
-////        List<Carwash> carwashList = carwashJPARepository.findCarwashesByMemberId(sessionMember.getId()); // 유저가 가진 모든 세차장 (dto에서 사용)
-//
-////        List<Reservation> reservationList = reservationJPARepository.findAllByCarwash_IdInOrderByStartTimeDesc(carwashIds, selectedDate);
-////        if (reservationList.isEmpty()) return new OwnerResponse.SaleResponseDTO(carwashList, new ArrayList<>());
-//
-//        List<Reservation> reservationList = reservationJPARepository.findByBay_Id(bayId);
-//        return new OwnerResponse.SaleResponseDTO(carwashList, reservationList);
-//    }
+    public OwnerResponse.ReservationListDTO findBayReservation(Long bayId, Member sessionMember) {
+        validateBayOwnership(bayId, sessionMember);
+
+        List<Reservation> reservationList = reservationJPARepository.findByBay_IdWithJoins(bayId);
+        return new OwnerResponse.ReservationListDTO(reservationList);
+    }
 
     /*
      owner가 해당 세차장의 주인인지 확인
@@ -119,7 +113,9 @@ public class OwnerService {
         Bay bay = bayJPARepository.findById(bayId)
                 .orElseThrow(() -> new IllegalArgumentException("Bay with id " + bayId + " not found"));
         Long carwashId = bay.getCarwash().getId();
-        if (carwashId != sessionMember.getId()) {
+        Carwash carwash = carwashJPARepository.findById(carwashId)
+                .orElseThrow(() -> new IllegalArgumentException("carwash with id" + carwashId + " not found"));
+        if (carwash.getMember().getId() != sessionMember.getId()) {
             throw new IllegalArgumentException("User is not the owner of the carwash. ");
         }
     }

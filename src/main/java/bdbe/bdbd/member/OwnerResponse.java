@@ -65,6 +65,19 @@ public class OwnerResponse {
     @Getter
     @Setter
     @ToString
+    public static class ReservationListDTO {
+        List<ReservationDTO> reservationDTOList;
+
+        public ReservationListDTO(List<Reservation> reservationList) {
+            this.reservationDTOList = reservationList.stream()
+                    .map(ReservationDTO::new)
+                    .collect(Collectors.toList());
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString
     public static class ReservationDTO {
         private Long reservationId;
         private int bayNo;
@@ -247,24 +260,5 @@ public class OwnerResponse {
         }
     }
 
-//    @Getter
-//    @Setter
-//    @ToString
-//    public static class ReservationDTO {
-//        private Long reservationId;
-////        private int bayNo;
-//        private String nickname;
-//        private int totalPrice;
-//        private String startTime;
-//        private String endTime;
-//
-//        public ReservationDTO(Reservation reservation) {
-//            this.reservationId = reservation.getId();
-////            this.bayNo = reservation.getBay().getBayNum();
-//            this.nickname = reservation.getMember().getUsername();
-//            this.totalPrice = reservation.getPrice();
-//            this.startTime = DateUtils.formatDateTime(reservation.getStartTime());
-//            this.endTime = DateUtils.formatDateTime(reservation.getEndTime());
-//        }
-//    }
+
 }

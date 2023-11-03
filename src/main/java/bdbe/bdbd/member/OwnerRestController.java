@@ -99,14 +99,16 @@ public class OwnerRestController {
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
 
-//    @GetMapping("/api/owner/reservation/{bay_id}")
-//    public ResponseEntity<?> fetchOwnerReservation(
-//            @PathVariable("bay_id") Long bayId
-//    )
-//    {
+    @GetMapping("/reservation/{bay_id}")
+    public ResponseEntity<?> fetchOwnerReservation(
+            @PathVariable("bay_id") Long bayId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    )
+    {
 //        OwnerResponse.OwnerDashboardDTO dto = ownerService.fetchOwnerHomepage(userDetails.getMember());
-//        return ResponseEntity.ok(ApiUtils.success(dto));
-//    }
+        OwnerResponse.ReservationListDTO dto = ownerService.findBayReservation(bayId, userDetails.getMember());
+        return ResponseEntity.ok(ApiUtils.success(dto));
+    }
 
 }
 
