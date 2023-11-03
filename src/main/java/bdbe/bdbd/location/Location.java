@@ -1,5 +1,6 @@
 package bdbe.bdbd.location;
 
+import bdbe.bdbd._core.errors.exception.BadRequestError;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,6 +33,8 @@ public class Location { //지역
 
     @Builder
     public Location(Long id, String place, String address, double latitude, double longitude) {
+        validateLatitudeAndLongitude(latitude, longitude);
+
         this.id = id;
         this.place = place;
         this.address = address;
@@ -39,7 +42,20 @@ public class Location { //지역
         this.longitude = longitude;
     }
 
+    private void validateLatitudeAndLongitude(double latitude, double longitude) {
+        if (latitude < -90 || latitude > 90) {
+            throw new BadRequestError("Invalid latitude value. Latitude must be between -90 and 90.");
+        }
+        if (longitude < -180 || longitude > 180) {
+            throw new BadRequestError("Invalid longitude value. Longitude must be between -180 and 180.");
+        }
+    }
+
+
+
     public void updateAddress(String address, String place, double latitude, double longitude) {
+        validateLatitudeAndLongitude(latitude, longitude);
+
         this.place = place;
         this.address = address;
         this.latitude = latitude;

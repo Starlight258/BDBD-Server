@@ -51,6 +51,7 @@ public class CarwashRequest {
         }
 
         public Location toLocationEntity() {
+
             return Location.builder()
                     .place(location.placeName)
                     .address(location.address)
@@ -167,8 +168,6 @@ public class CarwashRequest {
         private updateOperatingTimeDTO optime;
         private List<Long> keywordId;
         private String description;
-
-//        private List<String> images;
 
     }
     @Getter
