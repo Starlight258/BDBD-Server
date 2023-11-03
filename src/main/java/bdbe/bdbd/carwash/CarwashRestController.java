@@ -108,7 +108,7 @@ public class CarwashRestController {
     public ResponseEntity<?> updateCarwashDetails(
             @PathVariable("carwash_id") Long carwashId,
             @RequestPart("updateData") CarwashRequest.updateCarwashDetailsDTO updatedto,
-            @RequestPart(value = "images", required = false) MultipartFile[] images) {
+            @RequestPart(value = "images", required = true) MultipartFile[] images) {
         CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO = carwashService.updateCarwashDetails(carwashId, updatedto, images);
         return ResponseEntity.ok(ApiUtils.success(updateCarwashDetailsDTO));
     }
