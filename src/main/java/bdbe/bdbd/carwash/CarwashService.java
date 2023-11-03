@@ -108,8 +108,6 @@ public class CarwashService {
             uploadAndSaveFiles(images, carwash);
         }
 
-//        uploadAndSaveFiles(images, carwash);
-
     } //변경감지, 더티체킹, flush, 트랜잭션 종료
 
     @Transactional
@@ -266,86 +264,80 @@ public class CarwashService {
 
     @Transactional
     public CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetails(Long carwashId, CarwashRequest.updateCarwashDetailsDTO updatedto, MultipartFile[] images) {
-        try {
-            updateCarwashDetailsResponseDTO response = new updateCarwashDetailsResponseDTO();
-            Carwash carwash = carwashJPARepository.findById(carwashId)
-                    .orElseThrow(() -> new IllegalArgumentException("not found carwash"));
+        updateCarwashDetailsResponseDTO response = new updateCarwashDetailsResponseDTO();
+        Carwash carwash = carwashJPARepository.findById(carwashId)
+                .orElseThrow(() -> new IllegalArgumentException("not found carwash"));
 
-            carwash.setName(updatedto.getName());
-            carwash.setTel(updatedto.getTel());
-            carwash.setDes(updatedto.getDescription());
-            carwash.setPrice(updatedto.getPrice());
-            response.updateCarwashPart(carwash);
+        carwash.setName(updatedto.getName());
+        carwash.setTel(updatedto.getTel());
+        carwash.setDes(updatedto.getDescription());
+        carwash.setPrice(updatedto.getPrice());
+        response.updateCarwashPart(carwash);
 
-            CarwashRequest.updateLocationDTO updateLocationDTO = updatedto.getLocationDTO();
-            Location location = locationJPARepository.findById(carwash.getLocation().getId())
-                    .orElseThrow(() -> new NoSuchElementException("location not found"));
+        CarwashRequest.updateLocationDTO updateLocationDTO = updatedto.getLocationDTO();
+        Location location = locationJPARepository.findById(carwash.getLocation().getId())
+                .orElseThrow(() -> new NoSuchElementException("location not found"));
 
 
-            location.updateAddress(updateLocationDTO.getAddress(), updateLocationDTO.getPlaceName()
-                    , updateLocationDTO.getLatitude(), updateLocationDTO.getLongitude());
-            response.updateLocationPart(location);
+        location.updateAddress(updateLocationDTO.getAddress(), updateLocationDTO.getPlaceName()
+                , updateLocationDTO.getLatitude(), updateLocationDTO.getLongitude());
+        response.updateLocationPart(location);
 
-            CarwashRequest.updateOperatingTimeDTO updateOperatingTimeDTO = updatedto.getOptime();
+        CarwashRequest.updateOperatingTimeDTO updateOperatingTimeDTO = updatedto.getOptime();
 
-            List<Optime> optimeList = optimeJPARepository.findByCarwash_Id(carwashId);
-            Map<DayType, Optime> optimeByDayType = new EnumMap<>(DayType.class);
-            optimeList.forEach(ol -> optimeByDayType.put(ol.getDayType(), ol));
+        List<Optime> optimeList = optimeJPARepository.findByCarwash_Id(carwashId);
+        Map<DayType, Optime> optimeByDayType = new EnumMap<>(DayType.class);
+        optimeList.forEach(ol -> optimeByDayType.put(ol.getDayType(), ol));
 
-            Optime weekOptime = optimeByDayType.get(DayType.WEEKDAY);
-            Optime endOptime = optimeByDayType.get(DayType.WEEKEND);
+        Optime weekOptime = optimeByDayType.get(DayType.WEEKDAY);
+        Optime endOptime = optimeByDayType.get(DayType.WEEKEND);
 
-            weekOptime.setStartTime(updateOperatingTimeDTO.getWeekday().getStart());
-            weekOptime.setEndTime(updateOperatingTimeDTO.getWeekday().getEnd());
-            endOptime.setStartTime(updateOperatingTimeDTO.getWeekend().getStart());
-            endOptime.setEndTime(updateOperatingTimeDTO.getWeekend().getEnd());
+        weekOptime.setStartTime(updateOperatingTimeDTO.getWeekday().getStart());
+        weekOptime.setEndTime(updateOperatingTimeDTO.getWeekday().getEnd());
+        endOptime.setStartTime(updateOperatingTimeDTO.getWeekend().getStart());
+        endOptime.setEndTime(updateOperatingTimeDTO.getWeekend().getEnd());
 
-            response.updateOptimePart(weekOptime, endOptime);
+        response.updateOptimePart(weekOptime, endOptime);
 
-            // 입력받은 키워드
-            List<Long> newKeywordIds = updatedto.getKeywordId();
-            // 기존 키워드 조회
-            List<Long> existingKeywordIds = carwashKeywordJPARepository.findKeywordIdsByCarwashId(carwashId);
-            // 삭제할 키워드 삭제
-            List<Long> keywordsToDelete = existingKeywordIds.stream()
-                    .filter(id -> !newKeywordIds.contains(id))
-                    .collect(Collectors.toList());
-            carwashKeywordJPARepository.deleteByCarwashIdAndKeywordIds(carwashId, keywordsToDelete);
-            // 새로 추가할 키워드 추가
-            List<Long> keywordsToAdd = newKeywordIds.stream()
-                    .filter(id -> !existingKeywordIds.contains(id))
-                    .collect(Collectors.toList());
-            System.out.println(keywordsToAdd);
-            for (Long aLong : keywordsToAdd) {
-                System.out.println("aLong = " + aLong);
-            }
-            List<Keyword> keywordList = keywordJPARepository.findAllById(keywordsToAdd);
-            if (keywordList.size() != keywordsToAdd.size()) {
-                throw new IllegalArgumentException("Some keywords could not be found");
-            }
-            // carwash - keyword 연관지어 저장
-            List<CarwashKeyword> newCarwashKeywords = new ArrayList<>();
-            for (Keyword keyword : keywordList) {
-                CarwashKeyword carwashKeyword = CarwashKeyword.builder()
-                        .carwash(carwash)
-                        .keyword(keyword)
-                        .build();
-                newCarwashKeywords.add(carwashKeyword);
-            }
-            carwashKeywordJPARepository.saveAll(newCarwashKeywords);
-
-            List<Long> updateKeywordIds = carwashKeywordJPARepository.findKeywordIdsByCarwashId(carwashId);
-            response.updateKeywordPart(updateKeywordIds);
-
-            if (images != null && images.length > 0) {
-                uploadAndSaveFiles(images, carwash);
-            }
-            return response;
+        // 입력받은 키워드
+        List<Long> newKeywordIds = updatedto.getKeywordId();
+        // 기존 키워드 조회
+        List<Long> existingKeywordIds = carwashKeywordJPARepository.findKeywordIdsByCarwashId(carwashId);
+        // 삭제할 키워드 삭제
+        List<Long> keywordsToDelete = existingKeywordIds.stream()
+                .filter(id -> !newKeywordIds.contains(id))
+                .collect(Collectors.toList());
+        carwashKeywordJPARepository.deleteByCarwashIdAndKeywordIds(carwashId, keywordsToDelete);
+        // 새로 추가할 키워드 추가
+        List<Long> keywordsToAdd = newKeywordIds.stream()
+                .filter(id -> !existingKeywordIds.contains(id))
+                .collect(Collectors.toList());
+        System.out.println(keywordsToAdd);
+        for (Long aLong : keywordsToAdd) {
+            System.out.println("aLong = " + aLong);
         }
-        catch (Exception e) {
-            logger.error("Error in updateCarwashDetails", e);
-            throw new RuntimeException("Error updating carwash details", e);
+        List<Keyword> keywordList = keywordJPARepository.findAllById(keywordsToAdd);
+        if (keywordList.size() != keywordsToAdd.size()) {
+            throw new IllegalArgumentException("Some keywords could not be found");
         }
+        // carwash - keyword 연관지어 저장
+        List<CarwashKeyword> newCarwashKeywords = new ArrayList<>();
+        for (Keyword keyword : keywordList) {
+            CarwashKeyword carwashKeyword = CarwashKeyword.builder()
+                    .carwash(carwash)
+                    .keyword(keyword)
+                    .build();
+            newCarwashKeywords.add(carwashKeyword);
+        }
+        carwashKeywordJPARepository.saveAll(newCarwashKeywords);
+
+        List<Long> updateKeywordIds = carwashKeywordJPARepository.findKeywordIdsByCarwashId(carwashId);
+        response.updateKeywordPart(updateKeywordIds);
+
+        if (images != null && images.length > 0) {
+            uploadAndSaveFiles(images, carwash);
+        }
+        return response;
     }
 
 }
