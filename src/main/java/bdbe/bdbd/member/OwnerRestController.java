@@ -55,7 +55,7 @@ public class OwnerRestController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     )
     {
-        ownerService.findSales(carwashIds, selectedDate, userDetails.getMember());
+//        ownerService.findSales(carwashIds, selectedDate, userDetails.getMember());
         OwnerResponse.SaleResponseDTO saleResponseDTO = ownerService.findSales(carwashIds, selectedDate, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(saleResponseDTO));
     }
@@ -98,5 +98,15 @@ public class OwnerRestController {
         OwnerResponse.OwnerDashboardDTO dto = ownerService.fetchOwnerHomepage(userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
+
+    @GetMapping("/api/owner/reservation/{bay_id}")
+    public ResponseEntity<?> fetchOwnerReservation(
+            @PathVariable("bay_id") Long bayId
+    )
+    {
+        OwnerResponse.OwnerDashboardDTO dto = ownerService.fetchOwnerHomepage(userDetails.getMember());
+        return ResponseEntity.ok(ApiUtils.success(dto));
+    }
+
 }
 
