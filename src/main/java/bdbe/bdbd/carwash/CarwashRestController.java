@@ -1,5 +1,6 @@
 package bdbe.bdbd.carwash;
 
+import bdbe.bdbd._core.errors.exception.BadRequestError;
 import bdbe.bdbd._core.errors.security.CustomUserDetails;
 import bdbe.bdbd._core.errors.utils.ApiUtils;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +41,12 @@ public class CarwashRestController {
     public ResponseEntity<?> findCarwashesByKeywords(@RequestParam List<Long> keywordIds,
                                                      @RequestParam double latitude,
                                                      @RequestParam double longitude) {
+        // 위도 경도 유효성 검사
+        validateLatitudeAndLongitude(latitude, longitude);
+
         CarwashRequest.SearchRequestDTO searchRequest = new CarwashRequest.SearchRequestDTO();
         searchRequest.setKeywordIds(keywordIds);
+
         searchRequest.setLatitude(latitude);
         searchRequest.setLongitude(longitude);
 
@@ -49,8 +54,21 @@ public class CarwashRestController {
         return ResponseEntity.ok(ApiUtils.success(carwashes));
     }
 
+    private void validateLatitudeAndLongitude(double latitude, double longitude) {
+        if (latitude < -90 || latitude > 90) {
+            throw new BadRequestError("Invalid latitude value. Latitude must be between -90 and 90.");
+        }
+        if (longitude < -180 || longitude > 180) {
+            throw new BadRequestError("Invalid longitude value. Longitude must be between -180 and 180.");
+        }
+    }
+
+
+
     @GetMapping("/carwashes/nearby")
     public ResponseEntity<?> findNearestCarwashesByUserLocation(@RequestParam double latitude, @RequestParam double longitude) {
+        validateLatitudeAndLongitude(latitude, longitude);
+
         CarwashRequest.UserLocationDTO userLocation = new CarwashRequest.UserLocationDTO();
         userLocation.setLatitude(latitude);
         userLocation.setLongitude(longitude);
@@ -60,6 +78,8 @@ public class CarwashRestController {
 
     @GetMapping("/carwashes/recommended")
     public ResponseEntity<?> findNearestCarwash(@RequestParam double latitude, @RequestParam double longitude) {
+        validateLatitudeAndLongitude(latitude, longitude);
+
         CarwashRequest.UserLocationDTO userLocation = new CarwashRequest.UserLocationDTO();
         userLocation.setLatitude(latitude);
         userLocation.setLongitude(longitude);

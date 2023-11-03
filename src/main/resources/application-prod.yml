@@ -39,6 +39,9 @@ cloud:
       bucket: ${AWS_BUCKET_NAME}
     stack:
       auto: false
+kakao:
+  admin:
+    key: ${KAKAOPAY_ADMIN_KEY}
 # 파일 저장 경로
 #file:
 #  path: ./images/
