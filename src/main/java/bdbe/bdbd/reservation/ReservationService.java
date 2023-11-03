@@ -145,9 +145,9 @@ public class ReservationService {
         return new ReservationResponse.findAllResponseDTO(bayList, reservationList);
     }
 
-    public ReservationResponse.findLatestOneResponseDTO fetchLatestReservation(Member sessionMember) {
+    public ReservationResponse.findLatestOneResponseDTO fetchLatestReservation(Long reservationId) {
         // 가장 최근의 예약 찾기
-        Reservation reservation = reservationJPARepository.findTopByMemberIdOrderByIdDesc(sessionMember.getId())
+        Reservation reservation = reservationJPARepository.findById(reservationId)
                 .filter(r -> !r.isDeleted())
                 .orElseThrow(() -> new NoSuchElementException("no reservation found"));
         // 예약과 관련된 베이 찾기
@@ -159,8 +159,9 @@ public class ReservationService {
         // 세차장이 위치한 위치 찾기
         Location location = locationJPARepository.findById(carwash.getLocation().getId())
                 .orElseThrow(() -> new NoSuchElementException("no location found"));
-        List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwash.getId());
-        return new ReservationResponse.findLatestOneResponseDTO(reservation, bay, carwash, location, carwashImages);
+
+        File file = fileJPARepository.findFirstByCarwashIdOrderByUploadedAtAsc(carwash.getId()).orElse(null);
+        return new ReservationResponse.findLatestOneResponseDTO(reservation, bay, carwash, location, file);
     }
 
     public ReservationResponse.fetchCurrentStatusReservationDTO fetchCurrentStatusReservation(Member sessionMember) {
