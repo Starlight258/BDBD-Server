@@ -178,10 +178,14 @@ public class OwnerResponse {
     @ToString
     public static class BayReservationDTO {
         private int bayNo;
+        private Long bayId;
+        private int status;
         private List<BookedTimeDTO> bayBookedTime;
 
         public BayReservationDTO(Bay bay, List<Reservation> reservationList) {
             this.bayNo = bay.getBayNum();
+            this.bayId = bay.getId();
+            this.status = bay.getStatus();
             this.bayBookedTime = reservationList.stream()
                     .filter(reservation -> reservation.getBay() != null && reservation.getBay().getId().equals(bay.getId()))
                     .map(BookedTimeDTO::new)
