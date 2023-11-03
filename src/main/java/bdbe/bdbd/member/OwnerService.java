@@ -91,18 +91,18 @@ public class OwnerService {
         return new OwnerResponse.SaleResponseDTO(carwashList, reservationList);
     }
 
-    public OwnerResponse.SaleResponseDTO findBayReservation(Long bayId, Member sessionMember) {
-        validateBayOwnership(bayId, sessionMember);
-
-
-//        List<Carwash> carwashList = carwashJPARepository.findCarwashesByMemberId(sessionMember.getId()); // 유저가 가진 모든 세차장 (dto에서 사용)
-
-//        List<Reservation> reservationList = reservationJPARepository.findAllByCarwash_IdInOrderByStartTimeDesc(carwashIds, selectedDate);
-//        if (reservationList.isEmpty()) return new OwnerResponse.SaleResponseDTO(carwashList, new ArrayList<>());
-
-        List<Reservation> reservationList = reservationJPARepository.findByBay_Id(bayId);
-        return new OwnerResponse.SaleResponseDTO(carwashList, reservationList);
-    }
+//    public OwnerResponse.SaleResponseDTO findBayReservation(Long bayId, Member sessionMember) {
+//        validateBayOwnership(bayId, sessionMember);
+//
+//
+////        List<Carwash> carwashList = carwashJPARepository.findCarwashesByMemberId(sessionMember.getId()); // 유저가 가진 모든 세차장 (dto에서 사용)
+//
+////        List<Reservation> reservationList = reservationJPARepository.findAllByCarwash_IdInOrderByStartTimeDesc(carwashIds, selectedDate);
+////        if (reservationList.isEmpty()) return new OwnerResponse.SaleResponseDTO(carwashList, new ArrayList<>());
+//
+//        List<Reservation> reservationList = reservationJPARepository.findByBay_Id(bayId);
+//        return new OwnerResponse.SaleResponseDTO(carwashList, reservationList);
+//    }
 
     /*
      owner가 해당 세차장의 주인인지 확인
