@@ -66,13 +66,5 @@ public class PayResponse {
         private String card_item_code;
     }
 
-    @Getter
-    @Setter
-    public static class PaymentAndReservationResponseDTO {
-        private String paymentApprovalResponse;
-        private Reservation reservation;
-    }
-
-
 
 }

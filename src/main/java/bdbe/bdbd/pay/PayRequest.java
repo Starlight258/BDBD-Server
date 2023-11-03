@@ -26,28 +26,11 @@ public class PayRequest {
         private String cancel_url;
         private String fail_url;
 
-        public static PayReadyRequestDTO fromSaveDTO(SaveDTO saveDTO, Carwash carwash) {
-            int perPrice = carwash.getPrice();
-            LocalDateTime startTime = saveDTO.getStartTime();
-            LocalDateTime endTime = saveDTO.getEndTime();
-
-            int minutesDifference = (int) ChronoUnit.MINUTES.between(startTime, endTime);
-            int blocksOf30Minutes = minutesDifference / 30;
-            int price = perPrice * blocksOf30Minutes;
-
-            int totalAmount = (int)(price * 1.1);  //세금 포함 가격
-            int vatAmount = (int)(price * 0.1);  // 세금
-
-            PayReadyRequestDTO dto = new PayReadyRequestDTO();
-            dto.setTotal_amount(totalAmount);
-            dto.setVat_amount(vatAmount);
-            return dto;
-        }
     }
 
     @Getter
     @Setter
-    public class PayApprovalRequestDTO {
+    public static class PayApprovalRequestDTO {
         private String cid;
         private String tid;
         private String partner_order_id;
@@ -60,6 +43,14 @@ public class PayRequest {
     public static class PaymentReadyRequest {
         private PayRequest.PayReadyRequestDTO requestDto;
         private ReservationRequest.SaveDTO saveDTO;
+    }
+    @Getter
+    @Setter
+    public static class PaymentApprovalRequestDTO {
+        private PayRequest.PayApprovalRequestDTO payApprovalRequestDTO;
+        private ReservationRequest.SaveDTO saveDTO;
+        private Long carwashId;
+        private Long bayId;
     }
 
 }
