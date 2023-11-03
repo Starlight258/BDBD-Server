@@ -72,13 +72,13 @@ public class SecurityConfig {
 
         // 인증, 권한 필터 설정: 오너와 사용자 어드민 세가지로 url 접근 수정
         http.authorizeRequests(authorize -> authorize
-                .antMatchers("/owner/join", "/owner/login").permitAll()
-                .antMatchers("/user/join", "/user/login").permitAll()
-                .antMatchers("/admin/join", "/admin/login").permitAll()
-                .antMatchers("/user/check", "/user/check").permitAll()
-                .antMatchers("/owner/check", "/owner/check").permitAll()
-                .antMatchers("/admin/**").access("hasRole('ADMIN')")
-                .antMatchers("/owner/**").access("hasRole('OWNER')")
+                .antMatchers("/api/owner/join", "/api/owner/login").permitAll()
+                .antMatchers("/api/user/join", "/api/user/login").permitAll()
+                .antMatchers("/api/admin/join", "/api/admin/login").permitAll()
+                .antMatchers("/api/user/check", "/api/user/check").permitAll()
+                .antMatchers("/api/owner/check", "/api/owner/check").permitAll()
+                .antMatchers("/api/admin/**").access("hasRole('ADMIN')")
+                .antMatchers("/api/owner/**").access("hasRole('OWNER')")
                 .anyRequest().permitAll());
         return http.build();
     }
