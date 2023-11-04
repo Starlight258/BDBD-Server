@@ -7,6 +7,8 @@ import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -53,16 +55,25 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
                     );
             SecurityContextHolder.getContext().setAuthentication(authentication);
             log.debug("디버그 : 인증 객체 만들어짐");
+
         } catch (SignatureVerificationException sve) {
             log.error("토큰 검증 실패", sve);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("Invalid token signature");
+            return;
         } catch (TokenExpiredException tee) {
             log.error("토큰 만료됨", tee);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Failed to get an access token\n" +
-                    "JWT has expired");
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            response.getWriter().write("Failed to get an access token\n" +
+//                    "JWT has expired");
+            throw new IllegalArgumentException();
+//            return;
         }
         catch (Exception e) {
                 log.error("예상치 못한 오류가 발생했습니다", e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("An unexpected error occurred");
+            return;
         } finally {
             chain.doFilter(request, response);
         }
