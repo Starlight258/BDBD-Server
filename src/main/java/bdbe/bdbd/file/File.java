@@ -20,6 +20,10 @@ public class File {
     private String path;
     private LocalDateTime uploadedAt;
 
+    @Column(name="is_deleted", nullable = false)
+    private boolean isDeleted; // boolean 기본값은 false
+
+
     @ManyToOne
     @JoinColumn(name = "c_id")
     private Carwash carwash;
@@ -37,4 +41,8 @@ public class File {
         this.carwash = carwash;
 
     }
+    public void changeDeletedFlag(boolean flag) {
+        this.isDeleted = flag;
+    }
+
 }
