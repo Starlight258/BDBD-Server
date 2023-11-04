@@ -1,6 +1,9 @@
 package bdbe.bdbd.reservation;
 
 
+import bdbe.bdbd._core.errors.exception.BadRequestError;
+import bdbe.bdbd._core.errors.exception.ForbiddenError;
+import bdbe.bdbd._core.errors.exception.NotFoundError;
 import bdbe.bdbd._core.errors.utils.DateUtils;
 import bdbe.bdbd.bay.Bay;
 import bdbe.bdbd.bay.BayJPARepository;
@@ -60,23 +63,28 @@ public class ReservationService {
     }
 
     @Transactional
-    public void update(ReservationRequest.UpdateDTO dto, Long reservationId) {
+    public void update(ReservationRequest.UpdateDTO dto, Long reservationId, Member member) {
         Reservation reservation = reservationJPARepository.findById(reservationId)
                 .filter(r -> !r.isDeleted())
-                .orElseThrow(() -> new IllegalArgumentException("Reservation with id " + reservationId + " not found"));
+                .orElseThrow(() -> new NotFoundError("Reservation with id " + reservationId + " not found"));
+        if (reservation.getMember().getId() != member.getId())
+            throw new ForbiddenError("You do not have permission to modify this reservation.");
         Long carwashId = reservation.getBay().getCarwash().getId();
         Carwash carwash = carwashJPARepository.findById(carwashId)
-                .orElseThrow(() -> new IllegalArgumentException("Carwash with id " + carwashId + " not found"));
+                .orElseThrow(() -> new NotFoundError("Carwash with id " + carwashId + " not found"));
 
         reservation.updateReservation(dto.getStartTime(), dto.getEndTime(), carwash);
-
     }
 
     @Transactional
-    public void delete(Long reservationId) {
+    public void delete(Long reservationId, Member member) {
         Reservation reservation = reservationJPARepository.findById(reservationId)
                 .filter(r -> !r.isDeleted())
-                .orElseThrow(() -> new IllegalArgumentException("Reservation with id " + reservationId + " not found"));
+                .orElseThrow(() -> new NotFoundError("Reservation with id " + reservationId + " not found"));
+        System.out.println("id :" + reservation.getMember().getId());
+        System.out.println("id : " + member.getId());
+        if (reservation.getMember().getId() != member.getId())
+            throw new ForbiddenError("You do not have permission to delete this reservation.");
         reservation.changeDeletedFlag(true);
     }
 
