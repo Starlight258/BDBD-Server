@@ -94,7 +94,7 @@ public class OwnerService {
     public OwnerResponse.ReservationListDTO findBayReservation(Long bayId, Member sessionMember) {
         validateBayOwnership(bayId, sessionMember);
 
-        List<Reservation> reservationList = reservationJPARepository.findByBay_IdWithJoins(bayId);
+        List<Reservation> reservationList = reservationJPARepository.findByBay_IdWithJoinsAndIsDeletedFalse(bayId);
         return new OwnerResponse.ReservationListDTO(reservationList);
     }
 
