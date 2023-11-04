@@ -8,6 +8,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 
 @RequiredArgsConstructor
 @RestController
@@ -19,10 +21,11 @@ public class BayRestController {
     @PostMapping("/owner/carwashes/{carwash_id}/bays")
     public ResponseEntity<?> createBay(
             @PathVariable("carwash_id") Long carwashId,
-            @RequestBody BayRequest.SaveDTO saveDTO, Errors errors,
+            @Valid @RequestBody BayRequest.SaveDTO saveDTO,
+            Errors errors,
             @AuthenticationPrincipal CustomUserDetails userDetails)
     {
-        bayService.createBay(saveDTO, carwashId);
+        bayService.createBay(saveDTO, carwashId, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
