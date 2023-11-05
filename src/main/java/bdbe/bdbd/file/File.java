@@ -17,8 +17,12 @@ public class File {
 
     @Column(length = 1024)
     private String url;
-    private String path;
+
     private LocalDateTime uploadedAt;
+
+    @Column(name="is_deleted", nullable = false)
+    private boolean isDeleted; // boolean 기본값은 false
+
 
     @ManyToOne
     @JoinColumn(name = "c_id")
@@ -29,12 +33,16 @@ public class File {
     }
 
     @Builder
-    public File(String name, String url, String path, LocalDateTime uploadedAt, Carwash carwash) {
+    public File(String name, String url, LocalDateTime uploadedAt, Carwash carwash) {
         this.name = name;
         this.url = url;
-        this.path = path;
+//        this.path = path;
         this.uploadedAt = uploadedAt;
         this.carwash = carwash;
 
     }
+    public void changeDeletedFlag(boolean flag) {
+        this.isDeleted = flag;
+    }
+
 }

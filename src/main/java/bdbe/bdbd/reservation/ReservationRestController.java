@@ -33,20 +33,23 @@ public class ReservationRestController {
     @PutMapping("/reservations/{reservation_id}")
     public ResponseEntity<?> updateReservation(
             @PathVariable("reservation_id") Long reservationId,
-            @RequestBody ReservationRequest.UpdateDTO dto
+            @RequestBody ReservationRequest.UpdateDTO dto,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+
     )
     {
-        reservationService.update(dto, reservationId);
+        reservationService.update(dto, reservationId, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
     // 예약 취소하기
     @DeleteMapping("/reservations/{reservation_id}")
     public ResponseEntity<?> deleteReservation(
-            @PathVariable("reservation_id") Long reservationId
+            @PathVariable("reservation_id") Long reservationId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     )
     {
-        reservationService.delete(reservationId);
+        reservationService.delete(reservationId, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 

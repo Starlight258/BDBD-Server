@@ -1,6 +1,5 @@
 package bdbe.bdbd._core.errors.security;
 
-
 import bdbe.bdbd.member.Member;
 import bdbe.bdbd.member.MemberRole;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
@@ -54,17 +53,24 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             log.debug("디버그 : 인증 객체 만들어짐");
         } catch (SignatureVerificationException sve) {
-            log.error("토큰 검증 실패", sve);
+            sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid token signature");
+            return;
         } catch (TokenExpiredException tee) {
-            log.error("토큰 만료됨", tee);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Failed to get an access token\n" +
-                    "JWT has expired");
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "JWT has expired");
+            return;
+        } catch (Exception e) {
+            sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+            return;
         }
-        catch (Exception e) {
-                log.error("예상치 못한 오류가 발생했습니다", e);
-        } finally {
-            chain.doFilter(request, response);
+        chain.doFilter(request, response);
+    }
+    private void sendErrorResponse(HttpServletResponse response, int status, String message) {
+        response.setStatus(status);
+        try {
+            response.getWriter().write(message);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

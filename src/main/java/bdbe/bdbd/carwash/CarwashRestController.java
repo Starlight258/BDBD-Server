@@ -3,8 +3,10 @@ package bdbe.bdbd.carwash;
 import bdbe.bdbd._core.errors.exception.BadRequestError;
 import bdbe.bdbd._core.errors.security.CustomUserDetails;
 import bdbe.bdbd._core.errors.utils.ApiUtils;
+import bdbe.bdbd.file.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,10 @@ import java.util.List;
 public class CarwashRestController {
 
     private final CarwashService carwashService;
+
+    @Autowired
+    private final FileService fileService;
+
 
     // 전체 세차장 목록 조회, 10개씩 페이징
     @GetMapping("/carwashes")
@@ -99,17 +105,28 @@ public class CarwashRestController {
     }
 
     @GetMapping("/owner/carwashes/{carwash_id}/details") //세차장 정보 수정_세차장 기존 정보 불러오기
-    public ResponseEntity<?> findCarwashByDetails(@PathVariable("carwash_id") Long carwashId) {
-        CarwashResponse.carwashDetailsDTO carwashDetailsDTO = carwashService.findCarwashByDetails(carwashId);
+    public ResponseEntity<?> findCarwashByDetails(@PathVariable("carwash_id") Long carwashId,
+                                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
+        CarwashResponse.carwashDetailsDTO carwashDetailsDTO = carwashService.findCarwashByDetails(carwashId, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(carwashDetailsDTO));
+    }
+
+    @DeleteMapping("/owner/carwashes/{carwash_id}/images/{image_id}")
+    public ResponseEntity<?> deleteImage(
+            @PathVariable("carwash_id") Long carwashId,
+            @PathVariable("image_id") Long imageId) {
+        fileService.deleteFile(imageId);
+        return ResponseEntity.ok(ApiUtils.success(null));
     }
 
     @PutMapping("/owner/carwashes/{carwash_id}/details")
     public ResponseEntity<?> updateCarwashDetails(
             @PathVariable("carwash_id") Long carwashId,
             @RequestPart("updateData") CarwashRequest.updateCarwashDetailsDTO updatedto,
-            @RequestPart(value = "images", required = false) MultipartFile[] images) {
-        CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO = carwashService.updateCarwashDetails(carwashId, updatedto, images);
+            @RequestPart(value = "images", required = true) MultipartFile[] images,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+            ) {
+        CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO = carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(updateCarwashDetailsDTO));
     }
 

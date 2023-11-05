@@ -65,6 +65,19 @@ public class OwnerResponse {
     @Getter
     @Setter
     @ToString
+    public static class ReservationListDTO {
+        List<ReservationDTO> reservationDTOList;
+
+        public ReservationListDTO(List<Reservation> reservationList) {
+            this.reservationDTOList = reservationList.stream()
+                    .map(ReservationDTO::new)
+                    .collect(Collectors.toList());
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString
     public static class ReservationDTO {
         private Long reservationId;
         private int bayNo;
@@ -182,10 +195,14 @@ public class OwnerResponse {
     @ToString
     public static class BayReservationDTO {
         private int bayNo;
+        private Long bayId;
+        private int status;
         private List<BookedTimeDTO> bayBookedTime;
 
         public BayReservationDTO(Bay bay, List<Reservation> reservationList) {
             this.bayNo = bay.getBayNum();
+            this.bayId = bay.getId();
+            this.status = bay.getStatus();
             this.bayBookedTime = reservationList.stream()
                     .filter(reservation -> reservation.getBay() != null && reservation.getBay().getId().equals(bay.getId()))
                     .map(BookedTimeDTO::new)
@@ -233,6 +250,7 @@ public class OwnerResponse {
     @Setter
     public static class CarwashInfoDTO {
         private String name;
+        private Long carwashId;
         private Long monthlySales;
         private Long monthlyReservations;
         private List<FileDTO> imageFiles;
@@ -240,6 +258,7 @@ public class OwnerResponse {
 
         public CarwashInfoDTO(Carwash carwash, Long monthlySales, Long monthlyReservations,List<File> files) {
             this.name = carwash.getName();
+            this.carwashId = carwash.getId();
             this.monthlySales = monthlySales;
             this.monthlyReservations = monthlyReservations;
             this.imageFiles = files.stream().map(FileDTO::new).collect(Collectors.toList());
@@ -247,24 +266,5 @@ public class OwnerResponse {
         }
     }
 
-//    @Getter
-//    @Setter
-//    @ToString
-//    public static class ReservationDTO {
-//        private Long reservationId;
-////        private int bayNo;
-//        private String nickname;
-//        private int totalPrice;
-//        private String startTime;
-//        private String endTime;
-//
-//        public ReservationDTO(Reservation reservation) {
-//            this.reservationId = reservation.getId();
-////            this.bayNo = reservation.getBay().getBayNum();
-//            this.nickname = reservation.getMember().getUsername();
-//            this.totalPrice = reservation.getPrice();
-//            this.startTime = DateUtils.formatDateTime(reservation.getStartTime());
-//            this.endTime = DateUtils.formatDateTime(reservation.getEndTime());
-//        }
-//    }
+
 }
