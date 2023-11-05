@@ -125,8 +125,12 @@ public class CarwashRestController {
             @RequestPart("updateData") CarwashRequest.updateCarwashDetailsDTO updatedto,
             @RequestPart(value = "images", required = true) MultipartFile[] images,
             @AuthenticationPrincipal CustomUserDetails userDetails
-            ) {
-        CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO = carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
+    ) {
+
+        // 세차장 상세 정보 업데이트
+        CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO =
+                carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
+
         return ResponseEntity.ok(ApiUtils.success(updateCarwashDetailsDTO));
     }
 

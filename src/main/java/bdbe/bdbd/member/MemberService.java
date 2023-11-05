@@ -65,4 +65,14 @@ public class MemberService {
             throw new BadRequestError("duplicate email exist : " + email);
         }
     }
+
+    /*
+        토큰으로 전달받은 Member 객체의 ID를 이용하여 데이터베이스에서 해당 멤버의 전체 정보를 조회하는 메서드
+     */
+    public OwnerResponse.UserInfoDTO findUserInfo(Member member) {
+        Member findMember = memberJPARepository.findById(member.getId())
+                .orElseThrow(() -> new BadRequestError("member not found"));
+
+        return new OwnerResponse.UserInfoDTO(findMember);
+    }
 }

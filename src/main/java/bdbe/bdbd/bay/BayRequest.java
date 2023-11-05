@@ -28,16 +28,6 @@ public class BayRequest {
         }
 
     }
-    @Getter
-    @Setter
-    @ToString
-    public static class DeleteDTO {
-        @NotNull
-        private Long bayId;
-
-    }
-
-
 
     @Getter
     @Setter
