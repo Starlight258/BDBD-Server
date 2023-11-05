@@ -31,13 +31,13 @@ public class Reservation {
     private int price;
 
     @Column(name="start_time", nullable = false)
-    private LocalDateTime startTime;
+    private LocalDateTime startTime; // ex) 2023-10-11T12:34
 
     @Column(name="end_time", nullable = false)
     private LocalDateTime endTime;
 
     @Column(name="is_deleted", nullable = false)
-    private boolean isDeleted;
+    private boolean isDeleted; // boolean 기본값은 false
 
     @CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false)
@@ -47,11 +47,11 @@ public class Reservation {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) //외래키
     @JoinColumn(name="b_id",  nullable = false)
     private Bay bay;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) //외래키
     @JoinColumn(name="m_id",  nullable = false)
     private Member member;
 
@@ -71,9 +71,10 @@ public class Reservation {
         this.endTime = endTime;
 
         int perPrice = carwash.getPrice();
-        int minutesDifference = (int) ChronoUnit.MINUTES.between(startTime, endTime);
-        int blocksOf30Minutes = minutesDifference / 30;
-        this.price = perPrice * blocksOf30Minutes;
+        int minutesDifference = (int) ChronoUnit.MINUTES.between(startTime, endTime); //시간 차 계산
+        int blocksOf30Minutes = minutesDifference / 30; //30분 단위로 계산
+        int price = perPrice * blocksOf30Minutes;
+        this.price = price;
 
     }
 

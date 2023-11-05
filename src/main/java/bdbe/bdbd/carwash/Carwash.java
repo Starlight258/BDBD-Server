@@ -25,32 +25,32 @@ public class Carwash{
     private Long id;
 
     @Column(length = 100, nullable = false)
-    private String name;
+    private String name; //세차장 이름
 
     @Column(nullable = false)
-    private double rate = 0;
+    private double rate = 0; // 별점
 
     @Column(length = 50, nullable = false)
-    private String tel;
+    private String tel; //전화번호
 
     @Column(length = 255, nullable = false)
-    private String des;
+    private String des; //세차장 설명
 
     @Column(name="price", nullable = false)
-    private int price;
+    private int price; //30분당 가격
 
-    @OneToOne
-    @JoinColumn(name="l_id", nullable = false)
+    @OneToOne //일대일-소유측
+    @JoinColumn(name="l_id", nullable = false) //외래키
     private Location location;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) //외래키
     @JoinColumn(name="m_id",  nullable = false)
     private Member member;
 
-    @OneToMany(mappedBy = "carwash")
+    @OneToMany(mappedBy = "carwash") //양방향 비소유측, 1:1 참조 - readOnly
     private List<CarwashKeyword> carwashKeywords = new ArrayList<>();
 
-    @OneToMany(mappedBy = "carwash")
+    @OneToMany(mappedBy = "carwash") //양방향 비소유측, 1:1 참조  - readOnly
     private List<File> fileList = new ArrayList<>();
 
     @Builder

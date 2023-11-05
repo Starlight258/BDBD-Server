@@ -52,6 +52,7 @@ public class PayRestControllerTest {
         requestDto.setTax_free_amount(0);
 
         ReservationRequest.SaveDTO saveDTO = new ReservationRequest.SaveDTO();
+        saveDTO.setBayId(1L);
         saveDTO.setStartTime(LocalDateTime.parse("2024-11-01T14:00:00"));
         saveDTO.setEndTime(LocalDateTime.parse("2024-11-01T15:00:00"));
 

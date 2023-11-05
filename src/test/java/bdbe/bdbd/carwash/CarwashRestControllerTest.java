@@ -29,9 +29,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+//@ActiveProfiles("test") //test profile 사용
 @Transactional
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc //MockMvc 사용
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+//통합테스트(SF-F-DS(Handler, ExHandler)-C-S-R-PC-DB) 다 뜬다.
 public class CarwashRestControllerTest {
     @Autowired
     private MockMvc mvc;
@@ -81,6 +83,7 @@ public class CarwashRestControllerTest {
     @DisplayName("세차장 등록 기능")
     public void save_test() throws Exception {
         // given
+        // dto 생성
         CarwashRequest.SaveDTO dto = new CarwashRequest.SaveDTO();
 
         Keyword keyword = Keyword.builder()
@@ -135,6 +138,7 @@ public class CarwashRestControllerTest {
         // eye
         String responseBody = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         System.out.println("응답 Body : " + responseBody);
+//
         // verify
         resultActions.andExpect(jsonPath("$.success").value("true"));
 
@@ -186,6 +190,7 @@ public class CarwashRestControllerTest {
 
         // verify
         resultActions.andExpect(jsonPath("$.success").value("true"));
+//        resultActions.andExpect(jsonPath("$").isMap());
     }
 
     @WithUserDetails(value = "user@nate.com")

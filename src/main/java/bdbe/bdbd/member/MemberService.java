@@ -32,6 +32,17 @@ public class MemberService {
         }
     }
 
+//    public String login(UserRequest.LoginDTO requestDTO) {
+//        User userPS = userJPARepository.findByEmail(requestDTO.getEmail()).orElseThrow(
+//                () -> new Exception400("이메일을 찾을 수 없습니다 : "+requestDTO.getEmail())
+//        );
+//
+//        if(!passwordEncoder.matches(requestDTO.getPassword(), userPS.getPassword())){
+//            throw new Exception400("패스워드가 잘못입력되었습니다.");
+//        }
+//        return JWTProvider.create(userPS);
+//    }
+
     public MemberResponse.LoginResponse login(MemberRequest.LoginDTO requestDTO) {
         Member memberPS = memberJPARepository.findByEmail(requestDTO.getEmail()).orElseThrow(
                 () -> new BadRequestError("email not found : " + requestDTO.getEmail())

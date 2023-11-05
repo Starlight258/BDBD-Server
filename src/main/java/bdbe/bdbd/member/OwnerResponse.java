@@ -23,8 +23,8 @@ public class OwnerResponse {
     @Setter
     @ToString
     public static class SaleResponseDTO {
-        private List<CarwashListDTO> carwashList;
-        private List<ReservationCarwashDTO> reservationList;
+        private List<CarwashListDTO> carwashList;  // 세차장 목록
+        private List<ReservationCarwashDTO> reservationList; // 매출 정보
 
         public SaleResponseDTO(List<Carwash> carwashList, List<Reservation> reservationList) {
             this.carwashList = carwashList.stream()
@@ -142,7 +142,7 @@ public class OwnerResponse {
     @Getter
     @Setter
     @ToString
-    public static class CarwashManageByOwnerDTO {
+    public static class CarwashManageByOwnerDTO { // 매장 관리 (owner별, 세차장별 )
         private Long id;
         private String name;
         private OperationTimeDTO optime;
@@ -164,7 +164,7 @@ public class OwnerResponse {
     @Getter
     @Setter
     @ToString
-    public static class CarwashManageDTO {
+    public static class CarwashManageDTO { // 매장 관리 (owner별, 세차장별 )
         private Long id;
         private String name;
         private Long monthlySales;

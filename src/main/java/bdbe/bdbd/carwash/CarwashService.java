@@ -38,6 +38,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+//@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -49,10 +50,13 @@ public class CarwashService {
     private final CarwashKeywordJPARepository carwashKeywordJPARepository;
     private final ReviewJPARepository reviewJPARepository;
     private final BayJPARepository bayJPARepository;
+    private final FileUploadUtil fileUploadUtil;
     private final FileJPARepository fileJPARepository;
+    private final MemberJPARepository memberJPARepository;
     private final S3ProxyUploadService s3ProxyUploadService;
 
     public List<CarwashResponse.FindAllDTO> findAll(int page) {
+        // Pageable 검증
         if (page < 0) {
             throw new IllegalArgumentException("Invalid page number.");
         }
@@ -60,6 +64,7 @@ public class CarwashService {
         Pageable pageable = PageRequest.of(page, 10);
         Page<Carwash> carwashEntities = carwashJPARepository.findAll(pageable);
 
+        // Page 객체 검증
         if (carwashEntities == null || !carwashEntities.hasContent()) {
             throw new NoSuchElementException("No carwash entities found.");
         }
@@ -68,6 +73,7 @@ public class CarwashService {
                 .map(CarwashResponse.FindAllDTO::new)
                 .collect(Collectors.toList());
 
+        // List 객체 검증
         if (carwashResponses == null || carwashResponses.isEmpty()) {
             throw new NoSuchElementException("No carwash entities transformed.");
         }
@@ -77,21 +83,23 @@ public class CarwashService {
 
     @Transactional
     public void save(CarwashRequest.SaveDTO saveDTO, MultipartFile[] images, Member sessionMember) {
+        // 별점은 리뷰에서 계산해서 넣어주기
+        // 지역
         Location location = saveDTO.toLocationEntity();
         locationJPARepository.save(location);
-
+        // 세차장
         Carwash carwash = saveDTO.toCarwashEntity(location, sessionMember);
         carwashJPARepository.save(carwash);
-
+        // 운영시간
         List<Optime> optimes = saveDTO.toOptimeEntities(carwash);
         optimeJPARepository.saveAll(optimes);
-
+        // 키워드
         List<Long> keywordIdList = saveDTO.getKeywordId();
         List<CarwashKeyword> carwashKeywordList = new ArrayList<>();
         for (Long keywordId : keywordIdList) {
             Keyword keyword = keywordJPARepository.findById(keywordId)
                     .orElseThrow(() -> new IllegalArgumentException("Keyword not found"));
-
+            //carwash-keyword 다대다 매핑
             CarwashKeyword carwashKeyword = CarwashKeyword.builder().carwash(carwash).keyword(keyword).build();
             carwashKeywordList.add(carwashKeyword);
         }
@@ -101,7 +109,7 @@ public class CarwashService {
             uploadAndSaveFiles(images, carwash);
         }
 
-    }
+    } //변경감지, 더티체킹, flush, 트랜잭션 종료
 
     @Transactional
     public List<ReservationResponse.ImageDTO> uploadAndSaveFiles(MultipartFile[] images, Carwash carwash) {
@@ -114,10 +122,13 @@ public class CarwashService {
 
         List<ReservationResponse.ImageDTO> updatedImages = new ArrayList<>();
         try {
+            // 이미지 업로드
             List<String> imageUrls = uploadFiles(Arrays.asList(images));
 
+            // 파일 정보 저장
             List<File> savedFiles = saveFileEntities(imageUrls, carwash);
 
+            // 업데이트된 이미지 정보 생성
             for (File file : savedFiles) {
                 updatedImages.add(new ReservationResponse.ImageDTO(file));
             }
@@ -126,7 +137,7 @@ public class CarwashService {
             logger.error("File upload and save failed: " + e.getMessage(), e);
             throw new RuntimeException("File upload and save failed", e);
         }
-        return updatedImages;
+        return updatedImages;  // 업데이트된 이미지 정보를 반환
     }
 
 
@@ -152,13 +163,13 @@ public class CarwashService {
                         .build();
                 files.add(newFile);
             }
-            files = fileJPARepository.saveAll(files);
+            files = fileJPARepository.saveAll(files);  // 저장된 파일 엔터티 목록을 가져옵니다.
             logger.info("File entities saved successfully");
         } catch (Exception e) {
             logger.error("Saving file entities failed: " + e.getMessage(), e);
             throw new RuntimeException("Saving file entities failed", e);
         }
-        return files;
+        return files;  // 저장된 파일 엔터티 목록을 반환합니다.
     }
 
     public List<CarwashRequest.CarwashDistanceDTO> findNearbyCarwashesByUserLocation(CarwashRequest.UserLocationDTO userLocation) {
@@ -310,24 +321,28 @@ public class CarwashService {
 
         response.updateOptimePart(weekOptime, endOptime);
 
+        // 입력받은 키워드
         List<Long> newKeywordIds = updatedto.getKeywordId();
-
+        // 기존 키워드 조회
         List<Long> existingKeywordIds = carwashKeywordJPARepository.findKeywordIdsByCarwashId(carwashId);
-
+        // 삭제할 키워드 삭제
         List<Long> keywordsToDelete = existingKeywordIds.stream()
                 .filter(id -> !newKeywordIds.contains(id))
                 .collect(Collectors.toList());
         carwashKeywordJPARepository.deleteByCarwashIdAndKeywordIds(carwashId, keywordsToDelete);
-
+        // 새로 추가할 키워드 추가
         List<Long> keywordsToAdd = newKeywordIds.stream()
                 .filter(id -> !existingKeywordIds.contains(id))
                 .collect(Collectors.toList());
-
+        System.out.println(keywordsToAdd);
+        for (Long aLong : keywordsToAdd) {
+            System.out.println("aLong = " + aLong);
+        }
         List<Keyword> keywordList = keywordJPARepository.findAllById(keywordsToAdd);
         if (keywordList.size() != keywordsToAdd.size()) {
             throw new IllegalArgumentException("Some keywords could not be found");
         }
-
+        // carwash - keyword 연관지어 저장
         List<CarwashKeyword> newCarwashKeywords = new ArrayList<>();
         for (Keyword keyword : keywordList) {
             CarwashKeyword carwashKeyword = CarwashKeyword.builder()
@@ -343,7 +358,7 @@ public class CarwashService {
 
         if (images != null && images.length > 0) {
             List<ReservationResponse.ImageDTO> updatedImages = uploadAndSaveFiles(images, carwash);
-            response.setImages(updatedImages);
+            response.setImages(updatedImages);  // 업데이트된 이미지 정보를 응답 DTO에 설정
         }
         return response;
     }

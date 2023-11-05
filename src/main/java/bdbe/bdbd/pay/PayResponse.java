@@ -1,6 +1,7 @@
 package bdbe.bdbd.pay;
 
 
+import bdbe.bdbd.reservation.Reservation;
 import lombok.Getter;
 import lombok.Setter;
 
