@@ -49,8 +49,8 @@ public class OwnerRestController {
 
     @GetMapping("/sales")
     public ResponseEntity<?> findAllOwnerReservation(
-            @RequestParam("carwash-id") List<Long> carwashIds,
-            @RequestParam("selected-date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate,
+            @RequestParam(value = "carwash-id") List<Long> carwashIds,
+            @RequestParam(value = "selected-date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate,
             @AuthenticationPrincipal CustomUserDetails userDetails
     )
     {
@@ -60,8 +60,8 @@ public class OwnerRestController {
 
     @GetMapping("/revenue")
     public ResponseEntity<?> findMonthRevenueByCarwash(
-            @RequestParam("carwash-id") List<Long> carwashIds,
-            @RequestParam("selected-date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate,
+            @RequestParam(value = "carwash-id") List<Long> carwashIds,
+            @RequestParam(value = "selected-date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate,
             @AuthenticationPrincipal CustomUserDetails userDetails
     )
     {

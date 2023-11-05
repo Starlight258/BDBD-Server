@@ -80,6 +80,7 @@ public class OwnerResponse {
     @ToString
     public static class ReservationDTO {
         private Long reservationId;
+        private Long bayId;
         private int bayNo;
         private String nickname;
         private int totalPrice;
@@ -88,6 +89,7 @@ public class OwnerResponse {
 
         public ReservationDTO(Reservation reservation) {
             this.reservationId = reservation.getId();
+            this.bayId = reservation.getBay().getId();
             this.bayNo = reservation.getBay().getBayNum();
             this.nickname = reservation.getMember().getUsername();
             this.totalPrice = reservation.getPrice();
