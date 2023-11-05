@@ -37,7 +37,6 @@ public class MemberRestControllerTest {
         mockUserDTO.setUsername("mockuser");
         mockUserDTO.setEmail("mock@naver.com");
         mockUserDTO.setPassword("asdf1234!");
-//        mockUserDTO.setRole(MemberRole.ROLE_USER);
         mockUserDTO.setTel("010-1234-5678");
 
         Member mockMember = mockUserDTO.toUserEntity(passwordEncoder.encode(mockUserDTO.getPassword()));
@@ -73,8 +72,6 @@ public class MemberRestControllerTest {
         requestDTO.setUsername("imnewuser");
         requestDTO.setEmail("newuser@naver.com");
         requestDTO.setPassword("asdf1234!");
-//        requestDTO.setRole(MemberRole.ROLE_USER);
-//        requestDTO.setCredit(0);
         requestDTO.setTel("010-1234-5678");
 
 
@@ -105,10 +102,8 @@ public class MemberRestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(header().exists(JWTProvider.HEADER))
                 .andExpect(jsonPath("$.success").value("true"))
-//                .andExpect(jsonPath("$.response.redirectUrl").value("/user/home"))
                 .andDo(print());
     }
-    //jwt.io 에서 ROLE_USER정상반환 확인함 및 user/home으로 리다이렉트
 
 
     @Test
@@ -119,8 +114,6 @@ public class MemberRestControllerTest {
         requestDTO.setUsername("imnewuser");
         requestDTO.setEmail(email);
         requestDTO.setPassword("asdf1234!");
-//        requestDTO.setRole(MemberRole.ROLE_USER);
-//        requestDTO.setCredit(0);
         requestDTO.setTel("010-1234-5678");
 
 
@@ -145,8 +138,6 @@ public class MemberRestControllerTest {
         requestDTO.setUsername("imnewuser");
         requestDTO.setEmail(email);
         requestDTO.setPassword("asdf1234!");
-//        requestDTO.setRole(MemberRole.ROLE_USER);
-//        requestDTO.setCredit(0);
         requestDTO.setTel("010-1234-5678");
 
 
@@ -171,8 +162,6 @@ public class MemberRestControllerTest {
         requestDTO.setUsername("imnewuser");
         requestDTO.setEmail(email);
         requestDTO.setPassword("asdf1234");
-//        requestDTO.setRole(MemberRole.ROLE_USER);
-//        requestDTO.setCredit(0);
         requestDTO.setTel("010-1234-5678");
 
 
@@ -209,7 +198,6 @@ public class MemberRestControllerTest {
                 .andDo(print());
     }
 
-    //규칙에 맞지 않는 패스워드
     @Test
     public void loginWrongPasswordTest() throws Exception {
         String email = "mock@naver.com";
@@ -230,7 +218,6 @@ public class MemberRestControllerTest {
                 .andDo(print());
     }
 
-    //이메일은 맞는데 잘못 입력된 패스워드
     @Test
     public void loginNotMatchPasswordTest() throws Exception {
         String email = "mock@naver.com";

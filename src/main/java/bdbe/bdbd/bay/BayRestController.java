@@ -23,8 +23,7 @@ public class BayRestController {
             @PathVariable("carwash_id") Long carwashId,
             @Valid @RequestBody BayRequest.SaveDTO saveDTO,
             Errors errors,
-            @AuthenticationPrincipal CustomUserDetails userDetails)
-    {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         bayService.createBay(saveDTO, carwashId, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(null));
     }
