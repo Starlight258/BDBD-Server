@@ -191,6 +191,7 @@ public class ReservationResponse {
     public static class ReservationInfoDTO{
         private Long id; // 예약 id
         private TimeDTO time;
+        private Long carwashId;
         private String carwashName;
         private int bayNum;
         private int price;
@@ -201,6 +202,7 @@ public class ReservationResponse {
             timeDTO.start = reservation.getStartTime();
             timeDTO.end = reservation.getEndTime();
             this.time = timeDTO;
+            this.carwashId = carwash.getId();
             this.carwashName = carwash.getName();
             this.bayNum = bay.getBayNum();
             this.price = reservation.getPrice();

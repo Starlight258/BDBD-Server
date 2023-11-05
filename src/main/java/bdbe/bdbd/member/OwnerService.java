@@ -147,9 +147,8 @@ public class OwnerService {
             List<Reservation> reservationList = reservationJPARepository.findTodaysReservationsByCarwashId(carwash.getId(), today);
 
             List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwash.getId());
-            File carwashImage = carwashImages.stream().findFirst().orElse(null);
-            OwnerResponse.CarwashManageDTO dto = new OwnerResponse.CarwashManageDTO(carwash, bayList, optimeList, reservationList, carwashImage);
-            response.addCarwashManageDTO(dto);
+            OwnerResponse.CarwashManageByOwnerDTO dto = new OwnerResponse.CarwashManageByOwnerDTO(carwash, bayList, optimeList, reservationList, carwashImages);
+            response.addCarwashManageByOwnerDTO(dto);
         }
 
         return response;
@@ -159,6 +158,20 @@ public class OwnerService {
         // 세차장의 주인이 맞는지 확인하며 조회
         Carwash carwash = carwashJPARepository.findByIdAndMember_Id(carwashId, sessionMember.getId())
                 .orElseThrow(() -> new ForbiddenError("User is not the owner of the carwash."));
+        List<Long> carwashIds = carwashJPARepository.findCarwashIdsByMemberId(sessionMember.getId());
+        LocalDate firstDayOfCurrentMonth = LocalDate.now().withDayOfMonth(1);
+        LocalDate firstDayOfPreviousMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1);
+
+        Long currentMonthSales = reservationJPARepository.findTotalRevenueByCarwashIdsAndDate(carwashIds, firstDayOfCurrentMonth);
+        Long previousMonthSales = reservationJPARepository.findTotalRevenueByCarwashIdsAndDate(carwashIds, firstDayOfPreviousMonth);
+        Long currentMonthReservations = reservationJPARepository.findMonthlyReservationCountByCarwashIdsAndDate(carwashIds, firstDayOfCurrentMonth);
+        Long previousMonthReservations = reservationJPARepository.findMonthlyReservationCountByCarwashIdsAndDate(carwashIds, firstDayOfPreviousMonth);
+
+//        double salesGrowthPercentage = calculateGrowthPercentage(currentMonthSales, previousMonthSales); // 전월대비 판매 성장률 (단위: %)
+//        double reservationGrowthPercentage = calculateGrowthPercentage(currentMonthReservations, previousMonthReservations); // 전월대비 예약 성장률 (단위: %)
+
+        Long monthlySales = reservationJPARepository.findTotalRevenueByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
+        Long monthlyReservations = reservationJPARepository.findMonthlyReservationCountByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
 
         List<Bay> bayList = bayJPARepository.findByCarwashId(carwash.getId());
         List<Optime> optimeList = optimeJPARepository.findByCarwash_Id(carwash.getId());
@@ -167,8 +180,7 @@ public class OwnerService {
         List<Reservation> reservationList = reservationJPARepository.findTodaysReservationsByCarwashId(carwash.getId(), today);
 
         List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwash.getId());
-        File carwashImage = carwashImages.stream().findFirst().orElse(null);
-        OwnerResponse.CarwashManageDTO dto = new OwnerResponse.CarwashManageDTO(carwash, bayList, optimeList, reservationList, carwashImage);
+        OwnerResponse.CarwashManageDTO dto = new OwnerResponse.CarwashManageDTO(carwash, monthlySales, monthlyReservations, bayList, optimeList, reservationList, carwashImages);
 
         return dto;
     }
