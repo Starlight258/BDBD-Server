@@ -309,5 +309,18 @@ public class OwnerResponse {
         }
     }
 
+    @Getter
+    @Setter
+    @ToString
+    public static class UserInfoDTO {
+        private Long id;
+        private String name;
+
+        public UserInfoDTO(Member member) {
+            this.id = member.getId();
+            this.name = member.getUsername();
+        }
+    }
+
 
 }
