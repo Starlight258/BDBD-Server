@@ -113,9 +113,12 @@ public class CarwashService {
 
     @Transactional
     public List<ReservationResponse.ImageDTO> uploadAndSaveFiles(MultipartFile[] images, Carwash carwash) {
-        // 기존 이미지 삭제
         List<File> existingFiles = fileJPARepository.findByCarwash_Id(carwash.getId());
-        fileJPARepository.deleteAll(existingFiles);
+        for (File file : existingFiles) {
+            file.changeDeletedFlag(true);
+        }
+
+        fileJPARepository.saveAll(existingFiles);
 
         List<ReservationResponse.ImageDTO> updatedImages = new ArrayList<>();
         try {
