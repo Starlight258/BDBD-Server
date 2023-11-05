@@ -162,6 +162,7 @@ public class CarwashResponse {
             this.keywordId = keywordId;
             this.description = carwash.getDes();
             this.imageFiles = files.stream()
+                    .filter(file -> !file.isDeleted())  // 삭제되지 않은 파일만 포함
                     .map(FileDTO::new)
                     .collect(Collectors.toList());
         }
