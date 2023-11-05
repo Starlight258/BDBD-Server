@@ -2,15 +2,15 @@ package bdbe.bdbd.member;
 
 
 import bdbe.bdbd._core.errors.exception.BadRequestError;
+import bdbe.bdbd._core.errors.exception.UnAuthorizedError;
+import bdbe.bdbd._core.errors.security.CacheService;
 import bdbe.bdbd._core.errors.security.JWTProvider;
 import bdbe.bdbd._core.errors.utils.ApiUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -20,6 +20,10 @@ import javax.validation.Valid;
 public class MemberRestController {
 
     private final MemberService memberService;
+    @Autowired
+    private CacheService cacheService;
+
+
     // (기능3) 이메일 중복체크
     @PostMapping("/check")
     public ResponseEntity<?> check(@RequestBody @Valid MemberRequest.EmailCheckDTO emailCheckDTO, Errors errors) {
@@ -63,6 +67,22 @@ public class MemberRestController {
         MemberResponse.LoginResponse response = memberService.login(requestDTO);
         return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(null));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            MemberResponse.LogoutResponse response = cacheService.logout(token);
+            if (response.isSuccess()) {
+                return ResponseEntity.ok().body(ApiUtils.success("Logged out successfully"));
+            } else {
+                throw new UnAuthorizedError("Logout failed");
+            }
+        }
+        throw new UnAuthorizedError("No token provided");
+    }
+
+
 
 
     // 로그아웃 사용안함 - 프론트에서 JWT 토큰을 브라우저의 localstorage에서 삭제하면 됨.
