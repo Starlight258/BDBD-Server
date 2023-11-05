@@ -95,5 +95,9 @@ public class SecurityConfig {
         return source;
     }
 
+//    @Bean
+//    public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
+//        return new JwtAuthenticationEntryPoint();
+//    }
 
 }

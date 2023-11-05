@@ -159,8 +159,8 @@ public class ReservationRestControllerTest {
         String formattedDateTime = now.format(formatter);
 
         LocalDate date = LocalDate.now();
-        saveDTO.setStartTime(LocalDateTime.of(date, LocalTime.of(13, 30))); // 오전 6시
-        saveDTO.setEndTime(LocalDateTime.of(date, LocalTime.of(14, 00))); // 30분 뒤
+        saveDTO.setStartTime(LocalDateTime.of(date, LocalTime.of(14, 30))); // 오전 6시
+        saveDTO.setEndTime(LocalDateTime.of(date, LocalTime.of(15, 00))); // 30분 뒤
 
 
         String s = saveDTO.toString();

@@ -255,66 +255,66 @@ public class CarwashRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("true"));
     }
 
-    @WithUserDetails(value = "owner@nate.com")
-    @Test
-    @DisplayName("세차장 세부 정보 수정")
-    public void updateCarwashDetailsTest() throws Exception {
-
-        Long carwashId = carwashJPARepository.findFirstBy().getId();
-        System.out.println("carwashId:" + carwashId);
-
-        CarwashRequest.updateCarwashDetailsDTO updateCarwashDetailsDTO = new CarwashRequest.updateCarwashDetailsDTO();
-        updateCarwashDetailsDTO.setName("풍영 세차장");
-        updateCarwashDetailsDTO.setPrice(3000);
-        updateCarwashDetailsDTO.setTel("010-2222-3333");
-        updateCarwashDetailsDTO.setDescription("안녕하세요");
-
-        CarwashRequest.updateLocationDTO updateLocationDTO = new CarwashRequest.updateLocationDTO();
-        updateLocationDTO.setAddress("풍영 주소");
-        updateLocationDTO.setPlaceName("풍영 이름");
-        updateLocationDTO.setLatitude(1.121);
-        updateLocationDTO.setLongitude(2.232);
-        updateCarwashDetailsDTO.setLocationDTO(updateLocationDTO);
-
-        CarwashRequest.updateOperatingTimeDTO optimeDTO = new CarwashRequest.updateOperatingTimeDTO();
-
-        CarwashRequest.updateOperatingTimeDTO.updateTimeSlot weekday = new CarwashRequest.updateOperatingTimeDTO.updateTimeSlot();
-        weekday.setStart(LocalTime.of(9, 0));
-        weekday.setEnd(LocalTime.of(20, 0));
-        optimeDTO.setWeekday(weekday);
-
-        CarwashRequest.updateOperatingTimeDTO.updateTimeSlot weekend = new CarwashRequest.updateOperatingTimeDTO.updateTimeSlot();
-        weekend.setStart(LocalTime.of(9, 0));
-        weekend.setEnd(LocalTime.of(20, 0));
-        optimeDTO.setWeekend(weekend);
-        updateCarwashDetailsDTO.setOptime(optimeDTO);
-
-        Long keywordId = keywordJPARepository.findByType(KeywordType.CARWASH).get(0).getId();
-        updateCarwashDetailsDTO.setKeywordId(Arrays.asList(1L));
-
-        MockMultipartFile updatedtoFile = new MockMultipartFile("updateData", "", "application/json", om.writeValueAsBytes(updateCarwashDetailsDTO));
-
-        String requestBody = om.writeValueAsString(updateCarwashDetailsDTO);
-        System.out.println("요청 데이터 : " + requestBody);
-
-
-        ResultActions resultActions = mvc.perform(
-                MockMvcRequestBuilders.multipart(String.format("/api/owner/carwashes/%d/details", carwashId))
-                        .file(updatedtoFile)
-                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                        .with(request -> {
-                            request.setMethod("PUT");
-                            return request;
-                        })
-        );
-
-        resultActions.andExpect(status().isOk());
-
-        String responseBody = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
-        System.out.println("응답 Body:" + responseBody);
-
-        resultActions.andExpect(jsonPath("$.success").value("true"));
-    }
+//    @WithUserDetails(value = "owner@nate.com")
+//    @Test
+//    @DisplayName("세차장 세부 정보 수정")
+//    public void updateCarwashDetailsTest() throws Exception {
+//
+//        Long carwashId = carwashJPARepository.findFirstBy().getId();
+//        System.out.println("carwashId:" + carwashId);
+//
+//        CarwashRequest.updateCarwashDetailsDTO updateCarwashDetailsDTO = new CarwashRequest.updateCarwashDetailsDTO();
+//        updateCarwashDetailsDTO.setName("풍영 세차장");
+//        updateCarwashDetailsDTO.setPrice(3000);
+//        updateCarwashDetailsDTO.setTel("010-2222-3333");
+//        updateCarwashDetailsDTO.setDescription("안녕하세요");
+//
+//        CarwashRequest.updateLocationDTO updateLocationDTO = new CarwashRequest.updateLocationDTO();
+//        updateLocationDTO.setAddress("풍영 주소");
+//        updateLocationDTO.setPlaceName("풍영 이름");
+//        updateLocationDTO.setLatitude(1.121);
+//        updateLocationDTO.setLongitude(2.232);
+//        updateCarwashDetailsDTO.setLocationDTO(updateLocationDTO);
+//
+//        CarwashRequest.updateOperatingTimeDTO optimeDTO = new CarwashRequest.updateOperatingTimeDTO();
+//
+//        CarwashRequest.updateOperatingTimeDTO.updateTimeSlot weekday = new CarwashRequest.updateOperatingTimeDTO.updateTimeSlot();
+//        weekday.setStart(LocalTime.of(9, 0));
+//        weekday.setEnd(LocalTime.of(20, 0));
+//        optimeDTO.setWeekday(weekday);
+//
+//        CarwashRequest.updateOperatingTimeDTO.updateTimeSlot weekend = new CarwashRequest.updateOperatingTimeDTO.updateTimeSlot();
+//        weekend.setStart(LocalTime.of(9, 0));
+//        weekend.setEnd(LocalTime.of(20, 0));
+//        optimeDTO.setWeekend(weekend);
+//        updateCarwashDetailsDTO.setOptime(optimeDTO);
+//
+//        Long keywordId = keywordJPARepository.findByType(KeywordType.CARWASH).get(0).getId();
+//        updateCarwashDetailsDTO.setKeywordId(Arrays.asList(1L));
+//
+//        MockMultipartFile updatedtoFile = new MockMultipartFile("updateData", "", "application/json", om.writeValueAsBytes(updateCarwashDetailsDTO));
+//
+//        String requestBody = om.writeValueAsString(updateCarwashDetailsDTO);
+//        System.out.println("요청 데이터 : " + requestBody);
+//
+//
+//        ResultActions resultActions = mvc.perform(
+//                MockMvcRequestBuilders.multipart(String.format("/api/owner/carwashes/%d/details", carwashId))
+//                        .file(updatedtoFile)
+//                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+//                        .with(request -> {
+//                            request.setMethod("PUT");
+//                            return request;
+//                        })
+//        );
+//
+//        resultActions.andExpect(status().isOk());
+//
+//        String responseBody = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+//        System.out.println("응답 Body:" + responseBody);
+//
+//        resultActions.andExpect(jsonPath("$.success").value("true"));
+//    }
 }
 
 

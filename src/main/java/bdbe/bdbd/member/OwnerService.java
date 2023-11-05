@@ -1,6 +1,7 @@
 package bdbe.bdbd.member;
 
 import bdbe.bdbd._core.errors.exception.BadRequestError;
+import bdbe.bdbd._core.errors.exception.ForbiddenError;
 import bdbe.bdbd._core.errors.exception.InternalServerError;
 import bdbe.bdbd._core.errors.exception.UnAuthorizedError;
 import bdbe.bdbd._core.errors.security.JWTProvider;
@@ -91,18 +92,12 @@ public class OwnerService {
         return new OwnerResponse.SaleResponseDTO(carwashList, reservationList);
     }
 
-//    public OwnerResponse.SaleResponseDTO findBayReservation(Long bayId, Member sessionMember) {
-//        validateBayOwnership(bayId, sessionMember);
-//
-//
-////        List<Carwash> carwashList = carwashJPARepository.findCarwashesByMemberId(sessionMember.getId()); // 유저가 가진 모든 세차장 (dto에서 사용)
-//
-////        List<Reservation> reservationList = reservationJPARepository.findAllByCarwash_IdInOrderByStartTimeDesc(carwashIds, selectedDate);
-////        if (reservationList.isEmpty()) return new OwnerResponse.SaleResponseDTO(carwashList, new ArrayList<>());
-//
-//        List<Reservation> reservationList = reservationJPARepository.findByBay_Id(bayId);
-//        return new OwnerResponse.SaleResponseDTO(carwashList, reservationList);
-//    }
+    public OwnerResponse.ReservationListDTO findBayReservation(Long bayId, Member sessionMember) {
+        validateBayOwnership(bayId, sessionMember);
+
+        List<Reservation> reservationList = reservationJPARepository.findByBay_IdWithJoinsAndIsDeletedFalse(bayId);
+        return new OwnerResponse.ReservationListDTO(reservationList);
+    }
 
     /*
      owner가 해당 세차장의 주인인지 확인
@@ -119,7 +114,9 @@ public class OwnerService {
         Bay bay = bayJPARepository.findById(bayId)
                 .orElseThrow(() -> new IllegalArgumentException("Bay with id " + bayId + " not found"));
         Long carwashId = bay.getCarwash().getId();
-        if (carwashId != sessionMember.getId()) {
+        Carwash carwash = carwashJPARepository.findById(carwashId)
+                .orElseThrow(() -> new IllegalArgumentException("carwash with id" + carwashId + " not found"));
+        if (carwash.getMember().getId() != sessionMember.getId()) {
             throw new IllegalArgumentException("User is not the owner of the carwash. ");
         }
     }
@@ -161,7 +158,7 @@ public class OwnerService {
     public OwnerResponse.CarwashManageDTO fetchCarwashReservationOverview(Long carwashId, Member sessionMember) {
         // 세차장의 주인이 맞는지 확인하며 조회
         Carwash carwash = carwashJPARepository.findByIdAndMember_Id(carwashId, sessionMember.getId())
-                .orElseThrow(() -> new IllegalArgumentException("carwash id :" + carwashId + " not found"));
+                .orElseThrow(() -> new ForbiddenError("User is not the owner of the carwash."));
 
         List<Bay> bayList = bayJPARepository.findByCarwashId(carwash.getId());
         List<Optime> optimeList = optimeJPARepository.findByCarwash_Id(carwash.getId());
