@@ -64,12 +64,10 @@ public class ReviewService {
 
     private void updateAverageRate(ReviewRequest.SaveDTO dto, Carwash carwash) {
         // 세차장에 평점 저장
-        // 고객이 보낸 평점
         double clientRate = dto.getRate();
-        // 세차장 평점
         double carwashRate = carwash.getRate();
-        // 세차장 리뷰 몇 개 있는지
         long num = reviewJPARepository.countByCarwash_Id(carwash.getId());
+
         //평균 구하기
         double totalScore = 0;
         totalScore += clientRate;

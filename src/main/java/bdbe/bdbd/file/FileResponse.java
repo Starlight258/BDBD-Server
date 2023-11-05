@@ -12,7 +12,6 @@ public class FileResponse {
         private Long id;
         private String name;
         private String url;
-//        private String path;
         private LocalDateTime uploadedAt;
         private Long carwashId;
 
@@ -20,7 +19,6 @@ public class FileResponse {
             this.id = file.getId();
             this.name = file.getName();
             this.url = file.getUrl();
-//            this.path = file.getPath();
             this.uploadedAt = LocalDateTime.now();
             this.carwashId = carwashId;
         }
