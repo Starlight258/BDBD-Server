@@ -182,14 +182,14 @@ public class ReservationService {
         // 예약 분류하기
         for (Reservation reservation : reservationList) {
             Bay bay = bayJPARepository.findById(reservation.getBay().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Bay not found"));
+                    .orElseThrow(() -> new BadRequestError("Bay not found"));
             Carwash carwash = carwashJPARepository.findById(bay.getCarwash().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Carwash not found"));
+                    .orElseThrow(() -> new BadRequestError("Carwash not found"));
 
             List<File> fileList = carwash.getFileList();
-            if (!fileList.isEmpty()) {
-                File file = fileList.get(0);
-            }
+//            if (!fileList.isEmpty()) {
+//                File file = fileList.get(0);
+//            }
             LocalDateTime startDateTime = reservation.getStartTime();
             LocalDate reservationDate = startDateTime.toLocalDate();
             LocalDateTime endDateTime = reservation.getEndTime();
@@ -207,7 +207,7 @@ public class ReservationService {
             } else if (reservationDate.isAfter(today)) {
                 upcoming.add(new ReservationInfoDTO(reservation, bay, carwash));
             } else {
-                throw new IllegalStateException("reservation id: " + reservation.getId() + " not found");
+                throw new BadRequestError("reservation id: " + reservation.getId() + " not found");
             }
         }
         return new ReservationResponse.fetchCurrentStatusReservationDTO(current, upcoming, completed);
