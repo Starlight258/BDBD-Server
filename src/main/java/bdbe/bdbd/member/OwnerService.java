@@ -146,7 +146,7 @@ public class OwnerService {
             Date today = java.sql.Date.valueOf(LocalDate.now());
             List<Reservation> reservationList = reservationJPARepository.findTodaysReservationsByCarwashId(carwash.getId(), today);
 
-            List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwash.getId());
+            List<File> carwashImages = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwash.getId());
             OwnerResponse.CarwashManageByOwnerDTO dto = new OwnerResponse.CarwashManageByOwnerDTO(carwash, bayList, optimeList, reservationList, carwashImages);
             response.addCarwashManageByOwnerDTO(dto);
         }
@@ -170,7 +170,7 @@ public class OwnerService {
         Date today = java.sql.Date.valueOf(LocalDate.now());
         List<Reservation> reservationList = reservationJPARepository.findTodaysReservationsByCarwashId(carwash.getId(), today);
 
-        List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwash.getId());
+        List<File> carwashImages = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwash.getId());
         File carwashImage = carwashImages.stream().findFirst().orElse(null);
         OwnerResponse.CarwashManageDTO dto = new OwnerResponse.CarwashManageDTO(carwash, monthlySales, monthlyReservations, bayList, optimeList, reservationList, carwashImage);
 
@@ -207,7 +207,7 @@ public class OwnerService {
             Long monthlySales = reservationJPARepository.findTotalRevenueByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
             // 예약 수
             Long monthlyReservations = reservationJPARepository.findMonthlyReservationCountByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
-            List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwashId);
+            List<File> carwashImages = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwashId);
 
             OwnerResponse.CarwashInfoDTO dto = new OwnerResponse.CarwashInfoDTO(carwash, monthlySales, monthlyReservations, carwashImages);
             carwashInfoDTOList.add(dto);

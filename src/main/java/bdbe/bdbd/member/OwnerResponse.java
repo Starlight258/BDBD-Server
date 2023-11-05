@@ -262,7 +262,7 @@ public class OwnerResponse {
         private double salesGrowthPercentage;
         private Long monthlyReservations;
         private double reservationGrowthPercentage;
-        private List<CarwashInfoDTO> myStores = new ArrayList<>();
+        private List<CarwashInfoDTO> myStores;
 
         public OwnerDashboardDTO(Long monthlySales, double salesGrowthPercentage, Long monthlyReservations, double reservationGrowthPercentage, List<CarwashInfoDTO> myStores) {
             this.monthlySales = monthlySales;
@@ -272,9 +272,6 @@ public class OwnerResponse {
             this.myStores = myStores;
         }
 
-        public void addCarwashInfoDTO(CarwashInfoDTO carwashInfoDTO) {
-            this.myStores.add(carwashInfoDTO);
-        }
     }
 
     @Getter
@@ -293,7 +290,6 @@ public class OwnerResponse {
             this.monthlySales = monthlySales;
             this.monthlyReservations = monthlyReservations;
             this.imageFiles = files.stream()
-                    .filter(file -> !file.isDeleted())  // 삭제되지 않은 파일만 포함
                     .map(FileDTO::new)
                     .collect(Collectors.toList());
 

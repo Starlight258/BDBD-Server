@@ -113,7 +113,7 @@ public class CarwashService {
 
     @Transactional
     public List<ReservationResponse.ImageDTO> uploadAndSaveFiles(MultipartFile[] images, Carwash carwash) {
-        List<File> existingFiles = fileJPARepository.findByCarwash_Id(carwash.getId());
+        List<File> existingFiles = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwash.getId());
         for (File file : existingFiles) {
             file.changeDeletedFlag(true);
         }
@@ -252,7 +252,7 @@ public class CarwashService {
         Optime weekOptime = optimeByDayType.get(DayType.WEEKDAY);
         Optime endOptime = optimeByDayType.get(DayType.WEEKEND);
 
-        List<File> imageFiles = fileJPARepository.findByCarwash_Id(carwashId);
+        List<File> imageFiles = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwashId);
 
         return new CarwashResponse.findByIdDTO(carwash, reviewCnt, bayCnt, location, keywordIds, weekOptime, endOptime, imageFiles);
     }
@@ -275,7 +275,7 @@ public class CarwashService {
         Optime weekOptime = optimeByDayType.get(DayType.WEEKDAY);
         Optime endOptime = optimeByDayType.get(DayType.WEEKEND);
 
-        List<File> imageFiles = fileJPARepository.findByCarwash_Id(carwashId);
+        List<File> imageFiles = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwashId);
 
         return new CarwashResponse.carwashDetailsDTO(carwash, location, keywordIds, weekOptime, endOptime,imageFiles);
 

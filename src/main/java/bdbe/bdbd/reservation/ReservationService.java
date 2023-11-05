@@ -165,7 +165,7 @@ public class ReservationService {
         Location location = locationJPARepository.findById(carwash.getLocation().getId())
                 .orElseThrow(() -> new NoSuchElementException("no location found"));
 
-        File file = fileJPARepository.findFirstByCarwashIdOrderByUploadedAtAsc(carwash.getId()).orElse(null);
+        File file = fileJPARepository.findFirstByCarwashIdAndIsDeletedFalseOrderByUploadedAtAsc(carwash.getId()).orElse(null);
         return new ReservationResponse.findLatestOneResponseDTO(reservation, bay, carwash, location, file);
     }
 
@@ -216,17 +216,14 @@ public class ReservationService {
     public ReservationResponse.fetchRecentReservationDTO fetchRecentReservation(Member sessionMember) {
         // 유저의 예약내역 모두 조회
         Pageable pageable = PageRequest.of(0, 5); // 최대 5개까지만 가져오기
-        List<Reservation> reservationList = reservationJPARepository.findByMemberIdJoinFetch(sessionMember.getId(), pageable)
-                .stream()
-                .filter(r -> !r.isDeleted())
-                .collect(Collectors.toList());
+        List<Reservation> reservationList = reservationJPARepository.findByMemberIdJoinFetch(sessionMember.getId(), pageable);
         List<ReservationResponse.RecentReservation> recentReservations = new ArrayList<>();
         for (Reservation reservation : reservationList) {
             Bay bay = bayJPARepository.findById(reservation.getBay().getId())
                     .orElseThrow(() -> new EntityNotFoundException("Bay not found"));
             Carwash carwash = carwashJPARepository.findById(bay.getCarwash().getId())
                     .orElseThrow(() -> new EntityNotFoundException("Carwash not found"));
-            List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwash.getId());
+            List<File> carwashImages = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwash.getId());
             File carwashImage = carwashImages.stream().findFirst().orElse(null);
 
             recentReservations.add(new ReservationResponse.RecentReservation(reservation, carwashImage));
