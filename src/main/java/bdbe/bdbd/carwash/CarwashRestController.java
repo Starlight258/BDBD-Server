@@ -3,12 +3,10 @@ package bdbe.bdbd.carwash;
 import bdbe.bdbd._core.errors.exception.BadRequestError;
 import bdbe.bdbd._core.errors.security.CustomUserDetails;
 import bdbe.bdbd._core.errors.utils.ApiUtils;
-import bdbe.bdbd.file.FileResponse;
 import bdbe.bdbd.file.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -72,7 +70,6 @@ public class CarwashRestController {
     }
 
 
-
     @GetMapping("/carwashes/nearby")
     public ResponseEntity<?> findNearestCarwashesByUserLocation(@RequestParam double latitude, @RequestParam double longitude) {
         validateLatitudeAndLongitude(latitude, longitude);
@@ -113,11 +110,11 @@ public class CarwashRestController {
         return ResponseEntity.ok(ApiUtils.success(carwashDetailsDTO));
     }
 
-    @DeleteMapping("/owner/carwashes/{carwash_id}/images/{image_id}")
+    @DeleteMapping("/owner/images/{image_id}")
     public ResponseEntity<?> deleteImage(
-            @PathVariable("carwash_id") Long carwashId,
-            @PathVariable("image_id") Long imageId) {
-        fileService.deleteFile(imageId);
+            @PathVariable("image_id") Long imageId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        fileService.deleteFile(imageId, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
@@ -129,7 +126,6 @@ public class CarwashRestController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
 
-        // 세차장 상세 정보 업데이트
         CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO =
                 carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
 

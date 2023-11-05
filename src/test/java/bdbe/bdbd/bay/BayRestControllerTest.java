@@ -65,24 +65,6 @@ public class BayRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("true"));
     }
 
-//    @WithUserDetails("user@nate.com")
-//    @Test
-//    @DisplayName("베이 삭제")
-//    public void deleteBayTest() throws Exception {
-//
-//        Long carwashId = carwashJPARepository.findFirstBy().getId();
-//        System.out.println("carwashId:" + carwashId);
-//
-//        Long bayId = bayJPARepository.findFirstBy().getId();
-//        System.out.println("bayId:" + bayId);
-//
-//        mvc.perform(
-//                delete(String.format("/owner/bays/%d", bayId))
-//                        .contentType(MediaType.APPLICATION_JSON_VALUE))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.success").value("true")
-//                );
-//    }
     @WithUserDetails("owner@nate.com")
     @Test
     @DisplayName("베이 활성화/비활성화")

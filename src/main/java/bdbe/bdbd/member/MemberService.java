@@ -32,17 +32,6 @@ public class MemberService {
         }
     }
 
-//    public String login(UserRequest.LoginDTO requestDTO) {
-//        User userPS = userJPARepository.findByEmail(requestDTO.getEmail()).orElseThrow(
-//                () -> new Exception400("이메일을 찾을 수 없습니다 : "+requestDTO.getEmail())
-//        );
-//
-//        if(!passwordEncoder.matches(requestDTO.getPassword(), userPS.getPassword())){
-//            throw new Exception400("패스워드가 잘못입력되었습니다.");
-//        }
-//        return JWTProvider.create(userPS);
-//    }
-
     public MemberResponse.LoginResponse login(MemberRequest.LoginDTO requestDTO) {
         Member memberPS = memberJPARepository.findByEmail(requestDTO.getEmail()).orElseThrow(
                 () -> new BadRequestError("email not found : " + requestDTO.getEmail())
@@ -64,5 +53,15 @@ public class MemberService {
         if (userOP.isPresent()) {
             throw new BadRequestError("duplicate email exist : " + email);
         }
+    }
+
+    /*
+        토큰으로 전달받은 Member 객체의 ID를 이용하여 데이터베이스에서 해당 멤버의 전체 정보를 조회하는 메서드
+     */
+    public OwnerResponse.UserInfoDTO findUserInfo(Member member) {
+        Member findMember = memberJPARepository.findById(member.getId())
+                .orElseThrow(() -> new BadRequestError("member not found"));
+
+        return new OwnerResponse.UserInfoDTO(findMember);
     }
 }

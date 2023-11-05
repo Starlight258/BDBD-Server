@@ -42,10 +42,4 @@ public class FileRestController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/delete/{file_id}")
-    public ResponseEntity<?> deleteFile(@PathVariable("file_id") Long fileId) {
-        fileService.deleteFile(fileId);
-        return ResponseEntity.ok(ApiUtils.success(null));
-    }
-
 }

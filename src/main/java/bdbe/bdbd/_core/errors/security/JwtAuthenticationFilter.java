@@ -53,6 +53,18 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
                 throw new UnAuthorizedError("Token is not cached");
             }
 
+            MemberRole roleEnum = MemberRole.valueOf(role);
+            Member member = Member.builder().id(id).role(roleEnum).build();
+
+            CustomUserDetails myUserDetails = new CustomUserDetails(member);
+            Authentication authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            myUserDetails,
+                            myUserDetails.getPassword(),
+                            myUserDetails.getAuthorities()
+                    );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
         } catch (SignatureVerificationException sve) {
             sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid token signature");
             return;

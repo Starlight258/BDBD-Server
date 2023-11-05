@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.LocalTime;
 
@@ -28,16 +27,6 @@ public class BayRequest {
         }
 
     }
-    @Getter
-    @Setter
-    @ToString
-    public static class DeleteDTO {
-        @NotNull
-        private Long bayId;
-
-    }
-
-
 
     @Getter
     @Setter

@@ -29,11 +29,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//@ActiveProfiles("test") //test profile 사용
 @Transactional
-@AutoConfigureMockMvc //MockMvc 사용
+@AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-//통합테스트(SF-F-DS(Handler, ExHandler)-C-S-R-PC-DB) 다 뜬다.
 public class CarwashRestControllerTest {
     @Autowired
     private MockMvc mvc;
@@ -77,15 +75,20 @@ public class CarwashRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("true"));
     }
 
-//     사진까지 함께 등록해야함
+
     @WithUserDetails(value = "owner@nate.com")
     @Test
     @DisplayName("세차장 등록 기능")
     public void save_test() throws Exception {
         // given
-        // dto 생성
         CarwashRequest.SaveDTO dto = new CarwashRequest.SaveDTO();
-        dto.setKeywordId(new ArrayList<>());
+
+        Keyword keyword = Keyword.builder()
+                .name("하부세차")
+                .type(KeywordType.CARWASH)
+                .build();
+        Keyword savedKeyword = keywordJPARepository.save(keyword);
+        dto.setKeywordId(Arrays.asList(savedKeyword.getId()));
         dto.setName("test 세차장");
 
         dto.setTel("01012345678");
@@ -117,15 +120,6 @@ public class CarwashRestControllerTest {
         MockMultipartFile updatedtoFile = new MockMultipartFile("updateData", "", "application/json", om.writeValueAsBytes(dto));
         MockMultipartFile carwashFile = new MockMultipartFile("carwash", "", "application/json", om.writeValueAsBytes(dto));
 
-
-        Keyword keyword = Keyword.builder()
-                .name("하부세차")
-                .type(KeywordType.CARWASH)
-                .build();
-        Keyword savedKeyword = keywordJPARepository.save(keyword);
-        dto.setKeywordId(Arrays.asList(savedKeyword.getId()));
-
-
         String requestBody = om.writeValueAsString(dto);
         System.out.println("요청 데이터 : " + requestBody);
         // when
@@ -141,7 +135,6 @@ public class CarwashRestControllerTest {
         // eye
         String responseBody = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         System.out.println("응답 Body : " + responseBody);
-//
         // verify
         resultActions.andExpect(jsonPath("$.success").value("true"));
 
@@ -193,7 +186,6 @@ public class CarwashRestControllerTest {
 
         // verify
         resultActions.andExpect(jsonPath("$.success").value("true"));
-//        resultActions.andExpect(jsonPath("$").isMap());
     }
 
     @WithUserDetails(value = "user@nate.com")

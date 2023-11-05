@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 
 public interface ReservationJPARepository extends JpaRepository<Reservation, Long> {
-//    Reservation findFirstByIsDeletedFalse();  // 테스트시에 사용
 
     @Query("SELECT r FROM Reservation r JOIN FETCH r.bay b JOIN FETCH b.carwash WHERE r.member.id = :memberId AND r.isDeleted = false")
     List<Reservation> findFirstByMemberIdWithJoinFetch(@Param("memberId") Long memberId, Pageable pageable);
@@ -20,12 +19,13 @@ public interface ReservationJPARepository extends JpaRepository<Reservation, Lon
     @Query("select r from Reservation r " +
             "join fetch r.member m " +
             "join fetch r.bay b " +
+            "join fetch b.carwash c " +
             "where b.id = :bayId and r.isDeleted = false")
     List<Reservation> findByBay_IdWithJoinsAndIsDeletedFalse(@Param("bayId") Long bayId);
 
-    List<Reservation> findByBay_IdAndIsDeletedFalse(Long bayId); // 베이의 예약 목록 찾기
+    List<Reservation> findByBay_IdAndIsDeletedFalse(Long bayId);
 
-    List<Reservation> findByMemberIdAndIsDeletedFalse(Long memberId); // member의 예약 목록 찾기
+    List<Reservation> findByMemberIdAndIsDeletedFalse(Long memberId);
 
     @Query("SELECT r FROM Reservation r JOIN FETCH r.bay b JOIN FETCH b.carwash WHERE r.member.id = :memberId AND r.isDeleted = false")
     List<Reservation> findByMemberIdJoinFetch(@Param("memberId") Long memberId, Pageable pageable);
@@ -49,6 +49,7 @@ public interface ReservationJPARepository extends JpaRepository<Reservation, Lon
     // 세차장 id들로 판매 수익 구하기
     @Query("SELECT COALESCE(SUM(r.price), 0) FROM Reservation r WHERE r.bay.carwash.id IN :carwashIds AND FUNCTION('YEAR', r.startTime) = FUNCTION('YEAR', :selectedDate) AND FUNCTION('MONTH', r.startTime) = FUNCTION('MONTH', :selectedDate) AND r.isDeleted = false")
     Long findTotalRevenueByCarwashIdsAndDate(@Param("carwashIds") List<Long> carwashIds, @Param("selectedDate") LocalDate selectedDate);
+
 
     // 하나의 세차장 id로 판매 수익 구하기
     @Query("SELECT COALESCE(SUM(r.price), 0) FROM Reservation r WHERE r.bay.carwash.id = :carwashId AND FUNCTION('YEAR', r.startTime) = FUNCTION('YEAR', :selectedDate) AND FUNCTION('MONTH', r.startTime) = FUNCTION('MONTH', :selectedDate) AND r.isDeleted = false")

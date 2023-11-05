@@ -1,6 +1,8 @@
 package bdbe.bdbd.pay;
 
 import bdbe.bdbd._core.errors.exception.BadRequestError;
+import bdbe.bdbd._core.errors.exception.ForbiddenError;
+import bdbe.bdbd._core.errors.exception.NotFoundError;
 import bdbe.bdbd.carwash.Carwash;
 import bdbe.bdbd.carwash.CarwashJPARepository;
 import bdbe.bdbd.member.Member;
@@ -50,10 +52,10 @@ public class PayService {
     @Autowired
     private CarwashJPARepository carwashJpaRepository;
 
-    public ResponseEntity<String> requestPaymentReady(PayRequest.PayReadyRequestDTO requestDto, ReservationRequest.SaveDTO saveDTO, Long carwashId) {
+    public ResponseEntity<String> requestPaymentReady(PayRequest.PayReadyRequestDTO requestDto, ReservationRequest.SaveDTO saveDTO, Long carwashId, Member member) {
 
         Carwash carwash = carwashJpaRepository.findById(carwashId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 세차장이 존재하지 않습니다. id=" + carwashId));
+                .orElseThrow(() -> new BadRequestError("carwash id: " + carwashId + "not found"));
 
         int perPrice = carwash.getPrice();
         LocalDateTime startTime = saveDTO.getStartTime();
@@ -65,23 +67,15 @@ public class PayService {
         int price = perPrice * blocksOf30Minutes;
 
         int totalAmount = price;  //세금 포함 가격
-//        int vatAmount = (int)(price * 0.1);  // 세금
 
         PayRequest.PayReadyRequestDTO dto = new PayRequest.PayReadyRequestDTO();
         dto.setTotal_amount(totalAmount);
-//        dto.setVat_amount(vatAmount);
-
-//        RestTemplate restTemplate = new RestTemplate();
-
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set("Authorization", "KakaoAK " + adminKey);
 
-        PayRequest.PayReadyRequestDTO payReadyRequestDTO = new PayRequest.PayReadyRequestDTO();
         requestDto.setTotal_amount(totalAmount);
-//        requestDto.setVat_amount(vatAmount);
-        log.info("Request DTO: " + requestDto.toString());
 
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", requestDto.getCid());
@@ -90,7 +84,6 @@ public class PayService {
         parameters.add("item_name", requestDto.getItem_name());
         parameters.add("quantity", requestDto.getQuantity().toString());
         parameters.add("total_amount", requestDto.getTotal_amount().toString());
-//        parameters.add("vat_amount", requestDto.getVat_amount().toString());
         parameters.add("tax_free_amount", requestDto.getTax_free_amount().toString());
         parameters.add("approval_url", approval_url);
         parameters.add("cancel_url", cancel_url);
@@ -109,10 +102,8 @@ public class PayService {
             PayRequest.PayApprovalRequestDTO requestDto,
             Long carwashId,
             Long bayId,
-            Member member,  // 변수 이름 변경
+            Member member,
             ReservationRequest.SaveDTO saveDTO) {
-
-//        RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -129,9 +120,6 @@ public class PayService {
         String url = "https://kapi.kakao.com/v1/payment/approve";
 
         ResponseEntity<String> paymentApprovalResponse = restTemplate.postForEntity(url, request, String.class);
-
-//        PayResponse.PaymentAndReservationResponseDTO responseDto = new PayResponse.PaymentAndReservationResponseDTO();
-//        responseDto.setPaymentApprovalResponse(paymentApprovalResponse.getBody());
 
         Reservation reservation;
 

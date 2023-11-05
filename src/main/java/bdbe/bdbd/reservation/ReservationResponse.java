@@ -1,17 +1,13 @@
 package bdbe.bdbd.reservation;
 
-import bdbe.bdbd._core.errors.utils.Haversine;
 import bdbe.bdbd.bay.Bay;
 import bdbe.bdbd.carwash.Carwash;
 import bdbe.bdbd.file.File;
 import bdbe.bdbd.location.Location;
-import bdbe.bdbd.member.OwnerResponse;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import java.awt.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -96,7 +92,7 @@ public class ReservationResponse {
         private Long reservationId;
         private TimeDTO time;
         private int price;
-        private int bayNo; // 예약된 베이 번호
+        private int bayNo;
     }
     @Getter
     @Setter
@@ -105,7 +101,6 @@ public class ReservationResponse {
         private String name;
         private LocationDTO location;
         private List<ImageDTO> carwashImages;
-//        private String imagePath;
     }
     @Getter
     @Setter
@@ -128,14 +123,12 @@ public class ReservationResponse {
         private Long id;
         private String name;
         private String url;
-//        private String path;
         private LocalDateTime uploadedAt;
 
         public ImageDTO(File file) {
             this.id = file.getId();
             this.name = file.getName();
             this.url = file.getUrl();
-//            this.path = file.getPath();
             this.uploadedAt = file.getUploadedAt();
         }
     }
@@ -185,11 +178,10 @@ public class ReservationResponse {
 
 
 
-
     @Getter
     @Setter
     public static class ReservationInfoDTO{
-        private Long id; // 예약 id
+        private Long id;
         private TimeDTO time;
         private Long carwashId;
         private String carwashName;
@@ -207,7 +199,7 @@ public class ReservationResponse {
             this.bayNum = bay.getBayNum();
             this.price = reservation.getPrice();
             List<File> activeFiles = carwash.getFileList().stream()
-                    .filter(file -> !file.isDeleted())  // 삭제되지 않은 파일만 포함
+                    .filter(file -> !file.isDeleted())
                     .collect(Collectors.toList());
             if (!activeFiles.isEmpty()) {
                 this.image = new ImageDTO(activeFiles.get(0));
@@ -215,5 +207,20 @@ public class ReservationResponse {
         }
     }
 
+    @Getter
+    @Setter
+    @ToString
+    public static class PayAmountDTO {
+
+        private LocalDateTime startTime;
+        private LocalDateTime endTime;
+        private int price;
+
+        public PayAmountDTO(LocalDateTime startTime, LocalDateTime endTime, int price) {
+            this.startTime = startTime;
+            this.endTime = endTime;
+            this.price = price;
+        }
+    }
 
 }

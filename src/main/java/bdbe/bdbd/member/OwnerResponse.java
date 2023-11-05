@@ -23,8 +23,8 @@ public class OwnerResponse {
     @Setter
     @ToString
     public static class SaleResponseDTO {
-        private List<CarwashListDTO> carwashList;  // 세차장 목록
-        private List<ReservationCarwashDTO> reservationList; // 매출 정보
+        private List<CarwashListDTO> carwashList;
+        private List<ReservationCarwashDTO> reservationList;
 
         public SaleResponseDTO(List<Carwash> carwashList, List<Reservation> reservationList) {
             this.carwashList = carwashList.stream()
@@ -80,6 +80,7 @@ public class OwnerResponse {
     @ToString
     public static class ReservationDTO {
         private Long reservationId;
+        private Long bayId;
         private int bayNo;
         private String nickname;
         private int totalPrice;
@@ -88,6 +89,7 @@ public class OwnerResponse {
 
         public ReservationDTO(Reservation reservation) {
             this.reservationId = reservation.getId();
+            this.bayId = reservation.getBay().getId();
             this.bayNo = reservation.getBay().getBayNum();
             this.nickname = reservation.getMember().getUsername();
             this.totalPrice = reservation.getPrice();
@@ -140,7 +142,7 @@ public class OwnerResponse {
     @Getter
     @Setter
     @ToString
-    public static class CarwashManageByOwnerDTO { // 매장 관리 (owner별, 세차장별 )
+    public static class CarwashManageByOwnerDTO {
         private Long id;
         private String name;
         private OperationTimeDTO optime;
@@ -162,7 +164,7 @@ public class OwnerResponse {
     @Getter
     @Setter
     @ToString
-    public static class CarwashManageDTO { // 매장 관리 (owner별, 세차장별 )
+    public static class CarwashManageDTO {
         private Long id;
         private String name;
         private Long monthlySales;
@@ -224,14 +226,14 @@ public class OwnerResponse {
     @Setter
     @ToString
     public static class BayReservationDTO {
-        private int bayNo;
         private Long bayId;
+        private int bayNo;
         private int status;
         private List<BookedTimeDTO> bayBookedTime;
 
         public BayReservationDTO(Bay bay, List<Reservation> reservationList) {
-            this.bayNo = bay.getBayNum();
             this.bayId = bay.getId();
+            this.bayNo = bay.getBayNum();
             this.status = bay.getStatus();
             this.bayBookedTime = reservationList.stream()
                     .filter(reservation -> reservation.getBay() != null && reservation.getBay().getId().equals(bay.getId()))
@@ -262,7 +264,7 @@ public class OwnerResponse {
         private double salesGrowthPercentage;
         private Long monthlyReservations;
         private double reservationGrowthPercentage;
-        private List<CarwashInfoDTO> myStores = new ArrayList<>();
+        private List<CarwashInfoDTO> myStores;
 
         public OwnerDashboardDTO(Long monthlySales, double salesGrowthPercentage, Long monthlyReservations, double reservationGrowthPercentage, List<CarwashInfoDTO> myStores) {
             this.monthlySales = monthlySales;
@@ -272,31 +274,51 @@ public class OwnerResponse {
             this.myStores = myStores;
         }
 
-        public void addCarwashInfoDTO(CarwashInfoDTO carwashInfoDTO) {
-            this.myStores.add(carwashInfoDTO);
-        }
     }
 
     @Getter
     @Setter
     public static class CarwashInfoDTO {
-        private String name;
         private Long carwashId;
+        private String name;
         private Long monthlySales;
         private Long monthlyReservations;
         private List<FileDTO> imageFiles;
 
 
         public CarwashInfoDTO(Carwash carwash, Long monthlySales, Long monthlyReservations, List<File> files) {
-            this.name = carwash.getName();
             this.carwashId = carwash.getId();
+            this.name = carwash.getName();
             this.monthlySales = monthlySales;
             this.monthlyReservations = monthlyReservations;
             this.imageFiles = files.stream()
-                    .filter(file -> !file.isDeleted())  // 삭제되지 않은 파일만 포함
                     .map(FileDTO::new)
                     .collect(Collectors.toList());
 
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class ReservationCarwashListDTO {
+        private List<ReservationCarwashDTO> reservationList;
+
+        public ReservationCarwashListDTO(List<Reservation> reservationList) {
+            this.reservationList = reservationList.stream().map(ReservationCarwashDTO::new).collect(Collectors.toList());
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class UserInfoDTO {
+        private Long id;
+        private String name;
+
+        public UserInfoDTO(Member member) {
+            this.id = member.getId();
+            this.name = member.getUsername();
         }
     }
 
