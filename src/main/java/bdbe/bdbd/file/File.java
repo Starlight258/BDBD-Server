@@ -17,7 +17,7 @@ public class File {
 
     @Column(length = 1024)
     private String url;
-    private String path;
+
     private LocalDateTime uploadedAt;
 
     @Column(name="is_deleted", nullable = false)
@@ -33,10 +33,10 @@ public class File {
     }
 
     @Builder
-    public File(String name, String url, String path, LocalDateTime uploadedAt, Carwash carwash) {
+    public File(String name, String url, LocalDateTime uploadedAt, Carwash carwash) {
         this.name = name;
         this.url = url;
-        this.path = path;
+//        this.path = path;
         this.uploadedAt = uploadedAt;
         this.carwash = carwash;
 

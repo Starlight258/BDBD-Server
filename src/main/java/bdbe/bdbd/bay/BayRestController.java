@@ -38,8 +38,9 @@ public class BayRestController {
     @PutMapping("/owner/bays/{bay_id}/status") //베이 활성화/비활성화
     public ResponseEntity<?> updateStatus(
             @PathVariable("bay_id") Long bayId,
-            @RequestParam int status) {
-        bayService.changeStatus(bayId, status);
+            @RequestParam int status,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        bayService.changeStatus(bayId, status, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
