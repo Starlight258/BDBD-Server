@@ -229,6 +229,7 @@ public class CarwashResponse {
             this.price = carwash.getPrice();
             this.tel = carwash.getTel();
             this.images = carwash.getFileList().stream()
+                    .filter(file -> !file.isDeleted())
                     .map(ReservationResponse.ImageDTO::new)
                     .collect(Collectors.toList());
         }
