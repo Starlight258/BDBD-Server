@@ -1,6 +1,8 @@
 package bdbe.bdbd.carwash;
 
 
+import bdbe.bdbd._core.errors.exception.BadRequestError;
+import bdbe.bdbd._core.errors.exception.ForbiddenError;
 import bdbe.bdbd._core.errors.utils.FileUploadUtil;
 import bdbe.bdbd._core.errors.utils.Haversine;
 import bdbe.bdbd.file.S3ProxyUploadService;
@@ -240,10 +242,13 @@ public class CarwashService {
         return new CarwashResponse.findByIdDTO(carwash, reviewCnt, bayCnt, location, keywordIds, weekOptime, endOptime, imageFiles);
     }
 
-    public CarwashResponse.carwashDetailsDTO findCarwashByDetails(Long carwashId) {
+    public CarwashResponse.carwashDetailsDTO findCarwashByDetails(Long carwashId, Member member) {
 
         Carwash carwash = carwashJPARepository.findById(carwashId)
-                .orElseThrow(() -> new IllegalArgumentException("not found carwash"));
+                .orElseThrow(() -> new IllegalArgumentException("carwash not found"));
+        if (carwash.getMember().getId() != member.getId())
+            throw new ForbiddenError("User is not the owner of the carwash.");
+
         Location location = locationJPARepository.findById(carwash.getLocation().getId())
                 .orElseThrow(() -> new NoSuchElementException("location not found"));
         List<Long> keywordIds = carwashKeywordJPARepository.findKeywordIdsByCarwashId(carwashId);
@@ -263,11 +268,13 @@ public class CarwashService {
     private static final Logger logger = LoggerFactory.getLogger(CarwashService.class);
 
     @Transactional
-    public CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetails(Long carwashId, CarwashRequest.updateCarwashDetailsDTO updatedto, MultipartFile[] images) {
+    public CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetails(Long carwashId, CarwashRequest.updateCarwashDetailsDTO updatedto, MultipartFile[] images, Member member) {
         updateCarwashDetailsResponseDTO response = new updateCarwashDetailsResponseDTO();
         Carwash carwash = carwashJPARepository.findById(carwashId)
-                .orElseThrow(() -> new IllegalArgumentException("not found carwash"));
-
+                .orElseThrow(() -> new BadRequestError("carwash not found"));
+        if (carwash.getMember().getId() != member.getId()) {
+            throw new ForbiddenError("User is not the owner of the carwash.");
+        }
         carwash.setName(updatedto.getName());
         carwash.setTel(updatedto.getTel());
         carwash.setDes(updatedto.getDescription());
@@ -276,7 +283,7 @@ public class CarwashService {
 
         CarwashRequest.updateLocationDTO updateLocationDTO = updatedto.getLocationDTO();
         Location location = locationJPARepository.findById(carwash.getLocation().getId())
-                .orElseThrow(() -> new NoSuchElementException("location not found"));
+                .orElseThrow(() -> new BadRequestError("location not found"));
 
 
         location.updateAddress(updateLocationDTO.getAddress(), updateLocationDTO.getPlaceName()

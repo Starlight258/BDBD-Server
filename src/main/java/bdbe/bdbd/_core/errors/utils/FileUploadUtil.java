@@ -112,7 +112,7 @@ public class FileUploadUtil {
         bdbe.bdbd.file.File newFile = bdbe.bdbd.file.File.builder()
                 .name(fileName)
                 .url(amazonS3.getUrl(bucketName, fileName).toExternalForm())
-                .path(file.getPath())
+//                .path(file.getPath())
                 .uploadedAt(LocalDateTime.now())
                 .carwash(carwash)
                 .build();
@@ -158,7 +158,7 @@ public class FileUploadUtil {
             FileRequest.FileDTO fileDTO = new FileRequest.FileDTO();
             fileDTO.setName(fileName);
             fileDTO.setUrl(amazonS3.getUrl(bucketName, fileName).toExternalForm());
-            fileDTO.setPath(file.getPath());
+//            fileDTO.setPath(file.getPath());
             fileDTO.setUploadedAt(LocalDateTime.now());
             fileDTO.setCarwash(carwash);
             log.info("start to make file entity");

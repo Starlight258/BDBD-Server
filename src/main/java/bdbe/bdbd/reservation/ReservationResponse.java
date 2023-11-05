@@ -128,14 +128,14 @@ public class ReservationResponse {
         private Long id;
         private String name;
         private String url;
-        private String path;
+//        private String path;
         private LocalDateTime uploadedAt;
 
         public ImageDTO(File file) {
             this.id = file.getId();
             this.name = file.getName();
             this.url = file.getUrl();
-            this.path = file.getPath();
+//            this.path = file.getPath();
             this.uploadedAt = file.getUploadedAt();
         }
     }
