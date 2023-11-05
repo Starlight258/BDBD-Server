@@ -129,10 +129,32 @@ public class OwnerResponse {
     @Setter
     @ToString
     public static class ReservationOverviewResponseDTO {
-        private List<CarwashManageDTO> carwash = new ArrayList<>();
+        private List<CarwashManageByOwnerDTO> carwash = new ArrayList<>();
 
-        public void addCarwashManageDTO(CarwashManageDTO carwashManageDTO) {
-            this.carwash.add(carwashManageDTO);
+        public void addCarwashManageByOwnerDTO(CarwashManageByOwnerDTO carwashManageByOwnerDTO) {
+            this.carwash.add(carwashManageByOwnerDTO);
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class CarwashManageByOwnerDTO { // 매장 관리 (owner별, 세차장별 )
+        private Long id;
+        private String name;
+        private OperationTimeDTO optime;
+        private List<BayReservationDTO> bays = new ArrayList<>();
+        private List<FileDTO> imageFiles;
+
+        public CarwashManageByOwnerDTO(Carwash carwash, List<Bay> bayList, List<Optime> optimeList, List<Reservation> reservationList, List<File> files) {
+            this.id = carwash.getId();
+            this.name = carwash.getName();
+            this.optime = new OperationTimeDTO(optimeList);
+            for (Bay bay : bayList) {
+                BayReservationDTO bayReservationDTO = new BayReservationDTO(bay, reservationList);
+                this.bays.add(bayReservationDTO);
+            }
+            this.imageFiles = files.stream().map(FileDTO::new).collect(Collectors.toList());
         }
     }
 
@@ -142,21 +164,24 @@ public class OwnerResponse {
     public static class CarwashManageDTO { // 매장 관리 (owner별, 세차장별 )
         private Long id;
         private String name;
+        private Long monthlySales;
+        private Long monthlyReservations;
         private OperationTimeDTO optime;
         private List<BayReservationDTO> bays = new ArrayList<>();
-        private FileDTO image;
+        private List<FileDTO> imageFiles;
 
-        public CarwashManageDTO(Carwash carwash, List<Bay> bayList, List<Optime> optimeList, List<Reservation> reservationList, File file) {
+        public CarwashManageDTO(Carwash carwash, Long monthlySales, Long monthlyReservations, List<Bay> bayList, List<Optime> optimeList, List<Reservation> reservationList, List<File> files) {
             this.id = carwash.getId();
             this.name = carwash.getName();
+            this.monthlySales = monthlySales;
+            this.monthlyReservations = monthlyReservations;
             this.optime = new OperationTimeDTO(optimeList);
             for (Bay bay : bayList) {
                 BayReservationDTO bayReservationDTO = new BayReservationDTO(bay, reservationList);
                 this.bays.add(bayReservationDTO);
             }
-            this.image = (file != null) ? new FileDTO(file) : null;
+            this.imageFiles = files.stream().map(FileDTO::new).collect(Collectors.toList());
         }
-
     }
 
     @Getter
