@@ -224,14 +224,14 @@ public class OwnerResponse {
     @Setter
     @ToString
     public static class BayReservationDTO {
-        private int bayNo;
         private Long bayId;
+        private int bayNo;
         private int status;
         private List<BookedTimeDTO> bayBookedTime;
 
         public BayReservationDTO(Bay bay, List<Reservation> reservationList) {
-            this.bayNo = bay.getBayNum();
             this.bayId = bay.getId();
+            this.bayNo = bay.getBayNum();
             this.status = bay.getStatus();
             this.bayBookedTime = reservationList.stream()
                     .filter(reservation -> reservation.getBay() != null && reservation.getBay().getId().equals(bay.getId()))
@@ -280,16 +280,16 @@ public class OwnerResponse {
     @Getter
     @Setter
     public static class CarwashInfoDTO {
-        private String name;
         private Long carwashId;
+        private String name;
         private Long monthlySales;
         private Long monthlyReservations;
         private List<FileDTO> imageFiles;
 
 
         public CarwashInfoDTO(Carwash carwash, Long monthlySales, Long monthlyReservations, List<File> files) {
-            this.name = carwash.getName();
             this.carwashId = carwash.getId();
+            this.name = carwash.getName();
             this.monthlySales = monthlySales;
             this.monthlyReservations = monthlyReservations;
             this.imageFiles = files.stream()
