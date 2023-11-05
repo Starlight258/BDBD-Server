@@ -1,17 +1,13 @@
 package bdbe.bdbd.reservation;
 
-import bdbe.bdbd._core.errors.utils.Haversine;
 import bdbe.bdbd.bay.Bay;
 import bdbe.bdbd.carwash.Carwash;
 import bdbe.bdbd.file.File;
 import bdbe.bdbd.location.Location;
-import bdbe.bdbd.member.OwnerResponse;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import java.awt.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -215,5 +211,20 @@ public class ReservationResponse {
         }
     }
 
+    @Getter
+    @Setter
+    @ToString
+    public static class PayAmountDTO {
+
+        private LocalDateTime startTime;
+        private LocalDateTime endTime;
+        private int price;
+
+        public PayAmountDTO(LocalDateTime startTime, LocalDateTime endTime, int price) {
+            this.startTime = startTime;
+            this.endTime = endTime;
+            this.price = price;
+        }
+    }
 
 }

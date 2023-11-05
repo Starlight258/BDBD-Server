@@ -15,9 +15,16 @@ public class ReservationRequest {
     @Getter
     @Setter
     @ToString
-    public static class SaveDTO {
+    public static class ReservationTimeDTO {
 
-        private Long bayId;
+        private LocalDateTime startTime;
+        private LocalDateTime endTime;
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class SaveDTO {
 
         private LocalDateTime startTime;
         private LocalDateTime endTime;

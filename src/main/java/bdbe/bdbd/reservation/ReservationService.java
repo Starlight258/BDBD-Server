@@ -11,14 +11,12 @@ import bdbe.bdbd.carwash.Carwash;
 import bdbe.bdbd.carwash.CarwashJPARepository;
 import bdbe.bdbd.file.File;
 import bdbe.bdbd.file.FileJPARepository;
-import bdbe.bdbd.keyword.reviewKeyword.ReviewKeywordJPARepository;
 import bdbe.bdbd.location.Location;
 import bdbe.bdbd.location.LocationJPARepository;
 import bdbe.bdbd.optime.DayType;
 import bdbe.bdbd.optime.Optime;
 import bdbe.bdbd.optime.OptimeJPARepository;
 import bdbe.bdbd.reservation.ReservationResponse.ReservationInfoDTO;
-import bdbe.bdbd.review.ReviewJPARepository;
 import bdbe.bdbd.member.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -31,10 +29,10 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -46,8 +44,6 @@ public class ReservationService {
     private final LocationJPARepository locationJPARepository;
     private final OptimeJPARepository optimeJPARepository;
     private final FileJPARepository fileJPARepository;
-    private final ReviewJPARepository reviewJPARepository;
-    private final ReviewKeywordJPARepository reviewKeywordJPARepository;
 
     @Transactional
     public Reservation save(ReservationRequest.SaveDTO dto, Long carwashId, Long bayId, Member sessionMember) {
@@ -232,4 +228,17 @@ public class ReservationService {
         return new ReservationResponse.fetchRecentReservationDTO(recentReservations);
     }
 
+    public ReservationResponse.PayAmountDTO findPayAmount(ReservationRequest.ReservationTimeDTO dto, Long carwashId) {
+        Carwash carwash = carwashJPARepository.findById(carwashId)
+                .orElseThrow(() -> new BadRequestError("carwash id: " + carwashId + " not found"));
+        int perPrice = carwash.getPrice();
+
+        LocalDateTime startTime = dto.getStartTime();
+        LocalDateTime endTime = dto.getEndTime();
+
+        int minutesDifference = (int) ChronoUnit.MINUTES.between(startTime, endTime); //시간 차 계산
+        int blocksOf30Minutes = minutesDifference / 30; //30분 단위로 계산
+        int totalPrice = perPrice * blocksOf30Minutes;
+        return new ReservationResponse.PayAmountDTO(startTime, endTime, totalPrice);
+    }
 }
