@@ -11,12 +11,14 @@ import java.net.Proxy;
 
 @Configuration
 public class RestTemplateConfig {
+    private static final String PROXY_HOST = "krmp-proxy.9rum.cc";
+    private static final int PROXY_PORT = 3128;
 
     @Bean
     @Profile("prod")
     public RestTemplate restTemplateForProd() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("krmp-proxy.9rum.cc", 3128));
+        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(PROXY_HOST, PROXY_PORT));
         requestFactory.setProxy(proxy);
 
         return new RestTemplate(requestFactory);
