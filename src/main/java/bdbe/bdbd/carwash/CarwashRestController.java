@@ -105,8 +105,9 @@ public class CarwashRestController {
     }
 
     @GetMapping("/owner/carwashes/{carwash_id}/details") //세차장 정보 수정_세차장 기존 정보 불러오기
-    public ResponseEntity<?> findCarwashByDetails(@PathVariable("carwash_id") Long carwashId) {
-        CarwashResponse.carwashDetailsDTO carwashDetailsDTO = carwashService.findCarwashByDetails(carwashId);
+    public ResponseEntity<?> findCarwashByDetails(@PathVariable("carwash_id") Long carwashId,
+                                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
+        CarwashResponse.carwashDetailsDTO carwashDetailsDTO = carwashService.findCarwashByDetails(carwashId, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(carwashDetailsDTO));
     }
 
@@ -122,8 +123,10 @@ public class CarwashRestController {
     public ResponseEntity<?> updateCarwashDetails(
             @PathVariable("carwash_id") Long carwashId,
             @RequestPart("updateData") CarwashRequest.updateCarwashDetailsDTO updatedto,
-            @RequestPart(value = "images", required = true) MultipartFile[] images) {
-        CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO = carwashService.updateCarwashDetails(carwashId, updatedto, images);
+            @RequestPart(value = "images", required = true) MultipartFile[] images,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+            ) {
+        CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO = carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(updateCarwashDetailsDTO));
     }
 
