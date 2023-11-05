@@ -85,6 +85,5 @@ public class MemberRestController {
 
 
 
-    // 로그아웃 사용안함 - 프론트에서 JWT 토큰을 브라우저의 localstorage에서 삭제하면 됨.
 }
 
