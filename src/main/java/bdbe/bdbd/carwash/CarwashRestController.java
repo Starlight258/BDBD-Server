@@ -70,6 +70,7 @@ public class CarwashRestController {
     }
 
 
+
     @GetMapping("/carwashes/nearby")
     public ResponseEntity<?> findNearestCarwashesByUserLocation(@RequestParam double latitude, @RequestParam double longitude) {
         validateLatitudeAndLongitude(latitude, longitude);
@@ -110,11 +111,11 @@ public class CarwashRestController {
         return ResponseEntity.ok(ApiUtils.success(carwashDetailsDTO));
     }
 
-    @DeleteMapping("/owner/images/{image_id}")
+    @DeleteMapping("/owner/carwashes/{carwash_id}/images/{image_id}")
     public ResponseEntity<?> deleteImage(
-            @PathVariable("image_id") Long imageId,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
-        fileService.deleteFile(imageId, userDetails.getMember());
+            @PathVariable("carwash_id") Long carwashId,
+            @PathVariable("image_id") Long imageId) {
+        fileService.deleteFile(imageId);
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
@@ -126,6 +127,7 @@ public class CarwashRestController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
 
+        // 세차장 상세 정보 업데이트
         CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO =
                 carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
 

@@ -29,12 +29,13 @@ public class CarwashRequest {
         private String price;
 
         private OperatingTimeDTO optime;
+//        private List<FileRequest.FileDTO> images;
+//        private List<MultipartFile> images;
 
         private List<Long> keywordId;
-
         private String description;
-
         private String tel;
+
 
 
         public Carwash toCarwashEntity(Location location, Member member) {

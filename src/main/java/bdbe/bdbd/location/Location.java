@@ -12,23 +12,23 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name="location")
-public class Location {
+public class Location { //지역
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private Long id;
 
     @Column(name="place", length = 255, nullable = false)
-    private String place;
+    private String place; //장소명
 
     @Column(name="address", length = 255, nullable = false)
-    private String address;
+    private String address; //도로명 주소
 
     @Column(nullable = false)
-    private double latitude;
+    private double latitude; //위도
 
     @Column(nullable = false)
-    private double longitude;
+    private double longitude; //경도
 
 
     @Builder

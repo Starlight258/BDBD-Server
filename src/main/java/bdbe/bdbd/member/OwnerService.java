@@ -61,6 +61,7 @@ public class OwnerService {
             throw new BadRequestError("wrong password");
         }
 
+        // 여기서 사용자의 권한을 확인합니다.
         String userRole = String.valueOf(memberPS.getRole());
         if (!"ROLE_OWNER".equals(userRole) && !"ROLE_ADMIN".equals(userRole)) {
             throw new UnAuthorizedError("can't access this page");
@@ -100,7 +101,7 @@ public class OwnerService {
     }
 
     /*
-        owner가 해당 세차장의 주인인지 확인
+     owner가 해당 세차장의 주인인지 확인
      */
     private void validateCarwashOwnership(List<Long> carwashIds, Member sessionMember) {
         List<Long> userCarwashIds = carwashJPARepository.findCarwashIdsByMemberId(sessionMember.getId());
@@ -127,7 +128,6 @@ public class OwnerService {
         List<Carwash> carwashList = carwashJPARepository.findAllByIdInAndMember_Id(carwashIds, sessionMember.getId());
         if (carwashIds.size() != carwashList.size())
             throw new ForbiddenError("User is not the owner of the carwash.");
-
         // 매출 구하기 - 예약 삭제된 것 제외
         Map<String, Long> response = new HashMap<>();
         Long revenue = reservationJPARepository.findTotalRevenueByCarwashIdsAndDate(carwashIds, selectedDate);
@@ -204,9 +204,9 @@ public class OwnerService {
         for (Long carwashId : carwashIds) {
             Carwash carwash = carwashJPARepository.findById(carwashId)
                     .orElseThrow(() -> new EntityNotFoundException("Carwash not found with id: " + carwashId));
-
+            // 판매 수익
             Long monthlySales = reservationJPARepository.findTotalRevenueByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
-
+            // 예약 수
             Long monthlyReservations = reservationJPARepository.findMonthlyReservationCountByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
             List<File> carwashImages = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwashId);
 

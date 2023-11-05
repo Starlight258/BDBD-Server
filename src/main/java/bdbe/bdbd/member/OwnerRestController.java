@@ -21,19 +21,21 @@ import java.util.Map;
 @RequestMapping("/api/owner")
 public class OwnerRestController {
     private final OwnerService ownerService;
-
+    // (기능3) 이메일 중복체크
     @PostMapping("/check")
     public ResponseEntity<?> check(@RequestBody @Valid MemberRequest.EmailCheckDTO emailCheckDTO, Errors errors) {
         ownerService.sameCheckEmail(emailCheckDTO.getEmail());
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
+   //  (기능4) 회원가입
     @PostMapping("/join")
     public ResponseEntity<?> joinOwner(@RequestBody @Valid MemberRequest.JoinDTO requestDTO, Errors errors) {
         ownerService.join(requestDTO);
         return ResponseEntity.ok().body(ApiUtils.success(null));
     }
 
+    // (기능5) 로그인
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid MemberRequest.LoginDTO requestDTO, Errors errors) {
         if (errors.hasErrors()) {

@@ -25,16 +25,16 @@ public class Review {
     @Column(columnDefinition = "BIGINT")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) //외래키
     @JoinColumn(name="m_id",  nullable = false)
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) //외래키
     @JoinColumn(name="c_id",  nullable = false)
     private Carwash carwash;
 
     @OneToOne
-    @JoinColumn(name = "r_id", nullable = false)
+    @JoinColumn(name = "r_id", nullable = false) //외래키 가짐
     private Reservation reservation;
 
     @Column(length = 100, nullable = false)
