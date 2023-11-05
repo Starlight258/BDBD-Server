@@ -10,7 +10,6 @@ import bdbe.bdbd.bay.BayJPARepository;
 import bdbe.bdbd.carwash.CarwashResponse.updateCarwashDetailsResponseDTO;
 import bdbe.bdbd.file.File;
 import bdbe.bdbd.file.FileJPARepository;
-import bdbe.bdbd.file.FileResponse;
 import bdbe.bdbd.keyword.Keyword;
 import bdbe.bdbd.keyword.KeywordJPARepository;
 import bdbe.bdbd.keyword.carwashKeyword.CarwashKeyword;
@@ -21,11 +20,11 @@ import bdbe.bdbd.member.MemberJPARepository;
 import bdbe.bdbd.optime.DayType;
 import bdbe.bdbd.optime.Optime;
 import bdbe.bdbd.optime.OptimeJPARepository;
+import bdbe.bdbd.reservation.ReservationResponse;
 import bdbe.bdbd.review.ReviewJPARepository;
 import bdbe.bdbd.member.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -113,19 +112,34 @@ public class CarwashService {
     } //변경감지, 더티체킹, flush, 트랜잭션 종료
 
     @Transactional
-    public void uploadAndSaveFiles(MultipartFile[] images, Carwash carwash) {
+    public List<ReservationResponse.ImageDTO> uploadAndSaveFiles(MultipartFile[] images, Carwash carwash) {
+        List<File> existingFiles = fileJPARepository.findByCarwash_Id(carwash.getId());
+        for (File file : existingFiles) {
+            file.changeDeletedFlag(true);
+        }
+
+        fileJPARepository.saveAll(existingFiles);
+
+        List<ReservationResponse.ImageDTO> updatedImages = new ArrayList<>();
         try {
             // 이미지 업로드
             List<String> imageUrls = uploadFiles(Arrays.asList(images));
 
             // 파일 정보 저장
-            saveFileEntities(imageUrls, carwash);
+            List<File> savedFiles = saveFileEntities(imageUrls, carwash);
+
+            // 업데이트된 이미지 정보 생성
+            for (File file : savedFiles) {
+                updatedImages.add(new ReservationResponse.ImageDTO(file));
+            }
 
         } catch (Exception e) {
             logger.error("File upload and save failed: " + e.getMessage(), e);
             throw new RuntimeException("File upload and save failed", e);
         }
+        return updatedImages;  // 업데이트된 이미지 정보를 반환
     }
+
 
     private List<String> uploadFiles(List<MultipartFile> files) {
         try {
@@ -137,9 +151,9 @@ public class CarwashService {
         }
     }
 
-    private void saveFileEntities(List<String> imageUrls, Carwash carwash) {
+    private List<File> saveFileEntities(List<String> imageUrls, Carwash carwash) {
+        List<bdbe.bdbd.file.File> files = new ArrayList<>();
         try {
-            List<bdbe.bdbd.file.File> files = new ArrayList<>();
             for (String imageUrl : imageUrls) {
                 bdbe.bdbd.file.File newFile = bdbe.bdbd.file.File.builder()
                         .name(imageUrl.substring(imageUrl.lastIndexOf("/") + 1))
@@ -149,12 +163,13 @@ public class CarwashService {
                         .build();
                 files.add(newFile);
             }
-            fileJPARepository.saveAll(files);
+            files = fileJPARepository.saveAll(files);  // 저장된 파일 엔터티 목록을 가져옵니다.
             logger.info("File entities saved successfully");
         } catch (Exception e) {
             logger.error("Saving file entities failed: " + e.getMessage(), e);
             throw new RuntimeException("Saving file entities failed", e);
         }
+        return files;  // 저장된 파일 엔터티 목록을 반환합니다.
     }
 
     public List<CarwashRequest.CarwashDistanceDTO> findNearbyCarwashesByUserLocation(CarwashRequest.UserLocationDTO userLocation) {
@@ -342,7 +357,8 @@ public class CarwashService {
         response.updateKeywordPart(updateKeywordIds);
 
         if (images != null && images.length > 0) {
-            uploadAndSaveFiles(images, carwash);
+            List<ReservationResponse.ImageDTO> updatedImages = uploadAndSaveFiles(images, carwash);
+            response.setImages(updatedImages);  // 업데이트된 이미지 정보를 응답 DTO에 설정
         }
         return response;
     }

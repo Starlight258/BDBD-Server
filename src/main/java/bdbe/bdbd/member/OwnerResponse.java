@@ -111,11 +111,12 @@ public class OwnerResponse {
 
     @Getter
     @Setter
-    public static class FileDTO{
+    public static class FileDTO {
         private Long id;
         private String name;
         private String url;
         private LocalDateTime uploadedAt;
+
         public FileDTO(File file) {
             this.id = file.getId();
             this.name = file.getName();
@@ -168,9 +169,9 @@ public class OwnerResponse {
         private Long monthlyReservations;
         private OperationTimeDTO optime;
         private List<BayReservationDTO> bays = new ArrayList<>();
-        private List<FileDTO> imageFiles;
+        private FileDTO image;
 
-        public CarwashManageDTO(Carwash carwash, Long monthlySales, Long monthlyReservations, List<Bay> bayList, List<Optime> optimeList, List<Reservation> reservationList, List<File> files) {
+        public CarwashManageDTO(Carwash carwash, Long monthlySales, Long monthlyReservations, List<Bay> bayList, List<Optime> optimeList, List<Reservation> reservationList, File file) {
             this.id = carwash.getId();
             this.name = carwash.getName();
             this.monthlySales = monthlySales;
@@ -180,7 +181,11 @@ public class OwnerResponse {
                 BayReservationDTO bayReservationDTO = new BayReservationDTO(bay, reservationList);
                 this.bays.add(bayReservationDTO);
             }
-            this.imageFiles = files.stream().map(FileDTO::new).collect(Collectors.toList());
+            if (file != null && !file.isDeleted()) {
+                this.image = new FileDTO(file);
+            } else {
+                this.image = null;
+            }
         }
     }
 
@@ -266,6 +271,7 @@ public class OwnerResponse {
             this.reservationGrowthPercentage = reservationGrowthPercentage;
             this.myStores = myStores;
         }
+
         public void addCarwashInfoDTO(CarwashInfoDTO carwashInfoDTO) {
             this.myStores.add(carwashInfoDTO);
         }
@@ -281,12 +287,15 @@ public class OwnerResponse {
         private List<FileDTO> imageFiles;
 
 
-        public CarwashInfoDTO(Carwash carwash, Long monthlySales, Long monthlyReservations,List<File> files) {
+        public CarwashInfoDTO(Carwash carwash, Long monthlySales, Long monthlyReservations, List<File> files) {
             this.name = carwash.getName();
             this.carwashId = carwash.getId();
             this.monthlySales = monthlySales;
             this.monthlyReservations = monthlyReservations;
-            this.imageFiles = files.stream().map(FileDTO::new).collect(Collectors.toList());
+            this.imageFiles = files.stream()
+                    .filter(file -> !file.isDeleted())  // 삭제되지 않은 파일만 포함
+                    .map(FileDTO::new)
+                    .collect(Collectors.toList());
 
         }
     }

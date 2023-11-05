@@ -206,7 +206,12 @@ public class ReservationResponse {
             this.carwashName = carwash.getName();
             this.bayNum = bay.getBayNum();
             this.price = reservation.getPrice();
-            this.image =  new ImageDTO(carwash.getFileList().get(0));
+            List<File> activeFiles = carwash.getFileList().stream()
+                    .filter(file -> !file.isDeleted())  // 삭제되지 않은 파일만 포함
+                    .collect(Collectors.toList());
+            if (!activeFiles.isEmpty()) {
+                this.image = new ImageDTO(activeFiles.get(0));
+            }
         }
     }
 

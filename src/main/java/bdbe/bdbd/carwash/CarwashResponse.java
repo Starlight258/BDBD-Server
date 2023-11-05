@@ -161,7 +161,10 @@ public class CarwashResponse {
             this.optime = toOptimeListDTO(weekOptime, endOptime);
             this.keywordId = keywordId;
             this.description = carwash.getDes();
-            this.imageFiles = files.stream().map(FileDTO::new).collect(Collectors.toList());
+            this.imageFiles = files.stream()
+                    .filter(file -> !file.isDeleted())  // 삭제되지 않은 파일만 포함
+                    .map(FileDTO::new)
+                    .collect(Collectors.toList());
         }
 
         public detailsOperatingTimeDTO toOptimeListDTO(Optime weekOptime, Optime endOptime) {
