@@ -57,10 +57,6 @@ public class PayService {
         Carwash carwash = carwashJpaRepository.findById(carwashId)
                 .orElseThrow(() -> new BadRequestError("carwash id: " + carwashId + "not found"));
 
-        if (carwash.getMember().getId() != member.getId()) {
-            throw new ForbiddenError("User is not the owner of the carwash.");
-        }
-
         int perPrice = carwash.getPrice();
         LocalDateTime startTime = saveDTO.getStartTime();
         LocalDateTime endTime = saveDTO.getEndTime();
@@ -117,12 +113,6 @@ public class PayService {
             Long bayId,
             Member member,
             ReservationRequest.SaveDTO saveDTO) {
-
-        Carwash carwash = carwashJpaRepository.findById(carwashId)
-                .orElseThrow(() -> new NotFoundError("Carwash not found"));
-        if (carwash.getMember().getId() != member.getId()) {
-            throw new ForbiddenError("User is not the owner of the carwash.");
-        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
