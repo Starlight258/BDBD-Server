@@ -92,11 +92,12 @@ public class OwnerService {
         return new OwnerResponse.SaleResponseDTO(carwashList, reservationList);
     }
 
-    public OwnerResponse.ReservationListDTO findBayReservation(Long bayId, Member sessionMember) {
+    public OwnerResponse.ReservationCarwashListDTO findBayReservation(Long bayId, Member sessionMember) {
         validateBayOwnership(bayId, sessionMember);
 
         List<Reservation> reservationList = reservationJPARepository.findByBay_IdWithJoinsAndIsDeletedFalse(bayId);
-        return new OwnerResponse.ReservationListDTO(reservationList);
+
+        return new OwnerResponse.ReservationCarwashListDTO(reservationList);
     }
 
     /*
@@ -106,18 +107,18 @@ public class OwnerService {
         List<Long> userCarwashIds = carwashJPARepository.findCarwashIdsByMemberId(sessionMember.getId());
 
         if (!userCarwashIds.containsAll(carwashIds)) {
-            throw new IllegalArgumentException("User is not the owner of the carwash. ");
+            throw new ForbiddenError("User is not the owner of the carwash. ");
         }
     }
 
     private void validateBayOwnership(Long bayId, Member sessionMember) {
         Bay bay = bayJPARepository.findById(bayId)
-                .orElseThrow(() -> new IllegalArgumentException("Bay with id " + bayId + " not found"));
+                .orElseThrow(() -> new BadRequestError("Bay with id " + bayId + " not found"));
         Long carwashId = bay.getCarwash().getId();
         Carwash carwash = carwashJPARepository.findById(carwashId)
-                .orElseThrow(() -> new IllegalArgumentException("carwash with id" + carwashId + " not found"));
+                .orElseThrow(() -> new BadRequestError("carwash with id" + carwashId + " not found"));
         if (carwash.getMember().getId() != sessionMember.getId()) {
-            throw new IllegalArgumentException("User is not the owner of the carwash. ");
+            throw new ForbiddenError("User is not the owner of the carwash. ");
         }
     }
 
@@ -126,7 +127,7 @@ public class OwnerService {
         // 해당 유저가 운영하는 세차장의 id인지 확인
         List<Carwash> carwashList = carwashJPARepository.findAllByIdInAndMember_Id(carwashIds, sessionMember.getId());
         if (carwashIds.size() != carwashList.size())
-            throw new IllegalArgumentException("User is not the owner of the carwash.");
+            throw new ForbiddenError("User is not the owner of the carwash.");
         // 매출 구하기 - 예약 삭제된 것 제외
         Map<String, Long> response = new HashMap<>();
         Long revenue = reservationJPARepository.findTotalRevenueByCarwashIdsAndDate(carwashIds, selectedDate);
@@ -146,10 +147,9 @@ public class OwnerService {
             Date today = java.sql.Date.valueOf(LocalDate.now());
             List<Reservation> reservationList = reservationJPARepository.findTodaysReservationsByCarwashId(carwash.getId(), today);
 
-            List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwash.getId());
-            File carwashImage = carwashImages.stream().findFirst().orElse(null);
-            OwnerResponse.CarwashManageDTO dto = new OwnerResponse.CarwashManageDTO(carwash, bayList, optimeList, reservationList, carwashImage);
-            response.addCarwashManageDTO(dto);
+            List<File> carwashImages = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwash.getId());
+            OwnerResponse.CarwashManageByOwnerDTO dto = new OwnerResponse.CarwashManageByOwnerDTO(carwash, bayList, optimeList, reservationList, carwashImages);
+            response.addCarwashManageByOwnerDTO(dto);
         }
 
         return response;
@@ -160,15 +160,20 @@ public class OwnerService {
         Carwash carwash = carwashJPARepository.findByIdAndMember_Id(carwashId, sessionMember.getId())
                 .orElseThrow(() -> new ForbiddenError("User is not the owner of the carwash."));
 
+        LocalDate firstDayOfCurrentMonth = LocalDate.now().withDayOfMonth(1);
+
+        Long monthlySales = reservationJPARepository.findTotalRevenueByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
+        Long monthlyReservations = reservationJPARepository.findMonthlyReservationCountByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
+
         List<Bay> bayList = bayJPARepository.findByCarwashId(carwash.getId());
         List<Optime> optimeList = optimeJPARepository.findByCarwash_Id(carwash.getId());
 
         Date today = java.sql.Date.valueOf(LocalDate.now());
         List<Reservation> reservationList = reservationJPARepository.findTodaysReservationsByCarwashId(carwash.getId(), today);
 
-        List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwash.getId());
+        List<File> carwashImages = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwash.getId());
         File carwashImage = carwashImages.stream().findFirst().orElse(null);
-        OwnerResponse.CarwashManageDTO dto = new OwnerResponse.CarwashManageDTO(carwash, bayList, optimeList, reservationList, carwashImage);
+        OwnerResponse.CarwashManageDTO dto = new OwnerResponse.CarwashManageDTO(carwash, monthlySales, monthlyReservations, bayList, optimeList, reservationList, carwashImage);
 
         return dto;
     }
@@ -203,7 +208,8 @@ public class OwnerService {
             Long monthlySales = reservationJPARepository.findTotalRevenueByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
             // 예약 수
             Long monthlyReservations = reservationJPARepository.findMonthlyReservationCountByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
-            List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwashId);
+            List<File> carwashImages = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwashId);
+
             OwnerResponse.CarwashInfoDTO dto = new OwnerResponse.CarwashInfoDTO(carwash, monthlySales, monthlyReservations, carwashImages);
             carwashInfoDTOList.add(dto);
         }

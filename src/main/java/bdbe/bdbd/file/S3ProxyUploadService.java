@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -51,15 +52,25 @@ public class S3ProxyUploadService {
 
     public String uploadFile(MultipartFile file) {
         try {
-            String keyName = "uploads/" + file.getOriginalFilename();
+            String originalFilename = file.getOriginalFilename();
+            String extension = "";
+
+            int i = originalFilename.lastIndexOf('.');
+            if (i > 0) {
+                extension = originalFilename.substring(i);
+            }
+
+            String uniqueFilename = UUID.randomUUID().toString() + extension;
+            String keyName = "uploads/" + uniqueFilename;
+
             s3Client.putObject(bucketName, keyName, file.getInputStream(), null);
+
             return s3Client.getUrl(bucketName, keyName).toExternalForm();
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
-
 
     public List<String> uploadFiles(List<MultipartFile> files) {
         List<String> uploadResults = new ArrayList<>();

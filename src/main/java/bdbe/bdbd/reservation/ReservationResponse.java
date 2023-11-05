@@ -1,17 +1,13 @@
 package bdbe.bdbd.reservation;
 
-import bdbe.bdbd._core.errors.utils.Haversine;
 import bdbe.bdbd.bay.Bay;
 import bdbe.bdbd.carwash.Carwash;
 import bdbe.bdbd.file.File;
 import bdbe.bdbd.location.Location;
-import bdbe.bdbd.member.OwnerResponse;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import java.awt.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -191,6 +187,7 @@ public class ReservationResponse {
     public static class ReservationInfoDTO{
         private Long id; // 예약 id
         private TimeDTO time;
+        private Long carwashId;
         private String carwashName;
         private int bayNum;
         private int price;
@@ -201,12 +198,33 @@ public class ReservationResponse {
             timeDTO.start = reservation.getStartTime();
             timeDTO.end = reservation.getEndTime();
             this.time = timeDTO;
+            this.carwashId = carwash.getId();
             this.carwashName = carwash.getName();
             this.bayNum = bay.getBayNum();
             this.price = reservation.getPrice();
-            this.image =  new ImageDTO(carwash.getFileList().get(0));
+            List<File> activeFiles = carwash.getFileList().stream()
+                    .filter(file -> !file.isDeleted())  // 삭제되지 않은 파일만 포함
+                    .collect(Collectors.toList());
+            if (!activeFiles.isEmpty()) {
+                this.image = new ImageDTO(activeFiles.get(0));
+            }
         }
     }
 
+    @Getter
+    @Setter
+    @ToString
+    public static class PayAmountDTO {
+
+        private LocalDateTime startTime;
+        private LocalDateTime endTime;
+        private int price;
+
+        public PayAmountDTO(LocalDateTime startTime, LocalDateTime endTime, int price) {
+            this.startTime = startTime;
+            this.endTime = endTime;
+            this.price = price;
+        }
+    }
 
 }
