@@ -1,6 +1,8 @@
 package bdbe.bdbd.pay;
 
 import bdbe.bdbd._core.errors.exception.BadRequestError;
+import bdbe.bdbd._core.errors.exception.ForbiddenError;
+import bdbe.bdbd._core.errors.exception.NotFoundError;
 import bdbe.bdbd.carwash.Carwash;
 import bdbe.bdbd.carwash.CarwashJPARepository;
 import bdbe.bdbd.member.Member;
@@ -50,10 +52,14 @@ public class PayService {
     @Autowired
     private CarwashJPARepository carwashJpaRepository;
 
-    public ResponseEntity<String> requestPaymentReady(PayRequest.PayReadyRequestDTO requestDto, ReservationRequest.SaveDTO saveDTO, Long carwashId) {
+    public ResponseEntity<String> requestPaymentReady(PayRequest.PayReadyRequestDTO requestDto, ReservationRequest.SaveDTO saveDTO, Long carwashId, Member member) {
 
         Carwash carwash = carwashJpaRepository.findById(carwashId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 세차장이 존재하지 않습니다. id=" + carwashId));
+                .orElseThrow(() -> new BadRequestError("carwash id: " + carwashId + "not found"));
+
+        if (carwash.getMember().getId() != member.getId()) {
+            throw new ForbiddenError("User is not the owner of the carwash.");
+        }
 
         int perPrice = carwash.getPrice();
         LocalDateTime startTime = saveDTO.getStartTime();
@@ -109,10 +115,14 @@ public class PayService {
             PayRequest.PayApprovalRequestDTO requestDto,
             Long carwashId,
             Long bayId,
-            Member member,  // 변수 이름 변경
+            Member member,
             ReservationRequest.SaveDTO saveDTO) {
 
-//        RestTemplate restTemplate = new RestTemplate();
+        Carwash carwash = carwashJpaRepository.findById(carwashId)
+                .orElseThrow(() -> new NotFoundError("Carwash not found"));
+        if (carwash.getMember().getId() != member.getId()) {
+            throw new ForbiddenError("User is not the owner of the carwash.");
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

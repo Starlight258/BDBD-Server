@@ -18,17 +18,18 @@ import org.springframework.web.bind.annotation.*;
 public class PayController {
 
     private final PayService payService;
-    private final ReservationService reservationService;
-    private final CarwashService carwashService;
 
     @PostMapping("/ready/{carwash_id}")
     public ResponseEntity<String> requestPaymentReady(
             @PathVariable("carwash_id") Long carwashId,
-            @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest) {
+            @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+            ) {
         return payService.requestPaymentReady(
                 paymentReadyRequest.getRequestDto(),
                 paymentReadyRequest.getSaveDTO(),
-                carwashId
+                carwashId,
+                userDetails.getMember()
         );
     }
 
@@ -38,10 +39,6 @@ public class PayController {
             @PathVariable("bay_id") Long bayId,
             @RequestBody PayRequest.PaymentApprovalRequestDTO requestDTO,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
 
         return payService.requestPaymentApproval(
                 requestDTO.getPayApprovalRequestDTO(),

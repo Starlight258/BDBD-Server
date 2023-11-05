@@ -31,7 +31,6 @@ public class OwnerRestController {
    //  (기능4) 회원가입
     @PostMapping("/join")
     public ResponseEntity<?> joinOwner(@RequestBody @Valid MemberRequest.JoinDTO requestDTO, Errors errors) {
-//        requestDTO.setRole(MemberRole.ROLE_OWNER);
         ownerService.join(requestDTO);
         return ResponseEntity.ok().body(ApiUtils.success(null));
     }
@@ -55,7 +54,6 @@ public class OwnerRestController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     )
     {
-//        ownerService.findSales(carwashIds, selectedDate, userDetails.getMember());
         OwnerResponse.SaleResponseDTO saleResponseDTO = ownerService.findSales(carwashIds, selectedDate, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(saleResponseDTO));
     }
@@ -105,7 +103,6 @@ public class OwnerRestController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     )
     {
-//        OwnerResponse.OwnerDashboardDTO dto = ownerService.fetchOwnerHomepage(userDetails.getMember());
         OwnerResponse.ReservationListDTO dto = ownerService.findBayReservation(bayId, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(dto));
     }

@@ -106,18 +106,18 @@ public class OwnerService {
         List<Long> userCarwashIds = carwashJPARepository.findCarwashIdsByMemberId(sessionMember.getId());
 
         if (!userCarwashIds.containsAll(carwashIds)) {
-            throw new IllegalArgumentException("User is not the owner of the carwash. ");
+            throw new ForbiddenError("User is not the owner of the carwash. ");
         }
     }
 
     private void validateBayOwnership(Long bayId, Member sessionMember) {
         Bay bay = bayJPARepository.findById(bayId)
-                .orElseThrow(() -> new IllegalArgumentException("Bay with id " + bayId + " not found"));
+                .orElseThrow(() -> new BadRequestError("Bay with id " + bayId + " not found"));
         Long carwashId = bay.getCarwash().getId();
         Carwash carwash = carwashJPARepository.findById(carwashId)
-                .orElseThrow(() -> new IllegalArgumentException("carwash with id" + carwashId + " not found"));
+                .orElseThrow(() -> new BadRequestError("carwash with id" + carwashId + " not found"));
         if (carwash.getMember().getId() != sessionMember.getId()) {
-            throw new IllegalArgumentException("User is not the owner of the carwash. ");
+            throw new ForbiddenError("User is not the owner of the carwash. ");
         }
     }
 
@@ -126,7 +126,7 @@ public class OwnerService {
         // 해당 유저가 운영하는 세차장의 id인지 확인
         List<Carwash> carwashList = carwashJPARepository.findAllByIdInAndMember_Id(carwashIds, sessionMember.getId());
         if (carwashIds.size() != carwashList.size())
-            throw new IllegalArgumentException("User is not the owner of the carwash.");
+            throw new ForbiddenError("User is not the owner of the carwash.");
         // 매출 구하기 - 예약 삭제된 것 제외
         Map<String, Long> response = new HashMap<>();
         Long revenue = reservationJPARepository.findTotalRevenueByCarwashIdsAndDate(carwashIds, selectedDate);
