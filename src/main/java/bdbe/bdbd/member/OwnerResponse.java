@@ -181,11 +181,7 @@ public class OwnerResponse {
                 BayReservationDTO bayReservationDTO = new BayReservationDTO(bay, reservationList);
                 this.bays.add(bayReservationDTO);
             }
-            if (file != null && !file.isDeleted()) {
-                this.image = new FileDTO(file);
-            } else {
-                this.image = null;
-            }
+            this.image = (file != null) ? new FileDTO(file) : null;
         }
     }
 
@@ -293,7 +289,6 @@ public class OwnerResponse {
             this.monthlySales = monthlySales;
             this.monthlyReservations = monthlyReservations;
             this.imageFiles = files.stream()
-                    .filter(file -> !file.isDeleted())  // 삭제되지 않은 파일만 포함
                     .map(FileDTO::new)
                     .collect(Collectors.toList());
 

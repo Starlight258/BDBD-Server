@@ -4,6 +4,7 @@ import bdbe.bdbd._core.errors.utils.Haversine;
 import bdbe.bdbd.bay.Bay;
 import bdbe.bdbd.carwash.Carwash;
 import bdbe.bdbd.file.File;
+import bdbe.bdbd.file.FileJPARepository;
 import bdbe.bdbd.location.Location;
 import bdbe.bdbd.member.OwnerResponse;
 import lombok.Getter;
@@ -206,9 +207,7 @@ public class ReservationResponse {
             this.carwashName = carwash.getName();
             this.bayNum = bay.getBayNum();
             this.price = reservation.getPrice();
-            List<File> activeFiles = carwash.getFileList().stream()
-                    .filter(file -> !file.isDeleted())  // 삭제되지 않은 파일만 포함
-                    .collect(Collectors.toList());
+            List<File> activeFiles = FileJPARepository.findByIsDeletedFalseAndCarwashId(carwash.getId());
             if (!activeFiles.isEmpty()) {
                 this.image = new ImageDTO(activeFiles.get(0));
             }
