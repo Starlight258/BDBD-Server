@@ -20,6 +20,7 @@ public interface ReservationJPARepository extends JpaRepository<Reservation, Lon
     @Query("select r from Reservation r " +
             "join fetch r.member m " +
             "join fetch r.bay b " +
+            "join fetch b.carwash c " +
             "where b.id = :bayId and r.isDeleted = false")
     List<Reservation> findByBay_IdWithJoinsAndIsDeletedFalse(@Param("bayId") Long bayId);
 

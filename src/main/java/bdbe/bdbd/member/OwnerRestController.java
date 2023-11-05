@@ -103,7 +103,7 @@ public class OwnerRestController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     )
     {
-        OwnerResponse.ReservationListDTO dto = ownerService.findBayReservation(bayId, userDetails.getMember());
+        OwnerResponse.ReservationCarwashListDTO dto = ownerService.findBayReservation(bayId, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
 

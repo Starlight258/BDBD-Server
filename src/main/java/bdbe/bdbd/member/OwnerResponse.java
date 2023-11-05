@@ -298,5 +298,16 @@ public class OwnerResponse {
         }
     }
 
+    @Getter
+    @Setter
+    @ToString
+    public static class ReservationCarwashListDTO {
+        private List<ReservationCarwashDTO> reservationList;
+
+        public ReservationCarwashListDTO(List<Reservation> reservationList) {
+            this.reservationList = reservationList.stream().map(ReservationCarwashDTO::new).collect(Collectors.toList());
+        }
+    }
+
 
 }

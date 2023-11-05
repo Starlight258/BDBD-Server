@@ -92,11 +92,12 @@ public class OwnerService {
         return new OwnerResponse.SaleResponseDTO(carwashList, reservationList);
     }
 
-    public OwnerResponse.ReservationListDTO findBayReservation(Long bayId, Member sessionMember) {
+    public OwnerResponse.ReservationCarwashListDTO findBayReservation(Long bayId, Member sessionMember) {
         validateBayOwnership(bayId, sessionMember);
 
         List<Reservation> reservationList = reservationJPARepository.findByBay_IdWithJoinsAndIsDeletedFalse(bayId);
-        return new OwnerResponse.ReservationListDTO(reservationList);
+
+        return new OwnerResponse.ReservationCarwashListDTO(reservationList);
     }
 
     /*
