@@ -171,7 +171,8 @@ public class OwnerService {
         List<Reservation> reservationList = reservationJPARepository.findTodaysReservationsByCarwashId(carwash.getId(), today);
 
         List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwash.getId());
-        OwnerResponse.CarwashManageDTO dto = new OwnerResponse.CarwashManageDTO(carwash, monthlySales, monthlyReservations, bayList, optimeList, reservationList, carwashImages);
+        File carwashImage = carwashImages.stream().findFirst().orElse(null);
+        OwnerResponse.CarwashManageDTO dto = new OwnerResponse.CarwashManageDTO(carwash, monthlySales, monthlyReservations, bayList, optimeList, reservationList, carwashImage);
 
         return dto;
     }
@@ -207,6 +208,7 @@ public class OwnerService {
             // 예약 수
             Long monthlyReservations = reservationJPARepository.findMonthlyReservationCountByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
             List<File> carwashImages = fileJPARepository.findByCarwash_Id(carwashId);
+
             OwnerResponse.CarwashInfoDTO dto = new OwnerResponse.CarwashInfoDTO(carwash, monthlySales, monthlyReservations, carwashImages);
             carwashInfoDTOList.add(dto);
         }

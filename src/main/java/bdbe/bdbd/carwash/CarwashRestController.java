@@ -3,10 +3,12 @@ package bdbe.bdbd.carwash;
 import bdbe.bdbd._core.errors.exception.BadRequestError;
 import bdbe.bdbd._core.errors.security.CustomUserDetails;
 import bdbe.bdbd._core.errors.utils.ApiUtils;
+import bdbe.bdbd.file.FileResponse;
 import bdbe.bdbd.file.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -125,8 +127,12 @@ public class CarwashRestController {
             @RequestPart("updateData") CarwashRequest.updateCarwashDetailsDTO updatedto,
             @RequestPart(value = "images", required = true) MultipartFile[] images,
             @AuthenticationPrincipal CustomUserDetails userDetails
-            ) {
-        CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO = carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
+    ) {
+
+        // 세차장 상세 정보 업데이트
+        CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO =
+                carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
+
         return ResponseEntity.ok(ApiUtils.success(updateCarwashDetailsDTO));
     }
 
