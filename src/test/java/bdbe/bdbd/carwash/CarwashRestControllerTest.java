@@ -77,7 +77,7 @@ public class CarwashRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("true"));
     }
 
-//     사진까지 함께 등록해야함
+
     @WithUserDetails(value = "owner@nate.com")
     @Test
     @DisplayName("세차장 등록 기능")
@@ -85,7 +85,13 @@ public class CarwashRestControllerTest {
         // given
         // dto 생성
         CarwashRequest.SaveDTO dto = new CarwashRequest.SaveDTO();
-        dto.setKeywordId(new ArrayList<>());
+
+        Keyword keyword = Keyword.builder()
+                .name("하부세차")
+                .type(KeywordType.CARWASH)
+                .build();
+        Keyword savedKeyword = keywordJPARepository.save(keyword);
+        dto.setKeywordId(Arrays.asList(savedKeyword.getId()));
         dto.setName("test 세차장");
 
         dto.setTel("01012345678");
@@ -116,15 +122,6 @@ public class CarwashRestControllerTest {
 
         MockMultipartFile updatedtoFile = new MockMultipartFile("updateData", "", "application/json", om.writeValueAsBytes(dto));
         MockMultipartFile carwashFile = new MockMultipartFile("carwash", "", "application/json", om.writeValueAsBytes(dto));
-
-
-        Keyword keyword = Keyword.builder()
-                .name("하부세차")
-                .type(KeywordType.CARWASH)
-                .build();
-        Keyword savedKeyword = keywordJPARepository.save(keyword);
-        dto.setKeywordId(Arrays.asList(savedKeyword.getId()));
-
 
         String requestBody = om.writeValueAsString(dto);
         System.out.println("요청 데이터 : " + requestBody);

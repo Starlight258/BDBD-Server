@@ -15,18 +15,16 @@ public class ReservationRestController {
 
     private final ReservationService reservationService;
 
-    // 세차장 예약하기
-    @PostMapping("/carwashes/{carwash_id}/bays/{bay_id}/reservations")
-    public ResponseEntity<?> save(
+    // 결제 금액 조회하기
+    @PostMapping("/carwashes/{carwash_id}/payment")
+    public ResponseEntity<?> findPayAmount(
             @PathVariable("carwash_id") Long carwashId,
-            @PathVariable("bay_id") Long bayId,
-            @RequestBody ReservationRequest.SaveDTO dto,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @RequestBody ReservationRequest.ReservationTimeDTO dto
             )
     {
-        reservationService.save(dto, carwashId, bayId, userDetails.getMember());
+        ReservationResponse.PayAmountDTO responseDTO = reservationService.findPayAmount(dto, carwashId);
 
-        return ResponseEntity.ok(ApiUtils.success(null));
+        return ResponseEntity.ok(ApiUtils.success(responseDTO));
     }
 
     // 예약 수정하기

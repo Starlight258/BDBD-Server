@@ -29,13 +29,7 @@ public class BayRestController {
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
-//    @DeleteMapping("/owner/bays/{bay_id}") //베이 삭제
-//    public ResponseEntity<?> deleteBay(@PathVariable("bay_id") Long bayId){
-//        bayService.deleteBay(bayId);
-//        return ResponseEntity.ok(ApiUtils.success(null));
-//    }
-
-    @PutMapping("/owner/bays/{bay_id}/status") //베이 활성화/비활성화
+    @PutMapping("/owner/bays/{bay_id}/status")
     public ResponseEntity<?> updateStatus(
             @PathVariable("bay_id") Long bayId,
             @RequestParam int status,

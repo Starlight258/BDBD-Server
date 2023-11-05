@@ -75,7 +75,7 @@ public class CarwashResponse {
             this.keywordId = keywordId;
             this.description = carwash.getDes();
             this.tel = carwash.getTel();
-            this.imageFiles = files.stream().map(FileDTO::new).collect(Collectors.toList());
+            this.imageFiles = files.stream().filter(file -> !file.isDeleted()).map(FileDTO::new).collect(Collectors.toList());
         }
 
         public OperatingTimeDTOResponse toOptimeListDTO(Optime weekOptime, Optime endOptime) {
