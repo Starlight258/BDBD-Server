@@ -22,39 +22,18 @@ import javax.validation.Valid;
 public class MemberRestController {
 
     private final MemberService memberService;
-    // (기능3) 이메일 중복체크
+
     @PostMapping("/check")
     public ResponseEntity<?> check(@RequestBody @Valid MemberRequest.EmailCheckDTO emailCheckDTO, Errors errors) {
         memberService.sameCheckEmail(emailCheckDTO.getEmail());
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
-    //(기능4) 회원가입
     @PostMapping("/join")
     public ResponseEntity<?> joinUser(@RequestBody @Valid MemberRequest.JoinDTO requestDTO, Errors errors) {
-//        requestDTO.setRole(MemberRole.ROLE_USER);
         memberService.join(requestDTO);
         return ResponseEntity.ok().body(ApiUtils.success(null));
     }
-
-
-
-    // (기능5) 로그인
-//    @PostMapping("/login")
-////    public ResponseEntity<?> login(@RequestBody @Valid UserRequest.LoginDTO requestDTO, Errors errors) {
-////        String jwt = userService.login(requestDTO);
-////        return ResponseEntity.ok().header(JWTProvider.HEADER, jwt).body(ApiUtils.success(null));
-////    }
-
-//    @PostMapping("/login")
-//    public ResponseEntity<?> login(@RequestBody @Valid UserRequest.LoginDTO requestDTO, Errors errors) {
-//        if (errors.hasErrors()) {
-//            String errorMessage = errors.getAllErrors().get(0).getDefaultMessage();
-//            throw new Exception400(errorMessage);
-//        }
-//        String jwt = userService.login(requestDTO);
-//        return ResponseEntity.ok().header(JWTProvider.HEADER, jwt).body(ApiUtils.success(null));
-//    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid MemberRequest.LoginDTO requestDTO, Errors errors) {

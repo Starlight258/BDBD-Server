@@ -1,6 +1,8 @@
 package bdbe.bdbd.file;
 
+import bdbe.bdbd._core.errors.exception.ForbiddenError;
 import bdbe.bdbd._core.errors.utils.FileUploadUtil;
+import bdbe.bdbd.member.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,10 +31,13 @@ public class FileService {
         return fileUploadUtil.uploadFiles(multipartFile, carwashId);
     }
 
-    public void deleteFile(Long fileId) {
+    public void deleteFile(Long fileId, Member member) {
 
         File file = fileJPARepository.findById(fileId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 파일이 존재하지 않습니다. id=" + fileId));
+                .orElseThrow(() -> new IllegalArgumentException("file id :" + fileId + " not found"));
+        if (file.getCarwash().getMember().getId() != member.getId()){
+            throw new ForbiddenError("User is not the owner of the Carwash related to file.");
+        }
         file.changeDeletedFlag(true); //삭제에 대한 플래그
         fileJPARepository.save(file);
     }
