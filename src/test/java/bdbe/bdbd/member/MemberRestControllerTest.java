@@ -138,6 +138,37 @@ public class MemberRestControllerTest {
     }
 
     @Test
+    public void logoutTest() throws Exception {
+        MemberRequest.LoginDTO loginRequestDTO = new MemberRequest.LoginDTO();
+        loginRequestDTO.setEmail("mock@naver.com");
+        loginRequestDTO.setPassword("asdf1234!");
+
+        String loginRequestBody = om.writeValueAsString(loginRequestDTO);
+
+        String jwtToken = mvc.perform(
+                        post("/api/user/login")
+                                .content(loginRequestBody)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andReturn()
+                .getResponse()
+                .getHeader(JWTProvider.HEADER);
+
+        ResultActions logoutResultActions = mvc.perform(
+                post("/api/user/logout")
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        logoutResultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value("true"))
+                .andExpect(jsonPath("$.response").value("Logged out successfully"))
+                .andDo(print());
+    }
+
+
+    @Test
     public void joinEmailExceptionTest() throws Exception {
 
         String email = "mocknaver.com";
