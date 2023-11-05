@@ -51,7 +51,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
                             myUserDetails.getAuthorities()
                     );
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.debug("디버그 : 인증 객체 만들어짐");
+
         } catch (SignatureVerificationException sve) {
             sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid token signature");
             return;
