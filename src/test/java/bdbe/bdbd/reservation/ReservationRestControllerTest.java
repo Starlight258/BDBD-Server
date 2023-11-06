@@ -122,7 +122,7 @@ public class ReservationRestControllerTest {
                 delete(String.format("/api/reservations/%d", reservationId))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
         );
-//         eye
+        // eye
         String responseBody = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         System.out.println("응답 Body : " + responseBody);
         resultActions.andExpect(jsonPath("$.success").value("true"));
