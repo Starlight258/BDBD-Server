@@ -1,13 +1,11 @@
 package bdbe.bdbd.member;
 
+
 import bdbe.bdbd._core.errors.exception.BadRequestError;
-import bdbe.bdbd._core.errors.exception.UnAuthorizedError;
-import bdbe.bdbd._core.errors.security.CacheService;
 import bdbe.bdbd._core.errors.security.CustomUserDetails;
 import bdbe.bdbd._core.errors.security.JWTProvider;
 import bdbe.bdbd._core.errors.utils.ApiUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
@@ -21,10 +19,7 @@ import javax.validation.Valid;
 public class MemberRestController {
 
     private final MemberService memberService;
-    @Autowired
-    private CacheService cacheService;
 
-    // (기능3) 이메일 중복체크
     @PostMapping("/check")
     public ResponseEntity<?> check(@RequestBody @Valid MemberRequest.EmailCheckDTO emailCheckDTO, Errors errors) {
         memberService.sameCheckEmail(emailCheckDTO.getEmail());
@@ -47,24 +42,13 @@ public class MemberRestController {
         return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(null));
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            MemberResponse.LogoutResponse response = cacheService.logout(token);
-            if (response.isSuccess()) {
-                return ResponseEntity.ok().body(ApiUtils.success("Logged out successfully"));
-            } else {
-                throw new UnAuthorizedError("Logout failed");
-            }
-        }
-        throw new UnAuthorizedError("No token provided");
-    }
-
     @GetMapping("/info")
     public ResponseEntity<?> findUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         OwnerResponse.UserInfoDTO dto = memberService.findUserInfo(userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
+
+    // 로그아웃 사용안함 - 프론트에서 JWT 토큰을 브라우저의 localstorage에서 삭제하면 됨.
 }
+
