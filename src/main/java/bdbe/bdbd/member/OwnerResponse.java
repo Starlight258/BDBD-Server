@@ -117,13 +117,13 @@ public class OwnerResponse {
         private Long id;
         private String name;
         private String url;
-        private LocalDateTime uploadedAt;
+        private String uploadedAt;
 
         public FileDTO(File file) {
             this.id = file.getId();
             this.name = file.getName();
             this.url = file.getUrl();
-            this.uploadedAt = file.getUploadedAt();
+            this.uploadedAt = DateUtils.formatDateTime(file.getUploadedAt());
         }
     }
 
@@ -213,12 +213,12 @@ public class OwnerResponse {
     @Setter
     @ToString
     public static class TimeFrameDTO {
-        private LocalTime start;
-        private LocalTime end;
+        private String start;
+        private String end;
 
         public TimeFrameDTO(Optime optime) {
-            this.start = optime.getStartTime();
-            this.end = optime.getEndTime();
+            this.start = DateUtils.formatTime(optime.getStartTime());
+            this.end = DateUtils.formatTime(optime.getEndTime());
         }
     }
 
