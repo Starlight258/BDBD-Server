@@ -104,15 +104,13 @@ public class FileUploadUtil {
 
         log.info("start to make file entity");
         try (S3Object s3Object = amazonS3.getObject(bucketName, fileName)) {
-            System.out.println(s3Object.toString());
         } catch (Exception e) {
-            System.out.println("Unable to get object from Amazon S3: " + e);
+            log.error("Unable to get object from Amazon S3: " + e);
         }
 
         bdbe.bdbd.file.File newFile = bdbe.bdbd.file.File.builder()
                 .name(fileName)
                 .url(amazonS3.getUrl(bucketName, fileName).toExternalForm())
-//                .path(file.getPath())
                 .uploadedAt(LocalDateTime.now())
                 .carwash(carwash)
                 .build();
@@ -158,7 +156,6 @@ public class FileUploadUtil {
             FileRequest.FileDTO fileDTO = new FileRequest.FileDTO();
             fileDTO.setName(fileName);
             fileDTO.setUrl(amazonS3.getUrl(bucketName, fileName).toExternalForm());
-//            fileDTO.setPath(file.getPath());
             fileDTO.setUploadedAt(LocalDateTime.now());
             fileDTO.setCarwash(carwash);
             log.info("start to make file entity");

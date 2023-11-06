@@ -39,7 +39,6 @@ public class FileRestControllerTest {
         Carwash carwash = carwashJPARepository.findFirstBy();
         File file = File.builder()
                 .url("http://example.com/s3/test.txt")
-//                .path("/files/test.txt")
                 .name("test.txt")
                 .uploadedAt(LocalDateTime.now())
                 .carwash(carwash)
@@ -60,7 +59,6 @@ public class FileRestControllerTest {
                 .andExpect(jsonPath("$.id").value(successfulResponse.getId()))
                 .andExpect(jsonPath("$.name").value("test.txt"))
                 .andExpect(jsonPath("$.url").value("http://example.com/s3/test.txt"))
-//                .andExpect(jsonPath("$.path").value("/files/test.txt"))
                 .andExpect(jsonPath("$.carwashId").value(carwashId));
 
         verify(fileService, times(1)).uploadFile(any(), eq(carwashId));

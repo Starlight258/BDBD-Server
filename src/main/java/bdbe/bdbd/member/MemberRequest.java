@@ -3,10 +3,7 @@ package bdbe.bdbd.member;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -29,31 +26,10 @@ public class MemberRequest {
         @NotEmpty
         private String username;
 
-//        @NotNull
-//        private Long locationId;
-
-//        @Enumerated(EnumType.STRING)
-//        @NotNull
-//        private MemberRole role;
-
-//        //notNUll 설정 불가 by int
-//        private int credit = 0;
-
         @Size(min = 9, max = 14)
         @NotEmpty
         private String tel;
 
-        //        public User toEntity(LocationJPARepository locationRepository) {
-//            Location location = locationRepository.findById(locationId)
-//                    .orElseThrow(() -> new IllegalArgumentException("해당 ID의 Location이 존재하지 않습니다."));
-//
-//            return User.builder()
-//                    .email(email)
-//                    .password(password)
-//                    .username(username)
-//                    .role(String.valueOf(UserRole.ROLE_USER))
-//                    .build();
-//        }
         public Member toUserEntity(String encodedPassword) {
             return Member.builder()
                     .email(email)

@@ -15,12 +15,11 @@ public class ReservationRestController {
 
     private final ReservationService reservationService;
 
-    // 결제 금액 조회하기
     @PostMapping("/carwashes/{carwash_id}/payment")
     public ResponseEntity<?> findPayAmount(
             @PathVariable("carwash_id") Long carwashId,
             @RequestBody ReservationRequest.ReservationTimeDTO dto
-            )
+    )
     {
         ReservationResponse.PayAmountDTO responseDTO = reservationService.findPayAmount(dto, carwashId);
 
@@ -61,17 +60,6 @@ public class ReservationRestController {
         return ResponseEntity.ok(ApiUtils.success(dto));
 
     }
-
-//    // 결제 후 예약 내역 조회
-//    @GetMapping("/reservations")
-//    public ResponseEntity<?> fetchLatestReservation(
-//            @AuthenticationPrincipal CustomUserDetails userDetails
-//    )
-//    {
-//        ReservationResponse.findLatestOneResponseDTO dto = reservationService.fetchLatestReservation();
-//        System.out.println(dto.toString());
-//        return ResponseEntity.ok(ApiUtils.success(dto));
-//    }
 
     // 현재 시간 기준 예약 내역 조회
     @GetMapping("/reservations/current-status")

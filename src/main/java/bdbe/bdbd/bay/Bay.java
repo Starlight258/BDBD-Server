@@ -27,7 +27,7 @@ public class Bay {
     private Carwash carwash;
 
     @Column(name = "status", nullable = false)
-    private int status; //상태
+    private int status;
 
     @Builder
     public Bay(Long id, int bayNum, Carwash carwash, int status) {
