@@ -56,9 +56,9 @@ public class CarwashResponse {
         private Long id;
         private String name;
         private double rate;
-        private int reviewCnt; // 리뷰 갯수
-        private int bayCnt; // 예약 가능한 갯수
-        private OperatingTimeDTOResponse optime; //
+        private int reviewCnt;
+        private int bayCnt;
+        private OperatingTimeDTOResponse optime;
         private CarwashResponse.locationDTO locationDTO;
         private List<Long> keywordId;
         private String description;
@@ -147,7 +147,7 @@ public class CarwashResponse {
         private int price;
         private String tel;
         private detailLocationDTO locationDTO;
-        private detailsOperatingTimeDTO optime; //
+        private detailsOperatingTimeDTO optime;
         private List<Long> keywordId;
         private String description;
         private List<FileDTO> imageFiles;

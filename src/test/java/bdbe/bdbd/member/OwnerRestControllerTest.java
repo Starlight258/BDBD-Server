@@ -51,7 +51,6 @@ public class OwnerRestControllerTest {
         mockOwnerDTO.setUsername("aaamockowner");
         mockOwnerDTO.setEmail("aaamockowner@naver.com");
         mockOwnerDTO.setPassword("asdf1234!");
-//        mockOwnerDTO.setRole(MemberRole.ROLE_OWNER);
         mockOwnerDTO.setTel("010-1234-5678");
 
         Member mockOwner = mockOwnerDTO.toOwnerEntity(passwordEncoder.encode(mockOwnerDTO.getPassword()));
@@ -62,7 +61,6 @@ public class OwnerRestControllerTest {
         mockUserDTO.setUsername("aaauserRoleUser");
         mockUserDTO.setEmail("aaauserRoleUser@naver.com");
         mockUserDTO.setPassword("aaaa1111!");
-//        mockUserDTO.setRole(MemberRole.ROLE_USER);
         mockUserDTO.setTel("010-1234-5678");
 
         Member mockUserWithMemberRole = mockUserDTO.toUserEntity(passwordEncoder.encode(mockUserDTO.getPassword()));
@@ -95,7 +93,6 @@ public class OwnerRestControllerTest {
         requestDTO.setUsername("aaamockowner");
         requestDTO.setEmail("aaamockowner@nate.com");
         requestDTO.setPassword("asdf1234!");
-//        requestDTO.setRole(MemberRole.ROLE_OWNER);
         requestDTO.setTel("010-1234-5678");
 
 
@@ -119,17 +116,15 @@ public class OwnerRestControllerTest {
         String requestBody = om.writeValueAsString(requestDTO);
 
         mvc.perform(
-                    post("/api/owner/login")
-                            .content(requestBody)
-                            .contentType(MediaType.APPLICATION_JSON)
+                        post("/api/owner/login")
+                                .content(requestBody)
+                                .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
                 .andExpect(header().exists(JWTProvider.HEADER))
                 .andExpect(jsonPath("$.success").value("true"))
-//                .andExpect(jsonPath("$.response.redirectUrl").value("/owner/home"))
                 .andDo(print());
     }
-    //jwt.io 에서 ROLE_OWNER정상반환 확인함 및 리다이렉트 확인
 
 
     @Test
@@ -163,7 +158,6 @@ public class OwnerRestControllerTest {
                         .param("selected-date", "2023-10-01")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
         );
-        //then
         // eye
         String responseBody = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         System.out.println("응답 Body : " + responseBody);
@@ -183,7 +177,6 @@ public class OwnerRestControllerTest {
                         .param("selected-date", "2023-10-01")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
         );
-        //then
         // eye
         String responseBody = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         System.out.println("응답 Body : " + responseBody);
@@ -199,7 +192,6 @@ public class OwnerRestControllerTest {
         //when
         ResultActions resultActions = mvc.perform(
                 get("/api/owner/carwashes"));
-        //then
         // eye
         String responseBody = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         System.out.println("응답 Body : " + responseBody);
@@ -216,7 +208,6 @@ public class OwnerRestControllerTest {
         //when
         ResultActions resultActions = mvc.perform(
                 get(String.format("/api/owner/carwashes/%d", carwashId)));
-        //then
         // eye
         String responseBody = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         System.out.println("응답 Body : " + responseBody);
@@ -232,7 +223,6 @@ public class OwnerRestControllerTest {
         //when
         ResultActions resultActions = mvc.perform(
                 get("/api/owner/home"));
-        //then
         // eye
         String responseBody = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         System.out.println("응답 Body : " + responseBody);

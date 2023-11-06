@@ -11,6 +11,7 @@ import java.net.Proxy;
 
 @Configuration
 public class RestTemplateConfig {
+
     private static final String PROXY_HOST = "krmp-proxy.9rum.cc";
     private static final int PROXY_PORT = 3128;
 

@@ -19,7 +19,7 @@ public class PayController {
             @PathVariable("carwash_id") Long carwashId,
             @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest,
             @AuthenticationPrincipal CustomUserDetails userDetails
-            ) {
+    ) {
         return payService.requestPaymentReady(
                 paymentReadyRequest.getRequestDto(),
                 paymentReadyRequest.getSaveDTO(),

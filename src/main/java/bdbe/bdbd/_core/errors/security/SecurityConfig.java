@@ -94,10 +94,4 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
-//    @Bean
-//    public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
-//        return new JwtAuthenticationEntryPoint();
-//    }
-
 }

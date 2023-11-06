@@ -1,10 +1,12 @@
 package bdbe.bdbd.file;
 
-import bdbe.bdbd._core.errors.utils.ApiUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -40,12 +42,6 @@ public class FileRestController {
         List<FileResponse.SimpleFileResponseDTO> response = fileService.uploadFiles(files, carwashId);
 
         return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/delete/{file_id}")
-    public ResponseEntity<?> deleteFile(@PathVariable("file_id") Long fileId) {
-        fileService.deleteFile(fileId);
-        return ResponseEntity.ok(ApiUtils.success(null));
     }
 
 }
