@@ -77,10 +77,10 @@ public class ReservationService {
         Reservation reservation = reservationJPARepository.findById(reservationId)
                 .filter(r -> !r.isDeleted())
                 .orElseThrow(() -> new NotFoundError("Reservation with id " + reservationId + " not found"));
-        System.out.println("id :" + reservation.getMember().getId());
-        System.out.println("id : " + member.getId());
+
         if (reservation.getMember().getId() != member.getId())
             throw new ForbiddenError("You do not have permission to delete this reservation.");
+
         reservation.changeDeletedFlag(true);
     }
 
@@ -146,6 +146,7 @@ public class ReservationService {
         List<Long> bayIdList = bayJPARepository.findIdsByCarwashId(carwashId);
         //예약에서 베이 id 리스트로 모두 찾기
         List<Reservation> reservationList = reservationJPARepository.findByBayIdInAndIsDeletedFalse(bayIdList);
+
         return new ReservationResponse.findAllResponseDTO(bayList, reservationList);
     }
 
@@ -165,6 +166,7 @@ public class ReservationService {
                 .orElseThrow(() -> new NoSuchElementException("no location found"));
 
         File file = fileJPARepository.findFirstByCarwashIdAndIsDeletedFalseOrderByUploadedAtAsc(carwash.getId()).orElse(null);
+
         return new ReservationResponse.findLatestOneResponseDTO(reservation, bay, carwash, location, file);
     }
 
@@ -185,10 +187,6 @@ public class ReservationService {
             Carwash carwash = carwashJPARepository.findById(bay.getCarwash().getId())
                     .orElseThrow(() -> new BadRequestError("Carwash not found"));
 
-            List<File> fileList = carwash.getFileList();
-//            if (!fileList.isEmpty()) {
-//                File file = fileList.get(0);
-//            }
             LocalDateTime startDateTime = reservation.getStartTime();
             LocalDate reservationDate = startDateTime.toLocalDate();
             LocalDateTime endDateTime = reservation.getEndTime();
@@ -242,6 +240,7 @@ public class ReservationService {
         int minutesDifference = (int) ChronoUnit.MINUTES.between(startTime, endTime); //시간 차 계산
         int blocksOf30Minutes = minutesDifference / 30; //30분 단위로 계산
         int totalPrice = perPrice * blocksOf30Minutes;
+
         return new ReservationResponse.PayAmountDTO(startTime, endTime, totalPrice);
     }
 }

@@ -49,8 +49,8 @@ public class ReviewResponse {
             this.created_at = DateUtils.formatDateTime(review.getCreatedAt());
             this.comment = review.getComment();
             this.keywordIdList = reviewKeyword.stream()
-                            .map(rk -> rk.getKeyword().getId())
-                            .collect(Collectors.toList());
+                    .map(rk -> rk.getKeyword().getId())
+                    .collect(Collectors.toList());
         }
     }
     @Getter
