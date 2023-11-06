@@ -1,13 +1,10 @@
 package bdbe.bdbd.member;
 
 import bdbe.bdbd._core.errors.exception.BadRequestError;
-import bdbe.bdbd._core.errors.exception.UnAuthorizedError;
-import bdbe.bdbd._core.errors.security.CacheService;
 import bdbe.bdbd._core.errors.security.CustomUserDetails;
 import bdbe.bdbd._core.errors.security.JWTProvider;
 import bdbe.bdbd._core.errors.utils.ApiUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,10 +21,7 @@ import java.util.Map;
 @RequestMapping("/api/owner")
 public class OwnerRestController {
     private final OwnerService ownerService;
-    @Autowired
-    private CacheService cacheService;
 
-    // (기능3) 이메일 중복체크
     @PostMapping("/check")
     public ResponseEntity<?> check(@RequestBody @Valid MemberRequest.EmailCheckDTO emailCheckDTO, Errors errors) {
         ownerService.sameCheckEmail(emailCheckDTO.getEmail());
@@ -49,20 +43,7 @@ public class OwnerRestController {
         MemberResponse.LoginResponse response = ownerService.login(requestDTO);
         return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(null));
     }
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            MemberResponse.LogoutResponse response = cacheService.logout(token);
-            if (response.isSuccess()) {
-                return ResponseEntity.ok().body(ApiUtils.success("Logged out successfully"));
-            } else {
-                throw new UnAuthorizedError("Logout failed");
-            }
-        }
-        throw new UnAuthorizedError("No token provided");
-    }
-
+    // 로그아웃 사용안함 - 프론트에서 JWT 토큰을 브라우저의 localstorage에서 삭제하면 됨.
 
     @GetMapping("/sales")
     public ResponseEntity<?> findAllOwnerReservation(
@@ -123,8 +104,6 @@ public class OwnerRestController {
         OwnerResponse.ReservationCarwashListDTO dto = ownerService.findBayReservation(bayId, userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
-
-
 
 }
 
