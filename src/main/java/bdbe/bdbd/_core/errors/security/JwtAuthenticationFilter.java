@@ -53,6 +53,8 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
                 throw new UnAuthorizedError("Token is not cached");
             }
 
+            Long id = decodedJWT.getClaim("id").asLong();
+            String role = decodedJWT.getClaim("role").asString();
             MemberRole roleEnum = MemberRole.valueOf(role);
             Member member = Member.builder().id(id).role(roleEnum).build();
 
