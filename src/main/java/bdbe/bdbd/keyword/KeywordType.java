@@ -1,6 +1,5 @@
 package bdbe.bdbd.keyword;
 
-import bdbe.bdbd._core.errors.exception.NotFoundError;
 import lombok.Getter;
 @Getter
 public enum KeywordType {
@@ -19,6 +18,6 @@ public enum KeywordType {
                 return type;
             }
         }
-        throw new NotFoundError("Unknown enum value: " + value);
+        throw new IllegalArgumentException("Unknown enum value: " + value);
     }
 }

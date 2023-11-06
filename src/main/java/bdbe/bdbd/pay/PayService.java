@@ -67,15 +67,23 @@ public class PayService {
         int price = perPrice * blocksOf30Minutes;
 
         int totalAmount = price;  //세금 포함 가격
+//        int vatAmount = (int)(price * 0.1);  // 세금
 
         PayRequest.PayReadyRequestDTO dto = new PayRequest.PayReadyRequestDTO();
         dto.setTotal_amount(totalAmount);
+//        dto.setVat_amount(vatAmount);
+
+//        RestTemplate restTemplate = new RestTemplate();
+
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set("Authorization", "KakaoAK " + adminKey);
 
+        PayRequest.PayReadyRequestDTO payReadyRequestDTO = new PayRequest.PayReadyRequestDTO();
         requestDto.setTotal_amount(totalAmount);
+//        requestDto.setVat_amount(vatAmount);
+        log.info("Request DTO: " + requestDto.toString());
 
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", requestDto.getCid());
@@ -84,6 +92,7 @@ public class PayService {
         parameters.add("item_name", requestDto.getItem_name());
         parameters.add("quantity", requestDto.getQuantity().toString());
         parameters.add("total_amount", requestDto.getTotal_amount().toString());
+//        parameters.add("vat_amount", requestDto.getVat_amount().toString());
         parameters.add("tax_free_amount", requestDto.getTax_free_amount().toString());
         parameters.add("approval_url", approval_url);
         parameters.add("cancel_url", cancel_url);
@@ -120,6 +129,9 @@ public class PayService {
         String url = "https://kapi.kakao.com/v1/payment/approve";
 
         ResponseEntity<String> paymentApprovalResponse = restTemplate.postForEntity(url, request, String.class);
+
+//        PayResponse.PaymentAndReservationResponseDTO responseDto = new PayResponse.PaymentAndReservationResponseDTO();
+//        responseDto.setPaymentApprovalResponse(paymentApprovalResponse.getBody());
 
         Reservation reservation;
 
