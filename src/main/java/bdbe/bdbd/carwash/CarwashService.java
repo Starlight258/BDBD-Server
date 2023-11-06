@@ -210,6 +210,9 @@ public class CarwashService {
         List<Carwash> carwashesWithin10Km = carwashJPARepository.findCarwashesWithin10Kilometers(searchRequest.getLatitude(), searchRequest.getLongitude());
 
         List<Keyword> selectedKeywords = keywordJPARepository.findAllById(searchRequest.getKeywordIds());
+        if (searchRequest.getKeywordIds().size() != selectedKeywords.size()) {
+            throw new IllegalArgumentException("Some of the keyword IDs you provided are invalid ");
+        }
 
         List<CarwashKeyword> carwashKeywords = carwashKeywordJPARepository.findByKeywordIn(selectedKeywords);
 
@@ -340,7 +343,7 @@ public class CarwashService {
         }
         List<Keyword> keywordList = keywordJPARepository.findAllById(keywordsToAdd);
         if (keywordList.size() != keywordsToAdd.size()) {
-            throw new IllegalArgumentException("Some keywords could not be found");
+            throw new BadRequestError("Some keywords could not be found");
         }
         // carwash - keyword 연관지어 저장
         List<CarwashKeyword> newCarwashKeywords = new ArrayList<>();

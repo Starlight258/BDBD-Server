@@ -4,6 +4,7 @@ import bdbe.bdbd.optime.DayType;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class DateUtils {
@@ -20,5 +21,11 @@ public class DateUtils {
 
     public static String formatDateTime(LocalDateTime dateTime) {
         return dateTime.format(formatter);
+    }
+
+    private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+    public static String formatTime(LocalTime time) {
+        return time.format(timeFormatter);
     }
 }

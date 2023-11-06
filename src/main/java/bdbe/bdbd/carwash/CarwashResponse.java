@@ -1,5 +1,6 @@
 package bdbe.bdbd.carwash;
 
+import bdbe.bdbd._core.errors.utils.DateUtils;
 import bdbe.bdbd.location.Location;
 import bdbe.bdbd.optime.Optime;
 import bdbe.bdbd.file.File;
@@ -81,13 +82,13 @@ public class CarwashResponse {
         public OperatingTimeDTOResponse toOptimeListDTO(Optime weekOptime, Optime endOptime) {
             OperatingTimeDTOResponse dto = new OperatingTimeDTOResponse();
             OperatingTimeDTOResponse.TimeSlotResponse weekSlot= new OperatingTimeDTOResponse.TimeSlotResponse();
-            weekSlot.setStart(weekOptime.getStartTime());
-            weekSlot.setEnd(weekOptime.getEndTime());
+            weekSlot.setStart(DateUtils.formatTime(weekOptime.getStartTime()));
+            weekSlot.setEnd(DateUtils.formatTime(weekOptime.getEndTime()));
             dto.setWeekday(weekSlot);
 
             OperatingTimeDTOResponse.TimeSlotResponse endSlot= new OperatingTimeDTOResponse.TimeSlotResponse();
-            endSlot.setStart(endOptime.getStartTime());
-            endSlot.setEnd(endOptime.getEndTime());
+            endSlot.setStart(DateUtils.formatTime(endOptime.getStartTime()));
+            endSlot.setEnd(DateUtils.formatTime(endOptime.getEndTime()));
             dto.setWeekend(endSlot);
 
             return dto;
@@ -110,8 +111,8 @@ public class CarwashResponse {
         @Getter
         @Setter
         public static class TimeSlotResponse {
-            private LocalTime start;
-            private LocalTime end;
+            private String start;
+            private String end;
 
         }
     }
@@ -170,13 +171,13 @@ public class CarwashResponse {
         public detailsOperatingTimeDTO toOptimeListDTO(Optime weekOptime, Optime endOptime) {
             detailsOperatingTimeDTO dto = new detailsOperatingTimeDTO();
             detailsOperatingTimeDTO.detailsTimeSlot weekSlot= new detailsOperatingTimeDTO.detailsTimeSlot();
-            weekSlot.setStart(weekOptime.getStartTime());
-            weekSlot.setEnd(weekOptime.getEndTime());
+            weekSlot.setStart(DateUtils.formatTime(weekOptime.getStartTime()));
+            weekSlot.setEnd(DateUtils.formatTime(weekOptime.getEndTime()));
             dto.setWeekday(weekSlot);
 
             detailsOperatingTimeDTO.detailsTimeSlot endSlot= new detailsOperatingTimeDTO.detailsTimeSlot();
-            endSlot.setStart(endOptime.getStartTime());
-            endSlot.setEnd(endOptime.getEndTime());
+            endSlot.setStart(DateUtils.formatTime(endOptime.getStartTime()));
+            endSlot.setEnd(DateUtils.formatTime(endOptime.getEndTime()));
             dto.setWeekend(endSlot);
 
             return dto;
@@ -198,8 +199,8 @@ public class CarwashResponse {
         @Getter
         @Setter
         public static class detailsTimeSlot {
-            private LocalTime start;
-            private LocalTime end;
+            private String start;
+            private String end;
 
         }
     }
@@ -239,13 +240,13 @@ public class CarwashResponse {
             CarwashResponse.updateOperatingTimeDTO dto = new CarwashResponse.updateOperatingTimeDTO();
 
             CarwashResponse.updateOperatingTimeDTO.updateTimeSlot weekSlot = new CarwashResponse.updateOperatingTimeDTO.updateTimeSlot();
-            weekSlot.setStart(weekdayOptime.getStartTime());
-            weekSlot.setEnd(weekdayOptime.getEndTime());
+            weekSlot.setStart(DateUtils.formatTime(weekdayOptime.getStartTime()));
+            weekSlot.setEnd(DateUtils.formatTime(weekdayOptime.getEndTime()));
             dto.setWeekday(weekSlot);
 
             CarwashResponse.updateOperatingTimeDTO.updateTimeSlot endSlot = new CarwashResponse.updateOperatingTimeDTO.updateTimeSlot();
-            endSlot.setStart(weekendOptime.getStartTime());
-            endSlot.setEnd(weekendOptime.getEndTime());
+            endSlot.setStart(DateUtils.formatTime(weekendOptime.getStartTime()));
+            endSlot.setEnd(DateUtils.formatTime(weekendOptime.getEndTime()));
             dto.setWeekend(endSlot);
             this.optime = dto;
 
@@ -273,8 +274,8 @@ public class CarwashResponse {
         @Getter
         @Setter
         public static class updateTimeSlot {
-            private LocalTime start;
-            private LocalTime end;
+            private String start;
+            private String end;
 
         }
     }

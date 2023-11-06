@@ -20,7 +20,6 @@ import javax.persistence.EntityNotFoundException;
 public class BayService {
     private final BayJPARepository bayJPARepository;
     private final CarwashJPARepository carwashJPARepository;
-    private final ReservationJPARepository reservationJPARepository;
 
     public void createBay(BayRequest.SaveDTO dto, Long carwashId, Member member) {
         Carwash carwash = carwashJPARepository.findById(carwashId)
@@ -29,6 +28,7 @@ public class BayService {
         if (carwash.getMember().getId() != member.getId()) {
             throw new ForbiddenError("User is not the owner of the carwash.");
         }
+
         int bayNum = dto.getBayNum();
         boolean exists = bayJPARepository.findByCarwashId(carwashId)
                 .stream()

@@ -23,45 +23,55 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestError.class)
     public ResponseEntity<?> badRequest(BadRequestError e){
-        return new ResponseEntity<>(e.body(), e.status());
+        ApiUtils.ApiResult<?> errorResult = ApiUtils.error(e.getMessage(), e.status());
+
+        return new ResponseEntity<>(errorResult, e.status());
     }
 
+
     @ExceptionHandler(UnAuthorizedError.class)
-    public ResponseEntity<?> unAuthorized(UnAuthorizedError e){
-        return new ResponseEntity<>(e.body(), e.status());
+    public ResponseEntity<?> unAuthorized(UnAuthorizedError e) {
+        ApiUtils.ApiResult<?> errorResult = ApiUtils.error(e.getMessage(), e.status());
+
+        return new ResponseEntity<>(errorResult, e.status());
     }
 
     @ExceptionHandler(ForbiddenError.class)
     public ResponseEntity<?> forbidden(ForbiddenError e){
-        return new ResponseEntity<>(e.body(), e.status());
+        ApiUtils.ApiResult<?> errorResult = ApiUtils.error(e.getMessage(), e.status());
+
+        return new ResponseEntity<>(errorResult, e.status());
     }
 
     @ExceptionHandler(NotFoundError.class)
     public ResponseEntity<?> notFound(NotFoundError e){
-        return new ResponseEntity<>(e.body(), e.status());
+        ApiUtils.ApiResult<?> errorResult = ApiUtils.error(e.getMessage(), e.status());
+
+        return new ResponseEntity<>(errorResult, e.status());
     }
 
     @ExceptionHandler(InternalServerError.class)
     public ResponseEntity<?> serverError(InternalServerError e){
-        return new ResponseEntity<>(e.body(), e.status());
+        ApiUtils.ApiResult<?> errorResult = ApiUtils.error(e.getMessage(), e.status());
+
+        return new ResponseEntity<>(errorResult, e.status());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(e.getMessage());
+    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
+        ApiUtils.ApiResult<?> errorResult = ApiUtils.error(e.getMessage(), HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity<>(errorResult,HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<?> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
         String message = String.format("The parameter '%s' of value '%s' could not be converted to type '%s'",
                 e.getName(), e.getValue(), e.getRequiredType().getSimpleName());
-        Map<String, Object> errorBody = new HashMap<>();
-        errorBody.put("success", false);
-        errorBody.put("error", Collections.singletonMap("message", message));
-        return new ResponseEntity<>(errorBody, HttpStatus.BAD_REQUEST);
+        ApiUtils.ApiResult<?> errorResult = ApiUtils.error(message, HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -69,32 +79,31 @@ public class GlobalExceptionHandler {
         String name = ex.getParameterName();
         String type = ex.getParameterType();
         String message = String.format("The required parameter '%s' of type '%s' is missing", name, type);
+        ApiUtils.ApiResult<?> errorResult = ApiUtils.error(message, HttpStatus.BAD_REQUEST);
 
-        Map<String, String> errorBody = new HashMap<>();
-        errorBody.put("error", message);
-
-        return new ResponseEntity<>(errorBody, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorResult,HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> unknownServerError(Exception e){
-        ApiUtils.ApiResult<?> apiResult = ApiUtils.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        return new ResponseEntity<>(apiResult, HttpStatus.INTERNAL_SERVER_ERROR);
+        ApiUtils.ApiResult<?> errorResult = ApiUtils.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+        return new ResponseEntity<>(errorResult, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
+    public ResponseEntity<?> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
+        ApiUtils.ApiResult<?> errorResult = ApiUtils.error("Request has invalid or missing fields.", HttpStatus.BAD_REQUEST);
 
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body("Request has invalid or missing fields.");
+        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AmazonServiceException.class)
     public ResponseEntity<?> handleAmazonServiceException(AmazonServiceException ex) {
         String errorMsg = String.format("AmazonServiceException: %s", ex.getErrorMessage());
         ApiUtils.ApiResult<?> apiResult = ApiUtils.error(errorMsg, HttpStatus.INTERNAL_SERVER_ERROR);
+
         return new ResponseEntity<>(apiResult, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -102,6 +111,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleSdkClientException(SdkClientException ex) {
         String errorMsg = String.format("SdkClientException: %s", ex.getMessage());
         ApiUtils.ApiResult<?> apiResult = ApiUtils.error(errorMsg, HttpStatus.INTERNAL_SERVER_ERROR);
+
         return new ResponseEntity<>(apiResult, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

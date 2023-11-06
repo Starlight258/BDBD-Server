@@ -1,5 +1,6 @@
 package bdbe.bdbd.reservation;
 
+import bdbe.bdbd._core.errors.utils.DateUtils;
 import bdbe.bdbd.bay.Bay;
 import bdbe.bdbd.carwash.Carwash;
 import bdbe.bdbd.file.File;
@@ -11,6 +12,7 @@ import lombok.ToString;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,8 +34,8 @@ public class ReservationResponse {
                         .filter(reservation -> reservation.getBay().getId().equals(bay.getId()))
                         .map(reservation -> {
                             BookedTimeDTO bookedTimeDTO = new BookedTimeDTO();
-                            bookedTimeDTO.setStartTime(reservation.getStartTime());
-                            bookedTimeDTO.setEndTime(reservation.getEndTime());
+                            bookedTimeDTO.setStartTime(DateUtils.formatDateTime(reservation.getStartTime()));
+                            bookedTimeDTO.setEndTime(DateUtils.formatDateTime(reservation.getEndTime()));
                             return bookedTimeDTO;
                         }).collect(Collectors.toList());
                 bayResponseDTO.setBayBookedTime(bookedTimes);
@@ -53,8 +55,8 @@ public class ReservationResponse {
         @Setter
         @ToString
         public static class BookedTimeDTO{
-            private LocalDateTime startTime;
-            private LocalDateTime endTime;
+            private String startTime;
+            private String endTime;
         }
 
     }
@@ -67,8 +69,8 @@ public class ReservationResponse {
         public findLatestOneResponseDTO(Reservation reservation, Bay bay, Carwash carwash, Location location, File carwashImage) {
             ReservationDTO reservationDTO = new ReservationDTO();
             TimeDTO timeDTO = new TimeDTO();
-            timeDTO.start = reservation.getStartTime();
-            timeDTO.end = reservation.getEndTime();
+            timeDTO.start = DateUtils.formatDateTime(reservation.getStartTime());
+            timeDTO.end = DateUtils.formatDateTime(reservation.getEndTime());
             reservationDTO.time = timeDTO;
             reservationDTO.price = reservation.getPrice();
             reservationDTO.bayNo = bay.getBayNum();
@@ -107,8 +109,8 @@ public class ReservationResponse {
     @Setter
     @ToString
     public static class TimeDTO{
-        private LocalDateTime start;
-        private LocalDateTime end;
+        private String start;
+        private String end;
     }
     @Getter
     @Setter
@@ -124,15 +126,14 @@ public class ReservationResponse {
         private Long id;
         private String name;
         private String url;
-//        private String path;
-        private LocalDateTime uploadedAt;
+        private String uploadedAt;
 
         public ImageDTO(File file) {
             this.id = file.getId();
             this.name = file.getName();
             this.url = file.getUrl();
-//            this.path = file.getPath();
-            this.uploadedAt = file.getUploadedAt();
+            this.uploadedAt = DateUtils.formatDateTime(file.getUploadedAt());
+
         }
     }
 
@@ -195,8 +196,8 @@ public class ReservationResponse {
         public ReservationInfoDTO(Reservation reservation, Bay bay, Carwash carwash) {
             this.id = reservation.getId();
             TimeDTO timeDTO = new TimeDTO();
-            timeDTO.start = reservation.getStartTime();
-            timeDTO.end = reservation.getEndTime();
+            timeDTO.start = DateUtils.formatDateTime(reservation.getStartTime());
+            timeDTO.end = DateUtils.formatDateTime(reservation.getEndTime());
             this.time = timeDTO;
             this.carwashId = carwash.getId();
             this.carwashName = carwash.getName();
@@ -216,13 +217,13 @@ public class ReservationResponse {
     @ToString
     public static class PayAmountDTO {
 
-        private LocalDateTime startTime;
-        private LocalDateTime endTime;
+        private String startTime;
+        private String endTime;
         private int price;
 
         public PayAmountDTO(LocalDateTime startTime, LocalDateTime endTime, int price) {
-            this.startTime = startTime;
-            this.endTime = endTime;
+            this.startTime = DateUtils.formatDateTime(startTime);
+            this.endTime = DateUtils.formatDateTime(endTime);
             this.price = price;
         }
     }
