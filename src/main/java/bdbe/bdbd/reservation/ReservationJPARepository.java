@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface ReservationJPARepository extends JpaRepository<Reservation, Long> {
+//    Reservation findFirstByIsDeletedFalse();  // 테스트시에 사용
 
     @Query("SELECT r FROM Reservation r JOIN FETCH r.bay b JOIN FETCH b.carwash WHERE r.member.id = :memberId AND r.isDeleted = false")
     List<Reservation> findFirstByMemberIdWithJoinFetch(@Param("memberId") Long memberId, Pageable pageable);
@@ -23,9 +24,9 @@ public interface ReservationJPARepository extends JpaRepository<Reservation, Lon
             "where b.id = :bayId and r.isDeleted = false")
     List<Reservation> findByBay_IdWithJoinsAndIsDeletedFalse(@Param("bayId") Long bayId);
 
-    List<Reservation> findByBay_IdAndIsDeletedFalse(Long bayId);
+    List<Reservation> findByBay_IdAndIsDeletedFalse(Long bayId); // 베이의 예약 목록 찾기
 
-    List<Reservation> findByMemberIdAndIsDeletedFalse(Long memberId);
+    List<Reservation> findByMemberIdAndIsDeletedFalse(Long memberId); // member의 예약 목록 찾기
 
     @Query("SELECT r FROM Reservation r JOIN FETCH r.bay b JOIN FETCH b.carwash WHERE r.member.id = :memberId AND r.isDeleted = false")
     List<Reservation> findByMemberIdJoinFetch(@Param("memberId") Long memberId, Pageable pageable);

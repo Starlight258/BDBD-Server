@@ -1,9 +1,9 @@
 package bdbe.bdbd.file;
 
+
 import bdbe.bdbd._core.errors.exception.BadRequestError;
 import bdbe.bdbd._core.errors.exception.ForbiddenError;
 import bdbe.bdbd._core.errors.utils.FileUploadUtil;
-import bdbe.bdbd.member.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +32,7 @@ public class FileService {
         return fileUploadUtil.uploadFiles(multipartFile, carwashId);
     }
 
-    public void deleteFile(Long fileId, Member member) {
+    public void deleteFile(Long fileId) {
 
         File file = fileJPARepository.findById(fileId)
                 .orElseThrow(() -> new BadRequestError("file id :" + fileId + " not found"));

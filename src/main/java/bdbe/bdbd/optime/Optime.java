@@ -13,23 +13,23 @@ import java.time.LocalTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name="optime")
-public class Optime{
+public class Optime{ // 영업시간
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private Long id;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) // DB에 문자열 저장
     @Column(name="day_type", length = 10, nullable = false)
-    private DayType dayType; // 요일명 (평일, 주말, 휴일)
+    private DayType dayType; // enum 요일명 (평일, 주말, 휴일)
 
     @Column(name="start_time", nullable = false)
-    private LocalTime startTime;
+    private LocalTime startTime; // ex)10:00
 
     @Column(name="end_time", nullable = false)
     private LocalTime endTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) //외래키
     @JoinColumn(name="c_id",  nullable = false)
     private Carwash carwash;
 
