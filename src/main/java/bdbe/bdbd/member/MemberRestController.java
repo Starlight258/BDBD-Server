@@ -3,6 +3,7 @@ package bdbe.bdbd.member;
 import bdbe.bdbd._core.errors.exception.BadRequestError;
 import bdbe.bdbd._core.errors.exception.UnAuthorizedError;
 import bdbe.bdbd._core.errors.security.CacheService;
+import bdbe.bdbd._core.errors.security.CustomUserDetails;
 import bdbe.bdbd._core.errors.security.JWTProvider;
 import bdbe.bdbd._core.errors.utils.ApiUtils;
 import lombok.RequiredArgsConstructor;
@@ -60,4 +61,10 @@ public class MemberRestController {
         throw new UnAuthorizedError("No token provided");
     }
 
+    @GetMapping("/info")
+    public ResponseEntity<?> findUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        OwnerResponse.UserInfoDTO dto = memberService.findUserInfo(userDetails.getMember());
+        return ResponseEntity.ok(ApiUtils.success(dto));
+    }
 }
