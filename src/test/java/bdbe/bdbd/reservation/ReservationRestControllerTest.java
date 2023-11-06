@@ -70,63 +70,6 @@ public class ReservationRestControllerTest {
 
     private Member member;
 
-    @BeforeEach()
-    public void setup() {
-//        Location location = Location.builder()
-//                .place("place")
-//                .address("address")
-//                .latitude(1.234)
-//                .longitude(2.345)
-//                .build();
-//        Location savedLocation = locationJPARepository.save(location);
-//
-//        User user = User.builder()
-//                .role(UserRole.ROLE_USER)
-//                .email("user@nate.com")
-//                .password("user1234!")
-//                .username("useruser")
-//                .build();
-//        User savedUser = userJPARepository.findFirstBy();
-//
-//
-////        Carwash savedCarwash = carwashJPARepository.findFirstBy();
-//        Carwash carwash = Carwash.builder()
-//                .price(100)
-//                .name("세차장")
-//                .des("좋은 세차장입니다.")
-//                .tel("010-2222-3333")
-//                .location(savedLocation)
-//                .user(savedUser)
-//                .build();
-//        Carwash savedCarwash = carwashJPARepository.save(carwash);
-//
-////        Long id, int bayNum, int bayType, Carwash carwash, int status
-//        Bay bay = Bay.builder()
-//                .bayNum(1)
-//                .carwash(savedCarwash)
-//                .status(1)
-//                .build();
-//        bayJPARepository.save(bay);
-
-//        Carwash carwash = carwashJPARepository.findFirstBy();
-////
-//        Optime optime = Optime.builder()
-//                .dayType(WEEKDAY)
-//                .startTime(LocalTime.of(6, 0)) // 오전 6시
-//                .endTime(LocalTime.of(22, 0)) // 오후 10시
-//                .carwash(carwash)
-//                .build();
-//        Optime savedOptime = optimeJPARepository.save(optime);
-//
-//        optime = Optime.builder()
-//                .dayType(WEEKEND)
-//                .startTime(LocalTime.of(6, 0)) // 오전 6시
-//                .endTime(LocalTime.of(23, 59)) // 오후 11시 59분
-//                .carwash(carwash)
-//                .build();
-//        savedOptime = optimeJPARepository.save(optime);
-
-    }
 
 
     @WithUserDetails(value = "user@nate.com")
@@ -239,8 +182,8 @@ public class ReservationRestControllerTest {
                 delete(String.format("/api/reservations/%d", reservationId))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
         );
-//        then
-//         eye
+
+        // eye
         String responseBody = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         System.out.println("응답 Body : " + responseBody);
         resultActions.andExpect(jsonPath("$.success").value("true"));
@@ -335,37 +278,6 @@ public class ReservationRestControllerTest {
         Bay savedBay = bayJPARepository.findFirstBy();
 
         LocalDate date = LocalDate.now();
-        // 예약 1
-//        Reservation reservation = Reservation.builder()
-//                .price(4000)
-//                .startTime(LocalDateTime.of(date, LocalTime.of(6, 0))) // 오전 6시
-//                .endTime(LocalDateTime.of(date, LocalTime.of(6, 30))) // 30분 뒤
-//                .bay(savedBay)
-//                .user(user)
-//                .build();
-//        reservationJPARepository.save(reservation);
-//
-//        // 예약 2
-//        reservation = Reservation.builder()
-//                .price(4000)
-//                .startTime(LocalDateTime.of(date, LocalTime.of(20, 0))) // 오전 6시
-//                .endTime(LocalDateTime.of(date, LocalTime.of(20, 30))) // 30분 뒤
-//                .bay(savedBay)
-//                .user(user)
-//                .build();
-//        reservationJPARepository.save(reservation);
-//
-//        // 예약 3
-//        reservation = Reservation.builder()
-//                .price(4000)
-//                .startTime(LocalDateTime.now())
-//                .endTime(LocalDateTime.now().plusMinutes(30)) //30분 뒤로 설정
-//                .bay(savedBay)
-//                .user(user)
-//                .build();
-//        reservationJPARepository.save(reservation);
-
-
 
         //when
         ResultActions resultActions = mvc.perform(
@@ -388,53 +300,6 @@ public class ReservationRestControllerTest {
                 .orElseThrow(()-> new IllegalArgumentException("user not found"));
 
         Carwash carwash = carwashJPARepository.findFirstBy();
-//        Carwash carwash1 = carwashJPARepository.findById(3L).get();
-////        Bay bay = bayJPARepository.findByCarwashId(carwash.getId()).get(0);
-//
-//        Bay bay = Bay.builder()
-//                .bayNum(2)
-//                .carwash(carwash)
-//                .status(1)
-//                .build();
-//        Bay savedBay = bayJPARepository.save(bay);
-//
-//        bay = Bay.builder()
-//                .bayNum(2)
-//                .carwash(carwash1)
-//                .status(1)
-//                .build();
-//        Bay savedBay1 = bayJPARepository.save(bay);
-//
-//        LocalDate date = LocalDate.now();
-//        // 예약 1
-//        Reservation reservation = Reservation.builder()
-//                .price(4000)
-//                .startTime(LocalDateTime.of(date, LocalTime.of(6, 0))) // 오전 6시
-//                .endTime(LocalDateTime.of(date, LocalTime.of(6, 30))) // 30분 뒤
-//                .bay(savedBay)
-//                .user(user)
-//                .build();
-//        reservationJPARepository.save(reservation);
-//
-//        // 예약 2
-//        reservation = Reservation.builder()
-//                .price(4000)
-//                .startTime(LocalDateTime.of(date, LocalTime.of(20, 0))) // 오전 6시
-//                .endTime(LocalDateTime.of(date, LocalTime.of(20, 30))) // 30분 뒤
-//                .bay(savedBay)
-//                .user(user)
-//                .build();
-//        reservationJPARepository.save(reservation);
-//
-//        // 예약 3 (다른 세차장의 베이)
-//        reservation = Reservation.builder()
-//                .price(4000)
-//                .startTime(LocalDateTime.now())
-//                .endTime(LocalDateTime.now().plusMinutes(30)) //30분 뒤로 설정
-//                .bay(savedBay1)
-//                .user(user)
-//                .build();
-//        reservationJPARepository.save(reservation);
 
 
         //when
