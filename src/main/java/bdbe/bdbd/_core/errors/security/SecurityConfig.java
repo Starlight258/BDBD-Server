@@ -4,6 +4,7 @@ package bdbe.bdbd._core.errors.security;
 import bdbe.bdbd._core.errors.exception.ForbiddenError;
 import bdbe.bdbd._core.errors.exception.UnAuthorizedError;
 import bdbe.bdbd._core.errors.utils.FilterResponseUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,16 +22,27 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SecurityConfig {
 
+
+    @Autowired
+    private CacheService cacheService;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     public class CustomSecurityFilterManager extends AbstractHttpConfigurer<CustomSecurityFilterManager, HttpSecurity> {
+
+        private final CacheService cacheService;
+
+        public CustomSecurityFilterManager(CacheService cacheService) {
+            this.cacheService = cacheService;
+        }
+
         @Override
         public void configure(HttpSecurity builder) throws Exception {
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
-            builder.addFilter(new JwtAuthenticationFilter(authenticationManager));
+            builder.addFilter(new JwtAuthenticationFilter(authenticationManager, cacheService));
             super.configure(builder);
         }
     }
@@ -58,8 +70,7 @@ public class SecurityConfig {
         http.httpBasic().disable();
 
         // 커스텀 필터 적용 (시큐리티 필터 교환)
-        http.apply(new CustomSecurityFilterManager());
-
+        http.apply(new CustomSecurityFilterManager(cacheService));  // CacheService 인스턴스를 제공합니다.
         // 인증 실패 처리
         http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
             FilterResponseUtils.unAuthorized(response, new UnAuthorizedError("Not authenticated"));
