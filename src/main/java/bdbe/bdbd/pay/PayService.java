@@ -3,9 +3,12 @@ package bdbe.bdbd.pay;
 import bdbe.bdbd._core.errors.exception.BadRequestError;
 import bdbe.bdbd._core.errors.exception.ForbiddenError;
 import bdbe.bdbd._core.errors.exception.NotFoundError;
+import bdbe.bdbd.bay.Bay;
+import bdbe.bdbd.bay.BayJPARepository;
 import bdbe.bdbd.carwash.Carwash;
 import bdbe.bdbd.carwash.CarwashJPARepository;
 import bdbe.bdbd.member.Member;
+import bdbe.bdbd.optime.Optime;
 import bdbe.bdbd.reservation.Reservation;
 import bdbe.bdbd.reservation.ReservationRequest;
 import bdbe.bdbd.reservation.ReservationResponse;
@@ -52,16 +55,25 @@ public class PayService {
     @Autowired
     private CarwashJPARepository carwashJpaRepository;
 
-    public ResponseEntity<String> requestPaymentReady(PayRequest.PayReadyRequestDTO requestDto, ReservationRequest.SaveDTO saveDTO, Long carwashId, Member member) {
+    @Autowired
+    private BayJPARepository bayJPARepository;
 
+    public ResponseEntity<String> requestPaymentReady(PayRequest.PayReadyRequestDTO requestDto, ReservationRequest.SaveDTO saveDTO, Long bayId, Member member) {
+
+        Bay bay = bayJPARepository.findById(bayId)
+                .orElseThrow(() -> new BadRequestError("bay id:" + bayId + " not found"));
+        // 예약 시간 검증
+        Long carwashId = bay.getCarwash().getId();
         Carwash carwash = carwashJpaRepository.findById(carwashId)
-                .orElseThrow(() -> new BadRequestError("carwash id: " + carwashId + "not found"));
+                .orElseThrow(() -> new BadRequestError("carwash id:" + carwashId + " not found"));
 
-        int perPrice = carwash.getPrice();
         LocalDateTime startTime = saveDTO.getStartTime();
         LocalDateTime endTime = saveDTO.getEndTime();
-        System.out.println(saveDTO.toString());
+        Optime optime = reservationService.findOptime(carwash, startTime);
+        reservationService.validateReservationTime(startTime, endTime, optime, bayId);
 
+        // 금액 계산하기
+        int perPrice = carwash.getPrice();
         int minutesDifference = (int) ChronoUnit.MINUTES.between(startTime, endTime);
         int blocksOf30Minutes = minutesDifference / 30;
         int price = perPrice * blocksOf30Minutes;
@@ -105,6 +117,15 @@ public class PayService {
             Member member,
             ReservationRequest.SaveDTO saveDTO) {
 
+        // 예약 시간 검증하기
+        Carwash carwash = carwashJpaRepository.findById(carwashId)
+                .orElseThrow(() -> new BadRequestError("carwash id:" + carwashId + " not found"));
+        LocalDateTime startTime = saveDTO.getStartTime();
+        LocalDateTime endTime = saveDTO.getEndTime();
+        Optime optime = reservationService.findOptime(carwash, startTime);
+        reservationService.validateReservationTime(startTime, endTime, optime, bayId);
+
+        // API 요청 보내기
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set("Authorization", "KakaoAK " + adminKey);

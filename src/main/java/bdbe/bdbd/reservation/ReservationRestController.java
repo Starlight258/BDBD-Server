@@ -15,13 +15,13 @@ public class ReservationRestController {
 
     private final ReservationService reservationService;
 
-    @PostMapping("/carwashes/{carwash_id}/payment")
+    @PostMapping("/carwashes/{bay_id}/payment")
     public ResponseEntity<?> findPayAmount(
-            @PathVariable("carwash_id") Long carwashId,
+            @PathVariable("bay_id") Long bayId,
             @RequestBody ReservationRequest.ReservationTimeDTO dto
     )
     {
-        ReservationResponse.PayAmountDTO responseDTO = reservationService.findPayAmount(dto, carwashId);
+        ReservationResponse.PayAmountDTO responseDTO = reservationService.findPayAmount(dto, bayId);
 
         return ResponseEntity.ok(ApiUtils.success(responseDTO));
     }

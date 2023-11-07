@@ -14,16 +14,16 @@ public class PayController {
 
     private final PayService payService;
 
-    @PostMapping("/ready/{carwash_id}")
+    @PostMapping("/ready/{bay_id}")
     public ResponseEntity<String> requestPaymentReady(
-            @PathVariable("carwash_id") Long carwashId,
+            @PathVariable("bay_id") Long bayId,
             @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         return payService.requestPaymentReady(
                 paymentReadyRequest.getRequestDto(),
                 paymentReadyRequest.getSaveDTO(),
-                carwashId,
+                bayId,
                 userDetails.getMember()
         );
     }

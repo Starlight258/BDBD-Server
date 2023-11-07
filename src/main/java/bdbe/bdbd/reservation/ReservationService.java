@@ -16,6 +16,10 @@ import bdbe.bdbd.location.LocationJPARepository;
 import bdbe.bdbd.optime.DayType;
 import bdbe.bdbd.optime.Optime;
 import bdbe.bdbd.optime.OptimeJPARepository;
+import bdbe.bdbd.reservation.Reservation;
+import bdbe.bdbd.reservation.ReservationJPARepository;
+import bdbe.bdbd.reservation.ReservationRequest;
+import bdbe.bdbd.reservation.ReservationResponse;
 import bdbe.bdbd.reservation.ReservationResponse.ReservationInfoDTO;
 import bdbe.bdbd.member.Member;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +54,7 @@ public class ReservationService {
         Carwash carwash = findCarwashById(carwashId);
         Optime optime = findOptime(carwash, dto.getStartTime());
 
-        validateReservationTime(dto, optime, bayId);
+        validateReservationTime(dto.getStartTime(), dto.getEndTime(), optime, bayId);
         Bay bay = findBayById(bayId);
 
         Reservation reservation = dto.toReservationEntity(carwash, bay, sessionMember);
@@ -65,10 +69,17 @@ public class ReservationService {
                 .orElseThrow(() -> new NotFoundError("Reservation with id " + reservationId + " not found"));
         if (reservation.getMember().getId() != member.getId())
             throw new ForbiddenError("You do not have permission to modify this reservation.");
+        // 세차장 id 확인
         Long carwashId = reservation.getBay().getCarwash().getId();
         Carwash carwash = carwashJPARepository.findById(carwashId)
                 .orElseThrow(() -> new NotFoundError("Carwash with id " + carwashId + " not found"));
-
+        // 예약시간 검증
+        Long bayId = reservation.getBay().getId();
+        LocalDateTime startTime = dto.getStartTime();
+        LocalDateTime endTime = dto.getEndTime();
+        Optime optime = findOptime(carwash, startTime);
+        validateReservationTime(startTime, endTime, optime, bayId);
+        // 예약 갱신
         reservation.updateReservation(dto.getStartTime(), dto.getEndTime(), carwash);
     }
 
@@ -90,7 +101,7 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("carwash not found"));
     }
 
-    private Optime findOptime(Carwash carwash, LocalDateTime startTime) {
+    public Optime findOptime(Carwash carwash, LocalDateTime startTime) {
         List<Optime> optimeList = optimeJPARepository.findByCarwash_Id(carwash.getId());
         DayOfWeek dayOfWeek = startTime.getDayOfWeek();
         DayType dayType = DateUtils.getDayType(dayOfWeek);
@@ -100,15 +111,20 @@ public class ReservationService {
                 .orElseThrow(() -> new NoSuchElementException("carwash optime doesn't exist"));
     }
 
-    private void validateReservationTime(ReservationRequest.SaveDTO dto, Optime optime, Long bayId) {
+    public void validateReservationTime(LocalDateTime startTime, LocalDateTime endTime, Optime optime, Long bayId) {
         LocalTime opStartTime = optime.getStartTime();
         LocalTime opEndTime = optime.getEndTime();
-        LocalTime dtoStartTimePart = dto.getStartTime().toLocalTime();
-        LocalTime dtoEndTimePart = dto.getEndTime().toLocalTime();
+        LocalTime requestStartTimePart = startTime.toLocalTime();
+        LocalTime requestEndTimePart = endTime.toLocalTime();
+
+        // 예약 시작 시간이 종료 시간보다 뒤인지 확인
+        if (startTime.isAfter(endTime)) {
+            throw new BadRequestError("Reservation start time must be before end time.");
+        }
 
         // 예약이 운영시간을 넘지 않도록 함
-        if (!((opStartTime.isBefore(dtoStartTimePart) || opStartTime.equals(dtoStartTimePart)) &&
-                (opEndTime.isAfter(dtoEndTimePart) || opEndTime.equals(dtoEndTimePart)))) {
+        if (!((opStartTime.isBefore(requestStartTimePart) || opStartTime.equals(requestStartTimePart)) &&
+                (opEndTime.isAfter(requestEndTimePart) || opEndTime.equals(requestEndTimePart)))) {
             throw new BadRequestError("Reservation time is out of operating hours");
         }
         // 이미 예약된 시간은 피하도록 함
@@ -119,8 +135,8 @@ public class ReservationService {
                     LocalDateTime existingStartTime = existingReservation.getStartTime();
                     LocalDateTime existingEndTime = existingReservation.getEndTime();
                     return !(
-                            (dto.getEndTime().isBefore(existingStartTime) || dto.getEndTime().isEqual(existingStartTime)) ||
-                                    (dto.getStartTime().isAfter(existingEndTime) || dto.getStartTime().isEqual(existingEndTime))
+                            (endTime.isBefore(existingStartTime) || endTime.isEqual(existingStartTime)) ||
+                                    (startTime.isAfter(existingEndTime) || startTime.isEqual(existingEndTime))
                     );
                 });
 
@@ -229,13 +245,22 @@ public class ReservationService {
         return new ReservationResponse.fetchRecentReservationDTO(recentReservations);
     }
 
-    public ReservationResponse.PayAmountDTO findPayAmount(ReservationRequest.ReservationTimeDTO dto, Long carwashId) {
+    public ReservationResponse.PayAmountDTO findPayAmount(ReservationRequest.ReservationTimeDTO dto, Long bayId) {
+        Bay bay = bayJPARepository.findById(bayId)
+                .orElseThrow(() -> new BadRequestError("bay not found"));
+
+        Long carwashId = bay.getCarwash().getId();
         Carwash carwash = carwashJPARepository.findById(carwashId)
                 .orElseThrow(() -> new BadRequestError("carwash id: " + carwashId + " not found"));
-        int perPrice = carwash.getPrice();
-
+        // 예약 시간 검증
         LocalDateTime startTime = dto.getStartTime();
         LocalDateTime endTime = dto.getEndTime();
+
+        Optime optime = findOptime(carwash, startTime);
+        validateReservationTime(startTime, endTime, optime, bayId);
+
+        // 가격 계산
+        int perPrice = carwash.getPrice();
 
         int minutesDifference = (int) ChronoUnit.MINUTES.between(startTime, endTime); //시간 차 계산
         int blocksOf30Minutes = minutesDifference / 30; //30분 단위로 계산
@@ -244,3 +269,4 @@ public class ReservationService {
         return new ReservationResponse.PayAmountDTO(startTime, endTime, totalPrice);
     }
 }
+
