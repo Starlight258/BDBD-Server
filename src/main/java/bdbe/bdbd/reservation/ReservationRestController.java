@@ -19,7 +19,7 @@ public class ReservationRestController {
     public ResponseEntity<?> findPayAmount(
             @PathVariable("carwash_id") Long carwashId,
             @RequestBody ReservationRequest.ReservationTimeDTO dto
-            )
+    )
     {
         ReservationResponse.PayAmountDTO responseDTO = reservationService.findPayAmount(dto, carwashId);
 

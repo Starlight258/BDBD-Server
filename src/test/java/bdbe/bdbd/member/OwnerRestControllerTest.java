@@ -116,9 +116,9 @@ public class OwnerRestControllerTest {
         String requestBody = om.writeValueAsString(requestDTO);
 
         mvc.perform(
-                    post("/api/owner/login")
-                            .content(requestBody)
-                            .contentType(MediaType.APPLICATION_JSON)
+                        post("/api/owner/login")
+                                .content(requestBody)
+                                .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
                 .andExpect(header().exists(JWTProvider.HEADER))
