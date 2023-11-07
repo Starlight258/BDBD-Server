@@ -1,5 +1,6 @@
 package bdbe.bdbd.file;
 
+import bdbe.bdbd._core.errors.exception.BadRequestError;
 import bdbe.bdbd._core.errors.exception.ForbiddenError;
 import bdbe.bdbd._core.errors.utils.FileUploadUtil;
 import bdbe.bdbd.member.Member;
@@ -34,7 +35,7 @@ public class FileService {
     public void deleteFile(Long fileId, Member member) {
 
         File file = fileJPARepository.findById(fileId)
-                .orElseThrow(() -> new IllegalArgumentException("file id :" + fileId + " not found"));
+                .orElseThrow(() -> new BadRequestError("file id :" + fileId + " not found"));
         if (file.getCarwash().getMember().getId() != member.getId()){
             throw new ForbiddenError("User is not the owner of the Carwash related to file.");
         }
