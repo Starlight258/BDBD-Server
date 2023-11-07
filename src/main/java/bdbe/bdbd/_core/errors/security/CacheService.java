@@ -11,6 +11,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import static bdbe.bdbd._core.errors.security.JWTProvider.TOKEN_PREFIX;
+
 @Service
 @CacheConfig(cacheNames = "jwtTokens")
 public class CacheService {
@@ -25,26 +27,50 @@ public class CacheService {
 
     @Cacheable(key = "#token", condition = "#token != null")
     public String cacheToken(String token) {
+        if (!token.startsWith(TOKEN_PREFIX)) {
+            token = TOKEN_PREFIX + token;
+        }
+        logger.info("Caching token: {}", token);
         return token;
     }
 
     @CacheEvict(key = "#token")
-    public void evictToken(String token) {
-        logger.info("Token evicted from cache: {}", token);
+    public void evictToken(String jwt) {
+        String token = TOKEN_PREFIX + jwt;
+        Cache cache = cacheManager.getCache("jwtTokens");
+        if (cache != null && cache.get(jwt) != null) {
+            cache.evict(jwt);
+            logger.info("Token evicted from cache: {}", token);
+        } else {
+            logger.warn("Attempted to evict a token that does not exist in cache: {}", token);
+        }
     }
 
     public boolean isTokenCached(String token) {
-        Cache cache = cacheManager.getCache("jwtTokens");
-        if (cache != null && cache.get(token) != null) {
-            return true;
+        if (!token.startsWith(TOKEN_PREFIX)) {
+            token = TOKEN_PREFIX + token;
         }
-        return false;
+
+        Cache cache = cacheManager.getCache("jwtTokens");
+        if (cache != null) {
+            boolean isCached = cache.get(token) != null;
+            logger.info("Token cached status for '{}': {}", token, isCached);
+            return isCached;
+        } else {
+            logger.error("Cache 'jwtTokens' is not available.");
+            return false;
+        }
     }
 
     public MemberResponse.LogoutResponse logout(String token) {
         evictToken(token);
+        // 로그아웃 후 토큰 캐시 상태 재확인
+        boolean isCachedPostEviction = isTokenCached(token);
+        logger.debug("Token cache status post-eviction for '{}': {}", token, isCachedPostEviction);
+
         MemberResponse.LogoutResponse response = new MemberResponse.LogoutResponse();
-        response.setSuccess(true);
+        response.setSuccess(!isCachedPostEviction);
         return response;
     }
 }
+

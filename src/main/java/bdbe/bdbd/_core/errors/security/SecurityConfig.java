@@ -24,7 +24,7 @@ public class SecurityConfig {
 
 
     @Autowired
-    private CacheService cacheService;  // CacheService를 주입받습니다.
+    private CacheService cacheService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -33,7 +33,7 @@ public class SecurityConfig {
 
     public class CustomSecurityFilterManager extends AbstractHttpConfigurer<CustomSecurityFilterManager, HttpSecurity> {
 
-        private final CacheService cacheService;  // CacheService 인스턴스를 저장할 필드 추가
+        private final CacheService cacheService;
 
         public CustomSecurityFilterManager(CacheService cacheService) {
             this.cacheService = cacheService;
@@ -42,7 +42,7 @@ public class SecurityConfig {
         @Override
         public void configure(HttpSecurity builder) throws Exception {
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
-            builder.addFilter(new JwtAuthenticationFilter(authenticationManager, cacheService));  // CacheService 인스턴스 제공
+            builder.addFilter(new JwtAuthenticationFilter(authenticationManager, cacheService));
             super.configure(builder);
         }
     }

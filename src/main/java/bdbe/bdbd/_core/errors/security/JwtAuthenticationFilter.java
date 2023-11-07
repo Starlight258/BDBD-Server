@@ -21,20 +21,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static bdbe.bdbd._core.errors.security.JWTProvider.TOKEN_PREFIX;
+
 @Slf4j
 public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
-    private final CacheService cacheService;  // CacheService 인스턴스를 저장할 필드 추가
+    private final CacheService cacheService;
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager, CacheService cacheService) {
         super(authenticationManager);
-        this.cacheService = cacheService;  // 생성자를 통해 CacheService 인스턴스 주입
+        this.cacheService = cacheService;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String jwt = request.getHeader(JWTProvider.HEADER);
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        String header = request.getHeader(JWTProvider.HEADER);
         String requestURI = request.getRequestURI();
 
         if ("/api/user/logout".equals(requestURI)) {
@@ -42,14 +45,17 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
             return;
         }
 
-        if (jwt == null) {
+        if (header == null || !header.startsWith(TOKEN_PREFIX)) {
             chain.doFilter(request, response);
             return;
         }
 
+        String jwt = header.replace(TOKEN_PREFIX, "");
+
         try {
             DecodedJWT decodedJWT = JWTProvider.verify(jwt);
             if (!cacheService.isTokenCached(jwt)) {
+                logger.warn("Attempt to use a token that is not cached or has been evicted: {}", jwt);
                 throw new UnAuthorizedError("Token is not cached");
             }
 
