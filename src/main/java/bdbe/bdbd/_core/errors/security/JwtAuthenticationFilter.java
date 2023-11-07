@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
         try {
             DecodedJWT decodedJWT = JWTProvider.verify(jwt);
             if (!cacheService.isTokenCached(jwt)) {
-                logger.warn("Attempt to use a token that is not cached or has been evicted: {}", jwt);
+                logger.warn("Attempt to use a token that is not cached or has been evicted: Bearer {}", jwt);
                 throw new UnAuthorizedError("Token is not cached");
             }
 

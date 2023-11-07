@@ -35,17 +35,18 @@ public class CacheService {
     }
 
     @CacheEvict(key = "#token")
-    public void evictToken(String jwt) {
-        String token = TOKEN_PREFIX + jwt;
+    public void evictToken(String token) {
+        if (!token.startsWith(TOKEN_PREFIX)) {
+            token = TOKEN_PREFIX + token;
+        }
         Cache cache = cacheManager.getCache("jwtTokens");
-        if (cache != null && cache.get(jwt) != null) {
-            cache.evict(jwt);
+        if (cache != null && cache.get(token) != null) {
+            cache.evict(token);
             logger.info("Token evicted from cache: {}", token);
         } else {
             logger.warn("Attempted to evict a token that does not exist in cache: {}", token);
         }
     }
-
     public boolean isTokenCached(String token) {
         if (!token.startsWith(TOKEN_PREFIX)) {
             token = TOKEN_PREFIX + token;
@@ -60,17 +61,14 @@ public class CacheService {
             logger.error("Cache 'jwtTokens' is not available.");
             return false;
         }
-    }
 
+    }
     public MemberResponse.LogoutResponse logout(String token) {
         evictToken(token);
-        // 로그아웃 후 토큰 캐시 상태 재확인
         boolean isCachedPostEviction = isTokenCached(token);
         logger.debug("Token cache status post-eviction for '{}': {}", token, isCachedPostEviction);
-
         MemberResponse.LogoutResponse response = new MemberResponse.LogoutResponse();
         response.setSuccess(!isCachedPostEviction);
         return response;
     }
 }
-
