@@ -29,10 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,9 +114,20 @@ public class ReservationService {
         LocalTime requestStartTimePart = startTime.toLocalTime();
         LocalTime requestEndTimePart = endTime.toLocalTime();
 
-        // 예약 시작 시간이 종료 시간보다 뒤인지 확인
-        if (startTime.isAfter(endTime)) {
-            throw new BadRequestError("Reservation start time must be before end time.");
+        // 예약 시작 및 종료 시간의 분이 0 또는 30인지 확인
+        if (startTime.getMinute() % 30 != 0 || endTime.getMinute() % 30 != 0) {
+            throw new BadRequestError("Reservation time must be in 30-minute increments.");
+        }
+
+        // 종료 시간이 시작 시간보다 최소 30분 이후인지 확인
+        long minutesBetween = Duration.between(startTime, endTime).toMinutes();
+        if (minutesBetween < 30) {
+            throw new BadRequestError("Reservation duration must be at least 30 minutes.");
+        }
+
+        // 종료 시간과 시작 시간의 차이가 30분 단위인지 확인
+        if (minutesBetween % 30 != 0) {
+            throw new BadRequestError("Reservation duration must be a multiple of 30 minutes.");
         }
 
         // 예약이 운영시간을 넘지 않도록 함

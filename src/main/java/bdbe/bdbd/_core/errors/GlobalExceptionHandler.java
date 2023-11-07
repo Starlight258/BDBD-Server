@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -82,6 +83,13 @@ public class GlobalExceptionHandler {
         ApiUtils.ApiResult<?> errorResult = ApiUtils.error(message, HttpStatus.BAD_REQUEST);
 
         return new ResponseEntity<>(errorResult,HttpStatus.BAD_REQUEST);
+    }
+
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<?> handleMissingServletRequestPartException(MissingServletRequestPartException e) {
+        ApiUtils.ApiResult<?> errorResult = ApiUtils.error(e.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

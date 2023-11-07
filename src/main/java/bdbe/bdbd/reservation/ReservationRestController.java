@@ -32,7 +32,6 @@ public class ReservationRestController {
             @PathVariable("reservation_id") Long reservationId,
             @RequestBody ReservationRequest.UpdateDTO dto,
             @AuthenticationPrincipal CustomUserDetails userDetails
-
     )
     {
         reservationService.update(dto, reservationId, userDetails.getMember());
