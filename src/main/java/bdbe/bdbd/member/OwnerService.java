@@ -4,7 +4,6 @@ import bdbe.bdbd._core.errors.exception.BadRequestError;
 import bdbe.bdbd._core.errors.exception.ForbiddenError;
 import bdbe.bdbd._core.errors.exception.InternalServerError;
 import bdbe.bdbd._core.errors.exception.UnAuthorizedError;
-import bdbe.bdbd._core.errors.security.CacheService;
 import bdbe.bdbd._core.errors.security.JWTProvider;
 import bdbe.bdbd.bay.Bay;
 import bdbe.bdbd.bay.BayJPARepository;
@@ -38,7 +37,6 @@ public class OwnerService {
     private final OptimeJPARepository optimeJPARepository;
     private final BayJPARepository bayJPARepository;
     private final FileJPARepository fileJPARepository;
-    private final CacheService cacheService;
 
     @Transactional
     public void join(MemberRequest.JoinDTO requestDTO) {
@@ -68,7 +66,7 @@ public class OwnerService {
             throw new UnAuthorizedError("can't access this page");
         }
 
-        String jwt = JWTProvider.create(memberPS, cacheService);
+        String jwt = JWTProvider.create(memberPS);
         String redirectUrl = "/owner/home";
 
         return new MemberResponse.LoginResponse(jwt, redirectUrl);

@@ -4,7 +4,6 @@ package bdbe.bdbd.member;
 
 import bdbe.bdbd._core.errors.exception.BadRequestError;
 import bdbe.bdbd._core.errors.exception.InternalServerError;
-import bdbe.bdbd._core.errors.security.CacheService;
 import bdbe.bdbd._core.errors.security.JWTProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +18,6 @@ import java.util.Optional;
 public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final MemberJPARepository memberJPARepository;
-    private final CacheService cacheService;
 
     @Transactional
     public void join(MemberRequest.JoinDTO requestDTO) {
@@ -43,7 +41,7 @@ public class MemberService {
             throw new BadRequestError("wrong password");
         }
 
-        String jwt = JWTProvider.create(memberPS, cacheService);
+        String jwt = JWTProvider.create(memberPS);
         String redirectUrl = "/user/home";
 
         return new MemberResponse.LoginResponse(jwt, redirectUrl);

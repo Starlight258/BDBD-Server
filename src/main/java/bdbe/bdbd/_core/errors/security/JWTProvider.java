@@ -19,16 +19,14 @@ public class JWTProvider {
     public static final String HEADER = "Authorization";
     public static final String SECRET = "MySecretKey";
 
-    public static String create(Member member, CacheService cacheService) {
+    public static String create(Member member) {
         String jwt = JWT.create()
                 .withSubject(member.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXP))
                 .withClaim("id", member.getId())
                 .withClaim("role", member.getRole().name())
                 .sign(Algorithm.HMAC512(SECRET));
-        String token = TOKEN_PREFIX + jwt;
-        cacheService.cacheToken(token);
-        return token;
+        return TOKEN_PREFIX + jwt;
     }
 
     public static DecodedJWT verify(String jwt) throws SignatureVerificationException, TokenExpiredException {
