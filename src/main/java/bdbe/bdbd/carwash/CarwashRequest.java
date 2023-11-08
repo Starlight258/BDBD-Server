@@ -22,6 +22,7 @@ public class CarwashRequest {
     public static class SaveDTO {
 
         @NotEmpty(message = "Name is required.")
+        @Size(min = 2, max = 20, message = "Place name must be between 2 and 20 characters.")
         private String name;
 
         @NotNull(message = "Location is required.")
@@ -40,7 +41,8 @@ public class CarwashRequest {
         @Size(max = 200, message = "Description cannot be longer than 200 characters." )
         private String description;
 
-        @Pattern(regexp = "^(\\d{2,3}-\\d{3,4}-\\d{4})?$", message = "Telephone must be in the format XXX-XXXX-XXXX.")
+        @NotEmpty
+        @Size(min = 9, max = 14)
         private String tel;
 
 
@@ -105,7 +107,7 @@ public class CarwashRequest {
     public static class LocationDTO {
 
         @NotEmpty(message = "Place name is required.")
-        @Size(min = 2, max = 20, message = "Place name must be between 3 and 20 characters.")
+        @Size(min = 3, max = 30, message = "Place name must be between 3 and 30 characters.")
         private String placeName;
 
         @NotEmpty(message = "Address is required.")
@@ -157,6 +159,7 @@ public class CarwashRequest {
         private Long id;
 
         @NotEmpty(message = "Name is required.")
+        @Size(min = 2, max = 20, message = "Place name must be between 2 and 20 characters.")
         private String name;
 
         @NotNull(message = "Location is required.")
@@ -221,12 +224,14 @@ public class CarwashRequest {
     public static class updateCarwashDetailsDTO {
 
         @NotEmpty(message = "Name is required.")
+        @Size(min = 2, max = 20, message = "Place name must be between 2 and 20 characters.")
         private String name;
 
         @NotNull(message = "Price is required.")
         private Integer price;
 
-        @NotEmpty( message = "Price id required.")
+        @NotEmpty
+        @Size(min = 9, max = 14)
         private String tel;
 
         @Valid
@@ -238,7 +243,7 @@ public class CarwashRequest {
         @NotNull(message = "At least one keyword ID is required.")
         private List<Long> keywordId;
 
-        @NotEmpty( message = "Description id required.")
+        @NotEmpty( message = "Description is required.")
         @Size(max = 200, message = "Description cannot be longer than 200 characters." )
         private String description;
 
