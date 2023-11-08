@@ -1,11 +1,18 @@
 package bdbe.bdbd.pay;
 
+import bdbe.bdbd._core.errors.exception.BadRequestError;
+import bdbe.bdbd._core.errors.exception.InternalServerError;
 import bdbe.bdbd._core.errors.security.CustomUserDetails;
 import bdbe.bdbd.reservation.ReservationResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -27,6 +34,26 @@ public class PayController {
                 userDetails.getMember()
         );
     }
+
+    @GetMapping("/redirect")
+    public ResponseEntity<?> handlePaymentRedirect(@RequestParam String redirectUrl) {
+        if (!redirectUrl.startsWith("https://online-pay.kakao.com/")) {
+            throw new BadRequestError("Invalid redirect URL");
+        }
+
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            ResponseEntity<String> response = restTemplate.getForEntity(redirectUrl, String.class);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(URI.create(redirectUrl));
+            return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+        } catch (Exception e) {
+            throw new InternalServerError("Error during redirect");
+        }
+    }
+
 
     @PostMapping("/approve/{carwash_id}/{bay_id}")
     public ResponseEntity<ReservationResponse.findLatestOneResponseDTO> requestPaymentApproval(
