@@ -25,23 +25,30 @@ public class FileRestController {
 
     @PostMapping("/upload")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file,
-                                        @RequestParam("carwashId") Long carwashId) throws Exception {
-        if (file.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file");
+                                        @RequestParam("carwashId") Long carwashId) {
+        try {
+            FileResponse.SimpleFileResponseDTO response = fileService.uploadFile(file, carwashId);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while uploading the file.");
         }
-        FileResponse.SimpleFileResponseDTO response = fileService.uploadFile(file, carwashId);
-        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/uploadMultipleFile")
+    @PostMapping("/uploadMultipleFiles")
     public ResponseEntity<?> uploadFiles(@RequestParam("files") MultipartFile[] files,
-                                         @RequestParam("carwashId") Long carwashId) throws Exception {
-        if (files == null || files.length == 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No files provided");
+                                         @RequestParam("carwashId") Long carwashId) {
+        try {
+            if (files == null || files.length == 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No files provided");
+            }
+            List<FileResponse.SimpleFileResponseDTO> response = fileService.uploadFiles(files, carwashId);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while uploading the files.");
         }
-        List<FileResponse.SimpleFileResponseDTO> response = fileService.uploadFiles(files, carwashId);
-
-        return ResponseEntity.ok(response);
     }
-
 }
