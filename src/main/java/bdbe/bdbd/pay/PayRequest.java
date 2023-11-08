@@ -12,7 +12,7 @@ public class PayRequest {
     @Getter
     @Setter
     public static class PayReadyRequestDTO {
-
+        // NOTE: 카카오페이 API 요청 명세에 따름
         @NotBlank(message = "Cid is required")
         private String cid;
 
@@ -27,6 +27,9 @@ public class PayRequest {
 
         @NotNull(message = "Quantity is required")
         private Integer quantity;
+
+        @NotNull(message = "Total amount is required")
+        private Integer total_amount;
 
         @NotNull(message = "Tax_free_amount is required")
         private Integer tax_free_amount;
