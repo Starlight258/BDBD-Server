@@ -21,21 +21,23 @@ public class CarwashRequest {
     @ToString
     public static class SaveDTO {
 
-        @NotNull(message = "Name is required.")
+        @NotEmpty(message = "Name is required.")
         private String name;
 
         @NotNull(message = "Location is required.")
         private LocationDTO location;
 
-        @NotNull( message = "Price id required.")
+        @NotEmpty( message = "Price id required.")
         private String price;
 
         @Valid
         private OperatingTimeDTO optime;
 
-        @NotEmpty(message = "At least one keyword ID is required.")
+        @NotNull(message = "At least one keyword ID is required.")
         private List<Long> keywordId;
 
+        @NotEmpty( message = "Description id required.")
+        @Size(max = 200, message = "Description cannot be longer than 200 characters." )
         private String description;
 
         @Pattern(regexp = "^(\\d{2,3}-\\d{3,4}-\\d{4})?$", message = "Telephone must be in the format XXX-XXXX-XXXX.")
@@ -102,11 +104,11 @@ public class CarwashRequest {
     @ToString
     public static class LocationDTO {
 
-        @NotNull(message = "Place name is required.")
+        @NotEmpty(message = "Place name is required.")
         @Size(min = 2, max = 20, message = "Place name must be between 3 and 20 characters.")
         private String placeName;
 
-        @NotNull(message = "Address is required.")
+        @NotEmpty(message = "Address is required.")
         @Size(min = 5, max = 50, message = "Address must be between 5 and 200 characters.")
         private String address;
 
@@ -154,7 +156,7 @@ public class CarwashRequest {
         @NotNull(message = "ID is required.")
         private Long id;
 
-        @NotNull(message = "Name is required.")
+        @NotEmpty(message = "Name is required.")
         private String name;
 
         @NotNull(message = "Location is required.")
@@ -218,13 +220,13 @@ public class CarwashRequest {
     @ToString
     public static class updateCarwashDetailsDTO {
 
-        @NotNull(message = "Name is required.")
+        @NotEmpty(message = "Name is required.")
         private String name;
 
         @NotNull(message = "Price is required.")
-        private int price;
+        private Integer price;
 
-        @NotNull( message = "Price id required.")
+        @NotEmpty( message = "Price id required.")
         private String tel;
 
         @Valid
@@ -236,6 +238,7 @@ public class CarwashRequest {
         @NotNull(message = "At least one keyword ID is required.")
         private List<Long> keywordId;
 
+        @NotEmpty( message = "Description id required.")
         @Size(max = 200, message = "Description cannot be longer than 200 characters." )
         private String description;
 
@@ -269,11 +272,11 @@ public class CarwashRequest {
     @Setter
     public static class updateLocationDTO {
 
-        @NotNull(message = "Place name is required.")
+        @NotEmpty(message = "Place name is required.")
         @Size(min = 3, max = 30, message = "Place name must be between 3 and 30 characters.")
         private String placeName;
 
-        @NotNull(message = "Address is required.")
+        @NotEmpty(message = "Address is required.")
         @Size(min = 5, max = 50, message = "Address must be between 5 and 200 characters.")
         private String address;
 
