@@ -1,7 +1,8 @@
 package bdbe.bdbd.pay;
 
-import bdbe.bdbd.carwash.CarwashJPARepository;
-import bdbe.bdbd.reservation.ReservationRequest;
+import bdbe.bdbd.repository.carwash.CarwashJPARepository;
+import bdbe.bdbd.dto.pay.PayRequest;
+import bdbe.bdbd.dto.reservation.ReservationRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

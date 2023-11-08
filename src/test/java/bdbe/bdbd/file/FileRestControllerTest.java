@@ -1,7 +1,10 @@
 package bdbe.bdbd.file;
 
-import bdbe.bdbd.carwash.Carwash;
-import bdbe.bdbd.carwash.CarwashJPARepository;
+import bdbe.bdbd.model.carwash.Carwash;
+import bdbe.bdbd.repository.carwash.CarwashJPARepository;
+import bdbe.bdbd.dto.file.FileResponse;
+import bdbe.bdbd.model.file.File;
+import bdbe.bdbd.service.file.FileService;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import org.junit.jupiter.api.Test;
