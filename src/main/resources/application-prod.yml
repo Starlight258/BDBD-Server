@@ -43,9 +43,9 @@ kakao:
   admin:
     key: ${KAKAOPAY_ADMIN_KEY}
 payment:
-  approval-url: https://google.com
-  cancel-url: https://naver.com
-  fail-url: https://x.com
+  approval-url: https://ke1567c9038cca.user-app.krampoline.com/paymentwaiting
+  cancel-url: https://ke1567c9038cca.user-app.krampoline.com/paymentfail
+  fail-url: https://ke1567c9038cca.user-app.krampoline.com/paymentfail
 
 
 # 파일 저장 경로
