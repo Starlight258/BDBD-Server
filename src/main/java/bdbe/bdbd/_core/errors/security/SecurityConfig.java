@@ -6,6 +6,7 @@ import bdbe.bdbd._core.errors.exception.UnAuthorizedError;
 import bdbe.bdbd._core.errors.utils.FilterResponseUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -74,20 +75,60 @@ public class SecurityConfig {
         http.authorizeRequests(authorize -> authorize
                 .antMatchers("/api/owner/join", "/api/owner/login").permitAll()
                 .antMatchers("/api/user/join", "/api/user/login").permitAll()
-                .antMatchers("/api/admin/join", "/api/admin/login").permitAll()
-                .antMatchers("/api/user/check", "/api/user/check").permitAll()
-                .antMatchers("/api/owner/check", "/api/owner/check").permitAll()
+//                .antMatchers("/api/admin/join", "/api/admin/login").permitAll()
+//                .antMatchers("/api/user/check", "/api/user/check").permitAll()
+//                .antMatchers("/api/owner/check", "/api/owner/check").permitAll()
+                .antMatchers("/api/public/**").permitAll()
                 .antMatchers("/api/admin/**").access("hasRole('ADMIN')")
                 .antMatchers("/api/owner/**").access("hasRole('OWNER')")
-                .anyRequest().permitAll());
+                .anyRequest().authenticated()); // 모든 다른 요청은 인증 필요
+//                .anyRequest().permitAll());
         return http.build();
     }
+    @Bean
+    @Profile("!prod")
+    public CorsConfigurationSource devCorsConfigurationSource() {
+        // 개발 환경용 CORS 설정
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*"); // GET, POST, PUT, DELETE, HEAD (Javascript 요청 허용)
+
+        configuration.addAllowedOrigin("http://localhost:5173"); // 개발 환경 주소
+
+        configuration.setAllowCredentials(true); // 클라이언트에서 쿠키 요청 허용
+        configuration.addExposedHeader("Authorization"); // 권고사항
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
+    @Profile("prod")
+    public CorsConfigurationSource prodCorsConfigurationSource() {
+        // 운영 환경용 CORS 설정
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*"); // GET, POST, PUT, DELETE, HEAD (Javascript 요청 허용)
+
+        configuration.addAllowedOriginPattern("https://k92309e2e8ca6a.user-app.krampoline.com"); // 모든 IP 주소 허용 (프론트엔드 IP만 허용 react)
+        configuration.addAllowedOriginPattern("https://kd1d9a4cf1cdea.user-app.krampoline.com"); // 모든 IP 주소 허용 (프론트엔드 IP만 허용 react)
+        configuration.setAllowCredentials(true); // 클라이언트에서 쿠키 요청 허용
+        configuration.addExposedHeader("Authorization"); // 권고사항
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+
+
 
     public CorsConfigurationSource configurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*"); // GET, POST, PUT, DELETE, HEAD (Javascript 요청 허용)
+
         configuration.addAllowedOriginPattern("*"); // 모든 IP 주소 허용 (프론트엔드 IP만 허용 react)
+
         configuration.setAllowCredentials(true); // 클라이언트에서 쿠키 요청 허용
         configuration.addExposedHeader("Authorization"); // 권고사항
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

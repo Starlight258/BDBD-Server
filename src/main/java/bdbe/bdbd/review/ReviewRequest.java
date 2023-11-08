@@ -18,20 +18,21 @@ public class ReviewRequest {
     @Setter
     @ToString
     public static class SaveDTO {
-        @NotNull(message = "세차장 ID는 필수입니다.")
+
+        @NotNull(message = "carwashId is required.")
         private Long carwashId;
 
-        @NotNull(message = "예약 ID는 필수입니다.")
+        @NotNull(message = "reservationId is required.")
         private Long reservationId;
 
         private List<Long> keywordIdList; // 필수가 아님
 
-        @NotNull(message = "평점은 필수입니다.")
-        @DecimalMax(value = "5.0", message = "평점은 5점을 초과할 수 없습니다.")
+        @NotNull(message = "rate is required.")
+        @DecimalMax(value = "5.0", message = "The rating cannot exceed 5 points.")
         private double rate;
 
-        @Size(max = 100, message = "댓글은 100자 이내여야 합니다.")
-        @NotBlank(message = "댓글은 필수입니다.")
+        @Size(max = 100, message = "Comments must be less than 100 characters.")
+        @NotBlank(message = "Comments is required.")
         private String comment;
 
 

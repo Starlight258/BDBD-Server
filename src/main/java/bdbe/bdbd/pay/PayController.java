@@ -9,9 +9,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.net.URI;
 
 @RestController
@@ -21,16 +24,17 @@ public class PayController {
 
     private final PayService payService;
 
-    @PostMapping("/ready/{bay_id}")
+    @PostMapping("/ready/{carwash_id}")
     public ResponseEntity<String> requestPaymentReady(
-            @PathVariable("bay_id") Long bayId,
-            @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest,
+            @PathVariable("carwash_id") Long carwashId,
+            @Valid @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest,
+            Errors errors,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         return payService.requestPaymentReady(
                 paymentReadyRequest.getRequestDto(),
                 paymentReadyRequest.getSaveDTO(),
-                bayId,
+                carwashId,
                 userDetails.getMember()
         );
     }
@@ -59,7 +63,8 @@ public class PayController {
     public ResponseEntity<ReservationResponse.findLatestOneResponseDTO> requestPaymentApproval(
             @PathVariable("carwash_id") Long carwashId,
             @PathVariable("bay_id") Long bayId,
-            @RequestBody PayRequest.PaymentApprovalRequestDTO requestDTO,
+            @Valid @RequestBody PayRequest.PaymentApprovalRequestDTO requestDTO,
+            Errors errors,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         return payService.requestPaymentApproval(

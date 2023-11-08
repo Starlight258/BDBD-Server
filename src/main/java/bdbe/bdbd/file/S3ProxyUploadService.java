@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,6 +55,8 @@ public class S3ProxyUploadService {
         try {
             String originalFilename = file.getOriginalFilename();
             String extension = "";
+            String mimeType = file.getContentType();
+
 
             int i = originalFilename.lastIndexOf('.');
             if (i > 0) {
@@ -63,8 +66,13 @@ public class S3ProxyUploadService {
             String uniqueFilename = UUID.randomUUID().toString() + extension;
             String keyName = "bdbd/" + uniqueFilename;
 
-            s3Client.putObject(bucketName, keyName, file.getInputStream(), null);
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentType(mimeType);
+            metadata.setContentLength(file.getSize());
+            metadata.setContentDisposition("inline");
 
+
+            s3Client.putObject(bucketName, keyName, file.getInputStream(), metadata);
             return s3Client.getUrl(bucketName, keyName).toExternalForm();
         } catch (IOException e) {
             e.printStackTrace();

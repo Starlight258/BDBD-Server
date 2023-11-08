@@ -173,7 +173,7 @@ public class MemberRestControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(jsonPath("$.success").value("false"))
-                .andExpect(jsonPath("$.error.message").value("영문, 숫자, 특수문자가 포함되어야하고 공백이 포함될 수 없습니다.:password"))
+                .andExpect(jsonPath("$.error.message").value("It must contain letters, numbers, and special characters, and cannot contain spaces.:password"))
                 .andExpect(jsonPath("$.error.status").value(400))
                 .andDo(print());
     }
@@ -213,7 +213,7 @@ public class MemberRestControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(jsonPath("$.success").value("false"))
-                .andExpect(jsonPath("$.error.message").value("영문, 숫자, 특수문자가 포함되어야하고 공백이 포함될 수 없습니다.:password"))
+                .andExpect(jsonPath("$.error.message").value("It must contain letters, numbers, and special characters, and cannot contain spaces.:password"))
                 .andExpect(jsonPath("$.error.status").value(400))
                 .andDo(print());
     }
