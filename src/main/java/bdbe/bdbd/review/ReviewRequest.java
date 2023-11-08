@@ -22,13 +22,13 @@ public class ReviewRequest {
         @NotNull(message = "carwashId is required.")
         private Long carwashId;
 
-        @NotNull(message = "reservationId is required..")
+        @NotNull(message = "reservationId is required.")
         private Long reservationId;
 
         private List<Long> keywordIdList; // 필수가 아님
 
         @NotNull(message = "rate is required.")
-        @DecimalMax(value = "5.0", message = "평점은 5점을 초과할 수 없습니다.")
+        @DecimalMax(value = "5.0", message = "The rating cannot exceed 5 points.")
         private double rate;
 
         @Size(max = 100, message = "Comments must be less than 100 characters.")
