@@ -31,7 +31,7 @@ public class CarwashRequest {
         @NotEmpty( message = "Price id required.")
         private String price;
 
-        @Valid
+
         private OperatingTimeDTO optime;
 
         private List<Long> keywordId;
@@ -129,11 +129,9 @@ public class CarwashRequest {
     @Setter
     public static class OperatingTimeDTO {
 
-        @Valid
         @NotNull(message = "Weekday is required.")
         private TimeSlot weekday;
 
-        @Valid
         @NotNull(message = "Weekend is required")
         private TimeSlot weekend;
 
@@ -234,10 +232,8 @@ public class CarwashRequest {
         @Size(min = 9, max = 14)
         private String tel;
 
-        @Valid
         private updateLocationDTO locationDTO;
 
-        @Valid
         private updateOperatingTimeDTO optime;
 
         @NotNull(message = "At least one keyword ID is required.")
@@ -252,11 +248,9 @@ public class CarwashRequest {
     @Setter
     public static class updateOperatingTimeDTO {
 
-        @Valid
         @NotNull(message = "Weekday is required.")
         private CarwashRequest.updateOperatingTimeDTO.updateTimeSlot weekday;
 
-        @Valid
         @NotNull(message = "Weekend is required")
         private CarwashRequest.updateOperatingTimeDTO.updateTimeSlot weekend;
 

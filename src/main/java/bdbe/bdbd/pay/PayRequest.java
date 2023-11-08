@@ -76,20 +76,16 @@ public class PayRequest {
     @Setter
     public static class PaymentReadyRequest {
 
-        @Valid
         private PayRequest.PayReadyRequestDTO requestDto;
 
-        @Valid
         private ReservationRequest.SaveDTO saveDTO;
     }
     @Getter
     @Setter
     public static class PaymentApprovalRequestDTO {
 
-        @Valid
         private PayRequest.PayApprovalRequestDTO payApprovalRequestDTO;
 
-        @Valid
         private ReservationRequest.SaveDTO saveDTO;
 
         @NotNull(message = "carwashId is required.")
