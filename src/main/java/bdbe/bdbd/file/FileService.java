@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Transactional
@@ -16,7 +17,6 @@ import java.util.List;
 public class FileService {
 
     private final FileUploadUtil fileUploadUtil;
-
     @Autowired
     private FileJPARepository fileJPARepository;
 
@@ -42,6 +42,25 @@ public class FileService {
         file.changeDeletedFlag(true); //삭제에 대한 플래그
         fileJPARepository.save(file);
     }
+
+    public void validateFiles(MultipartFile[] files) throws BadRequestError {
+        for (MultipartFile file : files) {
+            String originalFilename = file.getOriginalFilename();
+            String extension = "";
+
+            if (originalFilename != null) {
+                int i = originalFilename.lastIndexOf('.');
+                if (i > 0) {
+                    extension = originalFilename.substring(i).toLowerCase();
+                }
+            }
+
+            if (!S3ProxyUploadService.ALLOWED_EXTENSIONS.contains(extension)) {
+                throw new BadRequestError("Invalid file extension for file: " + originalFilename + ". Only JPG, JPEG, and PNG are allowed.");
+            }
+        }
+    }
+
 
 
 }
