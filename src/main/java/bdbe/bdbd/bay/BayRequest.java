@@ -16,7 +16,7 @@ public class BayRequest {
     @ToString
     public static class SaveDTO {
 
-        @NotNull(message = "Bay number is required.")
+        @NotNull(message = "Bay number is required")
         private Integer bayNum;
 
         public Bay toBayEntity(Carwash carwash) {
@@ -34,22 +34,22 @@ public class BayRequest {
     @ToString
     public static class LocationDTO {
 
-        @NotEmpty(message = "Place name is required.")
-        @Size(min = 3, max = 30, message = "Place name must be between 3 and 30 characters.")
+        @NotBlank(message = "Place name is required")
+        @Size(min = 3, max = 30, message = "Place name must be between 3 and 30 characters")
         private String placeName;
 
-        @NotEmpty(message = "Address is required.")
-        @Size(min = 5, max = 50, message = "Address must be between 5 and 200 characters.")
+        @NotBlank(message = "Address is required")
+        @Size(min = 5, max = 50, message = "Address must be between 5 and 200 characters")
         private String address;
 
-        @NotNull(message = "Latitude is required.")
-        @DecimalMin(value = "-90.0", message = "Latitude must be greater than or equal to -90.")
-        @DecimalMax(value = "90.0", message = "Latitude must be less than or equal to 90.")
+        @NotNull(message = "Latitude is required")
+        @DecimalMin(value = "-90.0", message = "Latitude must be greater than or equal to -90")
+        @DecimalMax(value = "90.0", message = "Latitude must be less than or equal to 90")
         private double latitude;
 
-        @NotNull(message = "Longitude is required.")
-        @DecimalMin(value = "-180.0", message = "Longitude must be greater than or equal to -180.")
-        @DecimalMax(value = "180.0", message = "Longitude must be less than or equal to 180.")
+        @NotNull(message = "Longitude is required")
+        @DecimalMin(value = "-180.0", message = "Longitude must be greater than or equal to -180")
+        @DecimalMax(value = "180.0", message = "Longitude must be less than or equal to 180")
         private double longitude;
 
     }
@@ -58,11 +58,9 @@ public class BayRequest {
     @Setter
     public static class OperatingTimeDTO {
 
-        @Valid
-        @NotNull(message = "Weekday is required.")
+        @NotNull(message = "Weekday is required")
         private TimeSlot weekday;
 
-        @Valid
         @NotNull(message = "Weekend is required")
         private TimeSlot weekend;
 
@@ -70,10 +68,10 @@ public class BayRequest {
         @Setter
         public static class TimeSlot {
 
-            @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Open time must be in the format HH:mm.")
+            @NotNull(message = "Start time is required")
             private LocalTime start;
 
-            @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Close time must be in the format HH:mm.")
+            @NotNull(message = "End time is required")
             private LocalTime end;
 
         }
