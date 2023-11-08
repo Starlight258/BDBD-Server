@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PastOrPresent;
+//import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 
 public class FileRequest {
@@ -32,7 +32,7 @@ public class FileRequest {
         @NotNull(message = "File URL cannot is required.")
         private String url;
 
-        @PastOrPresent(message = "Uploaded time must be in the past or present.")
+//        @PastOrPresent(message = "Uploaded time must be in the past or present.")
         private LocalDateTime uploadedAt;
 
         private Carwash carwash;
@@ -54,7 +54,7 @@ public class FileRequest {
         @NotEmpty(message = "File URL cannot is required.")
         private String url;
 
-        @PastOrPresent(message = "Uploaded time must be in the past or present.")
+//        @PastOrPresent(message = "Uploaded time must be in the past or present.")
         private LocalDateTime uploadedAt;
 
 

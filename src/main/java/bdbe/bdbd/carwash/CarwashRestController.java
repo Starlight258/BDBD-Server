@@ -38,12 +38,18 @@ public class CarwashRestController {
     }
 
     @PostMapping(value = "/owner/carwashes/register")
-    public ResponseEntity<?> save(@Valid @RequestPart("carwash") CarwashRequest.SaveDTO saveDTOs,
-                                  Errors errors,
-                                  @RequestPart("images") MultipartFile[] images,
-                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
-        carwashService.save(saveDTOs, images, userDetails.getMember());
-        return ResponseEntity.ok(ApiUtils.success(null));
+    public ResponseEntity<?> save(
+            @Valid @RequestPart("carwash") CarwashRequest.SaveDTO saveDTOs,
+            @RequestPart("images") MultipartFile[] images,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        try {
+            fileService.validateFiles(images);
+            carwashService.save(saveDTOs, images, userDetails.getMember());
+            return ResponseEntity.ok(ApiUtils.success(null));
+        } catch (BadRequestError e) {
+            return ResponseEntity.status(e.status()).body(e.body());
+        }
     }
 
     @GetMapping("/carwashes/search")
@@ -125,18 +131,22 @@ public class CarwashRestController {
     public ResponseEntity<?> updateCarwashDetails(
             @PathVariable("carwash_id") Long carwashId,
             @Valid @RequestPart("updateData") CarwashRequest.updateCarwashDetailsDTO updatedto,
-            Errors errors,
             @RequestPart(value = "images", required = true) MultipartFile[] images,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO =
-                carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
 
-        return ResponseEntity.ok(ApiUtils.success(updateCarwashDetailsDTO));
+        try {
+            fileService.validateFiles(images);
+            CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO =
+                    carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
+
+            return ResponseEntity.ok(ApiUtils.success(updateCarwashDetailsDTO));
+        } catch (BadRequestError e) {
+            return ResponseEntity.status(e.status()).body(e.body());
+        }
     }
-
 }
+
 
 
 

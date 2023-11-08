@@ -47,6 +47,7 @@ public class MemberService {
         return new MemberResponse.LoginResponse(jwt, redirectUrl);
     }
 
+    
 
     public void sameCheckEmail(String email) {
         Optional<Member> userOP = memberJPARepository.findByEmail(email);

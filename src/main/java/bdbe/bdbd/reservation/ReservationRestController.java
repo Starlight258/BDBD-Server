@@ -18,20 +18,20 @@ public class ReservationRestController {
 
     private final ReservationService reservationService;
 
-    @PostMapping("/carwashes/{carwash_id}/payment")
+    @PostMapping("/user/carwashes/{bay_id}/payment")
     public ResponseEntity<?> findPayAmount(
-            @PathVariable("carwash_id") Long carwashId,
+            @PathVariable("bay_id") Long bayId,
             @Valid @RequestBody ReservationRequest.ReservationTimeDTO dto,
             Errors errors
     )
     {
-        ReservationResponse.PayAmountDTO responseDTO = reservationService.findPayAmount(dto, carwashId);
+        ReservationResponse.PayAmountDTO responseDTO = reservationService.findPayAmount(dto, bayId);
 
         return ResponseEntity.ok(ApiUtils.success(responseDTO));
     }
 
     // 예약 수정하기
-    @PutMapping("/reservations/{reservation_id}")
+    @PutMapping("/user/reservations/{reservation_id}")
     public ResponseEntity<?> updateReservation(
             @PathVariable("reservation_id") Long reservationId,
             @Valid @RequestBody ReservationRequest.UpdateDTO dto,
@@ -45,7 +45,7 @@ public class ReservationRestController {
     }
 
     // 예약 취소하기
-    @DeleteMapping("/reservations/{reservation_id}")
+    @DeleteMapping("/user/reservations/{reservation_id}")
     public ResponseEntity<?> deleteReservation(
             @PathVariable("reservation_id") Long reservationId,
             @AuthenticationPrincipal CustomUserDetails userDetails
@@ -56,7 +56,7 @@ public class ReservationRestController {
     }
 
     // 세차장별 예약 내역 조회
-    @GetMapping("/carwashes/{carwash_id}/bays")
+    @GetMapping("/public/carwashes/{carwash_id}/bays")
     public ResponseEntity<?> findAllByCarwash(
             @PathVariable("carwash_id") Long carwashId
     )
@@ -67,7 +67,7 @@ public class ReservationRestController {
     }
 
     // 현재 시간 기준 예약 내역 조회
-    @GetMapping("/reservations/current-status")
+    @GetMapping("/user/reservations/current-status")
     public ResponseEntity<?> fetchCurrentStatusReservation(
             @AuthenticationPrincipal CustomUserDetails userDetails
     )
@@ -76,8 +76,8 @@ public class ReservationRestController {
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
 
-    // 최근 이용 내역 가져오기
-    @GetMapping("/reservations/recent")
+    // 최근 예약 내역 가져오기
+    @GetMapping("/user/reservations/recent")
     public ResponseEntity<?> updateReservation(
             @AuthenticationPrincipal CustomUserDetails userDetails
     )

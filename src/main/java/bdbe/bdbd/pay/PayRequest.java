@@ -20,34 +20,34 @@ public class PayRequest {
         @NotNull(message = "cid is requierd.")
         private String cid;
 
-        @NotNull(message = "partner_order_id is requierd.")
+        @NotNull(message = "partner_order_id is required.")
         private String partner_order_id;
 
-        @NotNull(message = "partner_user_id is requierd.")
+        @NotNull(message = "partner_user_id is required.")
         private String partner_user_id;
 
-        @NotNull(message = "item_name is requierd.")
+        @NotNull(message = "item_name is required.")
         private String item_name;
 
-        @NotNull(message = "quantity is requierd.")
+        @NotNull(message = "quantity is required.")
         private Integer quantity;
 
-        @NotNull(message = "total_amount is requierd.")
+//        @NotNull(message = "total_amount is required.")
         private Integer total_amount;
 
-        @NotNull(message = "vat_amount is requierd.")
+//        @NotNull(message = "vat_amount is required.")
         private Integer vat_amount;
 
-        @NotNull(message = "tax_free_amount is requierd.")
+        @NotNull(message = "tax_free_amount is required.")
         private Integer tax_free_amount;
 
-        @NotNull(message = "approval_url is requierd.")
+//        @NotNull(message = "approval_url is required.")
         private String approval_url;
 
-        @NotNull(message = "cancel_url is requierd.")
+//        @NotNull(message = "cancel_url is required.")
         private String cancel_url;
 
-        @NotNull(message = "fail_url is requierd.")
+//        @NotNull(message = "fail_url is required.")
         private String fail_url;
 
     }

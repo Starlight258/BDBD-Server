@@ -58,7 +58,7 @@ public class PayService {
     @Autowired
     private BayJPARepository bayJPARepository;
 
-    public ResponseEntity<String> requestPaymentReady(PayRequest.PayReadyRequestDTO requestDto, ReservationRequest.SaveDTO saveDTO, Long bayId, Member member) {
+    public ResponseEntity<String> requestPaymentReady(PayRequest.PayReadyRequestDTO requestDto, ReservationRequest.SaveDTO saveDTO, Long bayId) {
 
         Bay bay = bayJPARepository.findById(bayId)
                 .orElseThrow(() -> new BadRequestError("bay id:" + bayId + " not found"));

@@ -1,11 +1,13 @@
 package bdbe.bdbd.file;
 
+import bdbe.bdbd._core.errors.exception.BadRequestError;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +15,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +26,10 @@ public class S3ProxyUploadService {
 
     private final AmazonS3 s3Client;
     private final String bucketName;
+    static final List<String> ALLOWED_EXTENSIONS = Arrays.asList(".jpg", ".jpeg", ".png");
+    @Autowired
+    private FileService fileService;
+
 
     public S3ProxyUploadService(
             @Value("${cloud.aws.credentials.accessKey}") String accessKey,
@@ -38,7 +45,6 @@ public class S3ProxyUploadService {
                 .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
                 .withRegion(region);
 
-        // prod 프로파일이 활성화된 경우에만 프록시 설정을 적용합니다.
         if ("prod".equals(System.getProperty("spring.profiles.active")) &&
                 proxyHost != null && !proxyHost.isEmpty() && proxyPort > 0) {
             ClientConfiguration clientConfiguration = new ClientConfiguration();
@@ -51,43 +57,35 @@ public class S3ProxyUploadService {
         this.bucketName = bucketName;
     }
 
-    public String uploadFile(MultipartFile file) {
-        try {
-            String originalFilename = file.getOriginalFilename();
-            String extension = "";
-            String mimeType = file.getContentType();
+    public String uploadFile(MultipartFile file) throws IOException {
+        fileService.validateFiles(new MultipartFile[]{file}); // This will throw BadRequestError if validation fails
 
+        String originalFilename = file.getOriginalFilename();
+        String mimeType = file.getContentType();
+        String extension = originalFilename.substring(originalFilename.lastIndexOf('.')).toLowerCase();
 
-            int i = originalFilename.lastIndexOf('.');
-            if (i > 0) {
-                extension = originalFilename.substring(i);
-            }
+        String uniqueFilename = UUID.randomUUID().toString() + extension;
+        String keyName = "uploads/" + uniqueFilename;
 
-            String uniqueFilename = UUID.randomUUID().toString() + extension;
-            String keyName = "bdbd/" + uniqueFilename;
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(mimeType);
+        metadata.setContentLength(file.getSize());
+        metadata.setContentDisposition("inline");
 
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(mimeType);
-            metadata.setContentLength(file.getSize());
-            metadata.setContentDisposition("inline");
-
-
-            s3Client.putObject(bucketName, keyName, file.getInputStream(), metadata);
-            return s3Client.getUrl(bucketName, keyName).toExternalForm();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        s3Client.putObject(bucketName, keyName, file.getInputStream(), metadata);
+        return s3Client.getUrl(bucketName, keyName).toExternalForm();
     }
 
-    public List<String> uploadFiles(List<MultipartFile> files) {
+    public List<String> uploadFiles(List<MultipartFile> files) throws IOException {
         List<String> uploadResults = new ArrayList<>();
         for (MultipartFile file : files) {
-            String result = uploadFile(file);
-            uploadResults.add(result);
+            try {
+                String result = uploadFile(file);
+                uploadResults.add(result);
+            } catch (BadRequestError e) {
+                log.error("File upload failed: {}", e.getMessage());
+            }
         }
         return uploadResults;
     }
-
-
 }

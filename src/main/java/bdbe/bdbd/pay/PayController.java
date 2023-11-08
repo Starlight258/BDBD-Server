@@ -14,52 +14,29 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/payment")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class PayController {
 
     private final PayService payService;
 
-    @PostMapping("/ready/{carwash_id}")
+    @PostMapping("/user/payment/ready/{bay_id}")
     public ResponseEntity<String> requestPaymentReady(
-            @PathVariable("carwash_id") Long carwashId,
-            @Valid @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest,
-            Errors errors,
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @PathVariable("bay_id") Long bayId,
+            @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest
     ) {
         return payService.requestPaymentReady(
                 paymentReadyRequest.getRequestDto(),
                 paymentReadyRequest.getSaveDTO(),
-                carwashId,
-                userDetails.getMember()
+                bayId
         );
     }
 
-    @GetMapping("/redirect")
-    public ResponseEntity<?> handlePaymentRedirect(@RequestParam String redirectUrl) {
-        if (!redirectUrl.startsWith("https://online-pay.kakao.com/")) {
-            throw new BadRequestError("Invalid redirect URL");
-        }
 
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-
-            ResponseEntity<String> response = restTemplate.getForEntity(redirectUrl, String.class);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(URI.create(redirectUrl));
-            return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
-        } catch (Exception e) {
-            throw new InternalServerError("Error during redirect");
-        }
-    }
-
-
-    @PostMapping("/approve/{carwash_id}/{bay_id}")
+    @PostMapping("/user/payment/approve/{carwash_id}/{bay_id}")
     public ResponseEntity<ReservationResponse.findLatestOneResponseDTO> requestPaymentApproval(
             @PathVariable("carwash_id") Long carwashId,
             @PathVariable("bay_id") Long bayId,

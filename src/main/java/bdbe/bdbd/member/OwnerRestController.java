@@ -18,23 +18,17 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/owner")
+@RequestMapping("/api")
 public class OwnerRestController {
     private final OwnerService ownerService;
 
-    @PostMapping("/check")
-    public ResponseEntity<?> check(@RequestBody @Valid MemberRequest.EmailCheckDTO emailCheckDTO, Errors errors) {
-        ownerService.sameCheckEmail(emailCheckDTO.getEmail());
-        return ResponseEntity.ok(ApiUtils.success(null));
-    }
-
-    @PostMapping("/join")
+    @PostMapping("/public/join/owner")
     public ResponseEntity<?> joinOwner(@RequestBody @Valid MemberRequest.JoinDTO requestDTO, Errors errors) {
         ownerService.join(requestDTO);
         return ResponseEntity.ok().body(ApiUtils.success(null));
     }
 
-    @PostMapping("/login")
+    @PostMapping("/public/login/owner")
     public ResponseEntity<?> login(@RequestBody @Valid MemberRequest.LoginDTO requestDTO, Errors errors) {
         if (errors.hasErrors()) {
             String errorMessage = errors.getAllErrors().get(0).getDefaultMessage();
@@ -45,7 +39,7 @@ public class OwnerRestController {
     }
     // 로그아웃 사용안함 - 프론트에서 JWT 토큰을 브라우저의 localstorage에서 삭제하면 됨.
 
-    @GetMapping("/sales")
+    @GetMapping("/owner/sales")
     public ResponseEntity<?> findAllOwnerReservation(
             @RequestParam(value = "carwash-id") List<Long> carwashIds,
             @RequestParam(value = "selected-date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate,
@@ -56,7 +50,7 @@ public class OwnerRestController {
         return ResponseEntity.ok(ApiUtils.success(saleResponseDTO));
     }
 
-    @GetMapping("/revenue")
+    @GetMapping("/owner/revenue")
     public ResponseEntity<?> findMonthRevenueByCarwash(
             @RequestParam(value = "carwash-id") List<Long> carwashIds,
             @RequestParam(value = "selected-date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate,
@@ -67,7 +61,7 @@ public class OwnerRestController {
         return ResponseEntity.ok(ApiUtils.success(map));
     }
 
-    @GetMapping("/carwashes")
+    @GetMapping("/owner/carwashes")
     public ResponseEntity<?> fetchOwnerReservationOverview(
             @AuthenticationPrincipal CustomUserDetails userDetails
     )
@@ -86,7 +80,7 @@ public class OwnerRestController {
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
 
-    @GetMapping("/home")
+    @GetMapping("/owner/home")
     public ResponseEntity<?> fetchOwnerHomepage(
             @AuthenticationPrincipal CustomUserDetails userDetails
     )
@@ -95,7 +89,7 @@ public class OwnerRestController {
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
 
-    @GetMapping("/reservation/{bay_id}")
+    @GetMapping("/owner/reservation/{bay_id}")
     public ResponseEntity<?> fetchOwnerReservation(
             @PathVariable("bay_id") Long bayId,
             @AuthenticationPrincipal CustomUserDetails userDetails

@@ -75,11 +75,9 @@ public class SecurityConfig {
         http.authorizeRequests(authorize -> authorize
                 .antMatchers("/api/owner/join", "/api/owner/login").permitAll()
                 .antMatchers("/api/user/join", "/api/user/login").permitAll()
-//                .antMatchers("/api/admin/join", "/api/admin/login").permitAll()
-//                .antMatchers("/api/user/check", "/api/user/check").permitAll()
-//                .antMatchers("/api/owner/check", "/api/owner/check").permitAll()
                 .antMatchers("/api/public/**").permitAll()
-                .antMatchers("/api/admin/**").access("hasRole('ADMIN')")
+//                .antMatchers("/api/user/**").access("hasRole('USER')")
+                .antMatchers("/api/user/**").access("hasAnyRole('USER', 'OWNER')")
                 .antMatchers("/api/owner/**").access("hasRole('OWNER')")
                 .anyRequest().authenticated()); // 모든 다른 요청은 인증 필요
 //                .anyRequest().permitAll());
