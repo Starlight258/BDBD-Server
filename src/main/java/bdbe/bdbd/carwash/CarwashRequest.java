@@ -34,7 +34,6 @@ public class CarwashRequest {
         @Valid
         private OperatingTimeDTO optime;
 
-        @NotNull(message = "At least one keyword ID is required.")
         private List<Long> keywordId;
 
         @NotEmpty( message = "Description id required.")
@@ -168,7 +167,8 @@ public class CarwashRequest {
         @Positive(message = "Distance must be positive.")
         private double distance;
 
-        @Size(min = 0, max = 5, message = "Rate must be 0 to 5.")
+        @NotNull(message = "rate is required.")
+        @DecimalMax(value = "5.0", message = "The rating cannot exceed 5 points.")
         private double rate;
 
         @NotNull(message = "Price is required.")
