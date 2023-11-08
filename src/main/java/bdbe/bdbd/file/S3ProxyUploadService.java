@@ -61,7 +61,7 @@ public class S3ProxyUploadService {
             }
 
             String uniqueFilename = UUID.randomUUID().toString() + extension;
-            String keyName = "uploads/" + uniqueFilename;
+            String keyName = "bdbd/" + uniqueFilename;
 
             s3Client.putObject(bucketName, keyName, file.getInputStream(), null);
 
