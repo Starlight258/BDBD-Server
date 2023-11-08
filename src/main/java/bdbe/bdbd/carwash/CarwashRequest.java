@@ -21,14 +21,14 @@ public class CarwashRequest {
     @ToString
     public static class SaveDTO {
 
-        @NotEmpty(message = "Name is required.")
+        @NotBlank(message = "Name is required.")
         @Size(min = 2, max = 20, message = "Place name must be between 2 and 20 characters.")
         private String name;
 
         @NotNull(message = "Location is required.")
         private LocationDTO location;
 
-        @NotEmpty( message = "Price id required.")
+        @NotBlank( message = "Price id required.")
         private String price;
 
 
@@ -36,11 +36,11 @@ public class CarwashRequest {
 
         private List<Long> keywordId;
 
-        @NotEmpty( message = "Description id required.")
+        @NotBlank( message = "Description id required.")
         @Size(max = 200, message = "Description cannot be longer than 200 characters." )
         private String description;
 
-        @NotEmpty
+        @NotBlank
         @Size(min = 9, max = 14)
         private String tel;
 
@@ -105,11 +105,11 @@ public class CarwashRequest {
     @ToString
     public static class LocationDTO {
 
-        @NotEmpty(message = "Place name is required.")
+        @NotBlank(message = "Place name is required.")
         @Size(min = 3, max = 30, message = "Place name must be between 3 and 30 characters.")
         private String placeName;
 
-        @NotEmpty(message = "Address is required.")
+        @NotBlank(message = "Address is required.")
         @Size(min = 5, max = 50, message = "Address must be between 5 and 200 characters.")
         private String address;
 
@@ -139,10 +139,10 @@ public class CarwashRequest {
         @Setter
         public static class TimeSlot {
 
-//            @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Open time must be in the format HH:mm.")
+            @NotNull(message = "Start time is required")
             private LocalTime start;
 
-//            @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Close time must be in the format HH:mm.")
+            @NotNull(message = "End time is required")
             private LocalTime end;
 
         }
@@ -155,7 +155,7 @@ public class CarwashRequest {
         @NotNull(message = "ID is required.")
         private Long id;
 
-        @NotEmpty(message = "Name is required.")
+        @NotBlank(message = "Name is required.")
         @Size(min = 2, max = 20, message = "Place name must be between 2 and 20 characters.")
         private String name;
 
@@ -221,14 +221,14 @@ public class CarwashRequest {
     @ToString
     public static class updateCarwashDetailsDTO {
 
-        @NotEmpty(message = "Name is required.")
+        @NotBlank(message = "Name is required.")
         @Size(min = 2, max = 20, message = "Place name must be between 2 and 20 characters.")
         private String name;
 
         @NotNull(message = "Price is required.")
         private Integer price;
 
-        @NotEmpty
+        @NotBlank(message = "tel is required")
         @Size(min = 9, max = 14)
         private String tel;
 
@@ -236,10 +236,9 @@ public class CarwashRequest {
 
         private updateOperatingTimeDTO optime;
 
-        @NotNull(message = "At least one keyword ID is required.")
         private List<Long> keywordId;
 
-        @NotEmpty( message = "Description is required.")
+        @NotBlank( message = "Description is required.")
         @Size(max = 200, message = "Description cannot be longer than 200 characters." )
         private String description;
 
@@ -258,10 +257,10 @@ public class CarwashRequest {
         @Setter
         public static class updateTimeSlot {
 
-//            @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Open time must be in the format HH:mm.")
+            @NotNull(message = "Start time is required")
             private LocalTime start;
 
-//            @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Close time must be in the format HH:mm.")
+            @NotNull(message = "End time is required")
             private LocalTime end;
 
         }
@@ -271,22 +270,22 @@ public class CarwashRequest {
     @Setter
     public static class updateLocationDTO {
 
-        @NotEmpty(message = "Place name is required.")
-        @Size(min = 3, max = 30, message = "Place name must be between 3 and 30 characters.")
+        @NotBlank(message = "Place name is required")
+        @Size(min = 3, max = 30, message = "Place name must be between 3 and 30 character")
         private String placeName;
 
-        @NotEmpty(message = "Address is required.")
-        @Size(min = 5, max = 50, message = "Address must be between 5 and 200 characters.")
+        @NotBlank(message = "Address is required.")
+        @Size(min = 5, max = 50, message = "Address must be between 5 and 200 characters")
         private String address;
 
         @NotNull(message = "Latitude is required.")
-        @DecimalMin(value = "-90.0", message = "Latitude must be greater than or equal to -90.")
-        @DecimalMax(value = "90.0", message = "Latitude must be less than or equal to 90.")
+        @DecimalMin(value = "-90.0", message = "Latitude must be greater than or equal to -90")
+        @DecimalMax(value = "90.0", message = "Latitude must be less than or equal to 90")
         private double latitude;
 
         @NotNull(message = "Longitude is required.")
-        @DecimalMin(value = "-180.0", message = "Longitude must be greater than or equal to -180.")
-        @DecimalMax(value = "180.0", message = "Longitude must be less than or equal to 180.")
+        @DecimalMin(value = "-180.0", message = "Longitude must be greater than or equal to -180")
+        @DecimalMax(value = "180.0", message = "Longitude must be less than or equal to 180")
         private double longitude;
     }
 }

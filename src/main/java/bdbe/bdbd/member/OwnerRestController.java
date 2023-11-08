@@ -70,7 +70,7 @@ public class OwnerRestController {
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
 
-    @GetMapping("/carwashes/{carwash_id}")
+    @GetMapping("/owner/carwashes/{carwash_id}")
     public ResponseEntity<?> fetchCarwashReservationOverview(
             @PathVariable("carwash_id") Long carwashId,
             @AuthenticationPrincipal CustomUserDetails userDetails

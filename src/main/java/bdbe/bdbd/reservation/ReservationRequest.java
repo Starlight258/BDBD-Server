@@ -19,10 +19,8 @@ public class ReservationRequest {
     @ToString
     public static class ReservationTimeDTO {
 
-//        @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Open time must be in the format HH:mm.")
         private LocalDateTime startTime;
 
-//        @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Close time must be in the format HH:mm.")
         private LocalDateTime endTime;
     }
 
@@ -31,18 +29,17 @@ public class ReservationRequest {
     @ToString
     public static class SaveDTO {
 
-//        @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Open time must be in the format HH:mm.")
-        @NotNull
+        @NotNull(message = "Start time is required")
         private LocalDateTime startTime;
 
-//        @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Close time must be in the format HH:mm.")
-        @NotNull
+        @NotNull(message = "End time is required")
         private LocalDateTime endTime;
 
         public Reservation toReservationEntity(Carwash carwash, Bay bay, Member member) {
             int perPrice = carwash.getPrice();
             LocalDateTime startTime = this.startTime;
             LocalDateTime endTime = this.endTime;
+
             int minutesDifference = (int) ChronoUnit.MINUTES.between(startTime, endTime); //시간 차 계산
             int blocksOf30Minutes = minutesDifference / 30; //30분 단위로 계산
             int price = perPrice * blocksOf30Minutes;
@@ -62,10 +59,10 @@ public class ReservationRequest {
     @ToString
     public static class UpdateDTO {
 
-//        @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Open time must be in the format HH:mm.")
+        @NotNull(message = "Start time is required")
         private LocalDateTime startTime;
 
-//        @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Close time must be in the format HH:mm.")
+        @NotNull(message = "End time is required")
         private LocalDateTime endTime;
 
     }

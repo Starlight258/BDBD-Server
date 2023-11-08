@@ -30,7 +30,7 @@ public class CarwashRestController {
 
 
     // 전체 세차장 목록 조회, 10개씩 페이징
-    @GetMapping("/carwashes")
+    @GetMapping("/public/carwashes")
     public ResponseEntity<?> findAll(@RequestParam(value = "page", defaultValue = "0") Integer page) {
         List<CarwashResponse.FindAllDTO> dtos = carwashService.findAll(page);
         ApiUtils.ApiResult<?> apiResult = ApiUtils.success(dtos);
@@ -38,21 +38,15 @@ public class CarwashRestController {
     }
 
     @PostMapping(value = "/owner/carwashes/register")
-    public ResponseEntity<?> save(
-            @Valid @RequestPart("carwash") CarwashRequest.SaveDTO saveDTOs,
-            @RequestPart("images") MultipartFile[] images,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
-
-        try {
-            fileService.validateFiles(images);
-            carwashService.save(saveDTOs, images, userDetails.getMember());
-            return ResponseEntity.ok(ApiUtils.success(null));
-        } catch (BadRequestError e) {
-            return ResponseEntity.status(e.status()).body(e.body());
-        }
+    public ResponseEntity<?> save(@Valid @RequestPart("carwash") CarwashRequest.SaveDTO saveDTOs,
+                                  Errors errors,
+                                  @RequestPart("images") MultipartFile[] images,
+                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
+        carwashService.save(saveDTOs, images, userDetails.getMember());
+        return ResponseEntity.ok(ApiUtils.success(null));
     }
 
-    @GetMapping("/carwashes/search")
+    @GetMapping("/public/carwashes/search")
     public ResponseEntity<?> findCarwashesByKeywords(@RequestParam List<Long> keywordIds,
                                                      @RequestParam double latitude,
                                                      @RequestParam double longitude) {
@@ -79,7 +73,7 @@ public class CarwashRestController {
     }
 
 
-    @GetMapping("/carwashes/nearby")
+    @GetMapping("/public/carwashes/nearby")
     public ResponseEntity<?> findNearestCarwashesByUserLocation(@RequestParam double latitude, @RequestParam double longitude) {
         validateLatitudeAndLongitude(latitude, longitude);
 
@@ -90,7 +84,7 @@ public class CarwashRestController {
         return ResponseEntity.ok(ApiUtils.success(carwashes));
     }
 
-    @GetMapping("/carwashes/recommended")
+    @GetMapping("/public/carwashes/recommended")
     public ResponseEntity<?> findNearestCarwash(@RequestParam double latitude, @RequestParam double longitude) {
         validateLatitudeAndLongitude(latitude, longitude);
 
@@ -106,7 +100,7 @@ public class CarwashRestController {
         return ResponseEntity.ok(ApiUtils.success(carwashList));
     }
 
-    @GetMapping("/carwashes/{carwash_id}/info")
+    @GetMapping("/public/carwashes/{carwash_id}/info")
     public ResponseEntity<?> findById(@PathVariable("carwash_id") Long carwashId) {
         CarwashResponse.findByIdDTO findByIdDTO = carwashService.getfindById(carwashId);
         return ResponseEntity.ok(ApiUtils.success(findByIdDTO));
@@ -131,20 +125,17 @@ public class CarwashRestController {
     public ResponseEntity<?> updateCarwashDetails(
             @PathVariable("carwash_id") Long carwashId,
             @Valid @RequestPart("updateData") CarwashRequest.updateCarwashDetailsDTO updatedto,
+            Errors errors,
             @RequestPart(value = "images", required = true) MultipartFile[] images,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
 
+        CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO =
+                carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
 
-        try {
-            fileService.validateFiles(images);
-            CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO =
-                    carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
-
-            return ResponseEntity.ok(ApiUtils.success(updateCarwashDetailsDTO));
-        } catch (BadRequestError e) {
-            return ResponseEntity.status(e.status()).body(e.body());
-        }
+        return ResponseEntity.ok(ApiUtils.success(updateCarwashDetailsDTO));
     }
+
 }
 
 

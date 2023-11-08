@@ -5,9 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-//import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 
 public class FileRequest {
@@ -26,13 +27,13 @@ public class FileRequest {
     @Setter
     public static class FileDTO {
 
-        @NotNull(message = "File name is required.")
+        @NotBlank(message = "File name is required")
         private String name;
 
-        @NotNull(message = "File URL cannot is required.")
+        @NotBlank(message = "File URL is required")
         private String url;
 
-//        @PastOrPresent(message = "Uploaded time must be in the past or present.")
+        @PastOrPresent(message = "Uploaded time must be in the past or present")
         private LocalDateTime uploadedAt;
 
         private Carwash carwash;
@@ -51,11 +52,12 @@ public class FileRequest {
     @Setter
     public static class FileUpdateDTO {
 
-        @NotEmpty(message = "File URL cannot is required.")
+        @NotBlank(message = "File URL is required")
         private String url;
 
-//        @PastOrPresent(message = "Uploaded time must be in the past or present.")
+        @PastOrPresent(message = "Uploaded time must be in the past or present")
         private LocalDateTime uploadedAt;
+
 
 
         public FileUpdateDTO(String url, LocalDateTime uploadedAt) {
