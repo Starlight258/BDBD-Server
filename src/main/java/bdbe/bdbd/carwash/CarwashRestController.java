@@ -9,9 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +38,8 @@ public class CarwashRestController {
     }
 
     @PostMapping(value = "/owner/carwashes/register")
-    public ResponseEntity<?> save(@RequestPart("carwash") CarwashRequest.SaveDTO saveDTOs,
+    public ResponseEntity<?> save(@Valid @RequestPart("carwash") CarwashRequest.SaveDTO saveDTOs,
+                                  Errors errors,
                                   @RequestPart("images") MultipartFile[] images,
                                   @AuthenticationPrincipal CustomUserDetails userDetails) {
         carwashService.save(saveDTOs, images, userDetails.getMember());
@@ -121,7 +124,8 @@ public class CarwashRestController {
     @PutMapping("/owner/carwashes/{carwash_id}/details")
     public ResponseEntity<?> updateCarwashDetails(
             @PathVariable("carwash_id") Long carwashId,
-            @RequestPart("updateData") CarwashRequest.updateCarwashDetailsDTO updatedto,
+            @Valid @RequestPart("updateData") CarwashRequest.updateCarwashDetailsDTO updatedto,
+            Errors errors,
             @RequestPart(value = "images", required = true) MultipartFile[] images,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {

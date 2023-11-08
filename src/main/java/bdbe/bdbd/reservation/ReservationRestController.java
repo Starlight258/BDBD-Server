@@ -5,7 +5,10 @@ import bdbe.bdbd._core.errors.utils.ApiUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 
 @RequiredArgsConstructor
@@ -18,7 +21,8 @@ public class ReservationRestController {
     @PostMapping("/carwashes/{carwash_id}/payment")
     public ResponseEntity<?> findPayAmount(
             @PathVariable("carwash_id") Long carwashId,
-            @RequestBody ReservationRequest.ReservationTimeDTO dto
+            @Valid @RequestBody ReservationRequest.ReservationTimeDTO dto,
+            Errors errors
     )
     {
         ReservationResponse.PayAmountDTO responseDTO = reservationService.findPayAmount(dto, carwashId);
@@ -30,7 +34,8 @@ public class ReservationRestController {
     @PutMapping("/reservations/{reservation_id}")
     public ResponseEntity<?> updateReservation(
             @PathVariable("reservation_id") Long reservationId,
-            @RequestBody ReservationRequest.UpdateDTO dto,
+            @Valid @RequestBody ReservationRequest.UpdateDTO dto,
+            Errors errors,
             @AuthenticationPrincipal CustomUserDetails userDetails
 
     )
