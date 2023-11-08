@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -18,10 +19,8 @@ public class ReservationRequest {
     @ToString
     public static class ReservationTimeDTO {
 
-        @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Open time must be in the format HH:mm.")
         private LocalDateTime startTime;
 
-        @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Close time must be in the format HH:mm.")
         private LocalDateTime endTime;
     }
 
@@ -30,10 +29,10 @@ public class ReservationRequest {
     @ToString
     public static class SaveDTO {
 
-        @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Open time must be in the format HH:mm.")
+        @NotNull(message = "Start time is required")
         private LocalDateTime startTime;
 
-        @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Close time must be in the format HH:mm.")
+        @NotNull(message = "End time is required")
         private LocalDateTime endTime;
 
         public Reservation toReservationEntity(Carwash carwash, Bay bay, Member member) {
@@ -60,10 +59,10 @@ public class ReservationRequest {
     @ToString
     public static class UpdateDTO {
 
-        @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Open time must be in the format HH:mm.")
+        @NotNull(message = "Start time is required")
         private LocalDateTime startTime;
 
-        @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Close time must be in the format HH:mm.")
+        @NotNull(message = "End time is required")
         private LocalDateTime endTime;
 
     }
