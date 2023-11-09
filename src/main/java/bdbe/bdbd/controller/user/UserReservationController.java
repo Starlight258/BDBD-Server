@@ -40,7 +40,6 @@ public class UserReservationController {
             @Valid @RequestBody ReservationRequest.UpdateDTO dto,
             Errors errors,
             @AuthenticationPrincipal CustomUserDetails userDetails
-
     )
     {
         reservationService.update(dto, reservationId, userDetails.getMember());
