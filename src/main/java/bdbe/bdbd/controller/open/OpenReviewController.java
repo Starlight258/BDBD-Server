@@ -1,17 +1,14 @@
 package bdbe.bdbd.controller.open;
 
-import bdbe.bdbd._core.security.CustomUserDetails;
 import bdbe.bdbd._core.utils.ApiUtils;
-import bdbe.bdbd.dto.review.ReviewRequest;
 import bdbe.bdbd.dto.review.ReviewResponse;
 import bdbe.bdbd.service.review.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
