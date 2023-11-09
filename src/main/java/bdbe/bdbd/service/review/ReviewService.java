@@ -51,16 +51,18 @@ public class ReviewService {
         // 리뷰 키워드 저장
         List<Long> keywordIdList = dto.getKeywordIdList();
 
-        keywordIdList.stream()
-                .map(id -> {
-                    Keyword keyword = keywordJPARepository.findById(id)
-                            .orElseThrow(() -> new IllegalArgumentException("keyword not found"));
-                    ReviewKeyword reviewKeyword = ReviewKeyword.builder().keyword(keyword).review(savedReview).build();
-                    ReviewKeyword savedReviewKeyword = reviewKeywordJPARepository.save(reviewKeyword);
-                    System.out.println("reviewKeyword:" + savedReviewKeyword.toString());
-                    return savedReviewKeyword;
-                })
-                .collect(Collectors.toList());
+        if (keywordIdList != null) {
+            keywordIdList.stream()
+                    .map(id -> {
+                        Keyword keyword = keywordJPARepository.findById(id)
+                                .orElseThrow(() -> new IllegalArgumentException("keyword not found"));
+                        ReviewKeyword reviewKeyword = ReviewKeyword.builder().keyword(keyword).review(savedReview).build();
+                        ReviewKeyword savedReviewKeyword = reviewKeywordJPARepository.save(reviewKeyword);
+                        System.out.println("reviewKeyword:" + savedReviewKeyword.toString());
+                        return savedReviewKeyword;
+                    })
+                    .collect(Collectors.toList());
+        }
 
         updateAverageRate(dto, carwash);
 
