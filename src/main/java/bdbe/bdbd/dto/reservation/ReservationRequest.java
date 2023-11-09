@@ -18,9 +18,9 @@ public class ReservationRequest {
     @Setter
     @ToString
     public static class ReservationTimeDTO {
-
+        @NotNull(message = "Start time is required")
         private LocalDateTime startTime;
-
+        @NotNull(message = "End time is required")
         private LocalDateTime endTime;
     }
 

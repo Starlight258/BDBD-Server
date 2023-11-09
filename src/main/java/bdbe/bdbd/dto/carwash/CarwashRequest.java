@@ -32,7 +32,7 @@ public class CarwashRequest {
         @NotNull(message = "Location is required.")
         private LocationDTO location;
 
-        @NotBlank( message = "Price id required.")
+        @NotBlank( message = "Price is required.")
         private String price;
 
 
@@ -40,11 +40,11 @@ public class CarwashRequest {
 
         private List<Long> keywordId;
 
-        @NotBlank( message = "Description id required.")
+        @NotBlank( message = "Description is required.")
         @Size(max = 200, message = "Description cannot be longer than 200 characters." )
         private String description;
 
-        @NotBlank
+        @NotBlank(message = "Tel is required.")
         @Size(min = 9, max = 14)
         private String tel;
 

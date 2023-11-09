@@ -15,20 +15,20 @@ public class UserRequest {
     @Setter
     public static class JoinDTO {
 
-        @NotBlank
+        @NotBlank(message = "email is required.")
         @Pattern(regexp = "^[\\w._%+-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$", message = "Please enter a valid email address")
         private String email;
 
-        @NotBlank
+        @NotBlank(message = "password is required.")
         @Size(min = 8, max = 20, message = "Password must be between 8 and 20 characters")
         @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@#$%^&+=!~`<>,./?;:'\"\\[\\]{}\\\\()|_-])\\S*$", message = "It must contain letters, numbers, and special characters, and cannot contain spaces")
         private String password;
 
-        @NotBlank
+        @NotBlank(message = "username is required.")
         @Size(min = 2, max = 20, message = "Username must be between 2 and 20 characters")
         private String username;
 
-        @NotBlank
+        @NotBlank(message = "tel is required.")
         @Size(min = 9, max = 14, message = "Tel must be between 9 and 14 characters")
         private String tel;
 
@@ -59,11 +59,11 @@ public class UserRequest {
     @Setter
     public static class LoginDTO {
 
-        @NotBlank
+        @NotBlank(message = "email is required.")
         @Pattern(regexp = "^[\\w._%+-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$", message = "Please enter a valid email address.")
         private String email;
 
-        @NotBlank
+        @NotBlank(message = "password is required.")
         @Size(min = 8, max = 20, message = "Password must be between 8 and 20 characters.")
         @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@#$%^&+=!~`<>,./?;:'\"\\[\\]{}\\\\()|_-])\\S*$", message = "It must contain letters, numbers, and special characters, and cannot contain spaces.")
         private String password;
@@ -73,7 +73,7 @@ public class UserRequest {
     @Setter
     public static class EmailCheckDTO {
 
-        @NotBlank
+        @NotBlank(message = "email is required.")
         @Pattern(regexp = "^[\\w._%+-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$", message = "Please enter a valid email address")
         private String email;
     }
@@ -82,7 +82,7 @@ public class UserRequest {
     @Setter
     public static class UpdatePasswordDTO {
 
-        @NotBlank
+        @NotBlank(message = "password is required.")
         @Size(min = 8, max = 20, message = "Password must be between 8 and 20 characters")
         @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@#$%^&+=!~`<>,./?;:'\"\\[\\]{}\\\\()|_-])\\S*$", message = "It must contain letters, numbers, and special characters, and cannot contain spaces")
         private String password;
