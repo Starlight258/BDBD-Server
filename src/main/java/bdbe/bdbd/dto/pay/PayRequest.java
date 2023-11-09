@@ -4,6 +4,7 @@ import bdbe.bdbd.dto.reservation.ReservationRequest;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -34,7 +35,6 @@ public class PayRequest {
         @NotNull(message = "Tax_free_amount is required")
         private Integer tax_free_amount;
 
-
     }
 
     @Getter
@@ -60,17 +60,17 @@ public class PayRequest {
     @Getter
     @Setter
     public static class PaymentReadyRequest {
-
+        @Valid
         private PayRequest.PayReadyRequestDTO requestDto;
-
+        @Valid
         private ReservationRequest.SaveDTO saveDTO;
     }
     @Getter
     @Setter
     public static class PaymentApprovalRequestDTO {
-
+        @Valid
         private PayRequest.PayApprovalRequestDTO payApprovalRequestDTO;
-
+        @Valid
         private ReservationRequest.SaveDTO saveDTO;
 
         @NotNull(message = "CarwashId is required")

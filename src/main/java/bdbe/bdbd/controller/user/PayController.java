@@ -20,10 +20,12 @@ public class PayController {
     private final PayService payService;
 
     @PostMapping("/payment/ready/{bay_id}")
-    public ResponseEntity<String> requestPaymentReady(
+    public ResponseEntity<?> requestPaymentReady(
             @PathVariable("bay_id") Long bayId,
-            @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest
+            @RequestBody @Valid  PayRequest.PaymentReadyRequest paymentReadyRequest,
+            Errors errors
     ) {
+        System.out.println("error");
         return payService.requestPaymentReady(
                 paymentReadyRequest.getRequestDto(),
                 paymentReadyRequest.getSaveDTO(),

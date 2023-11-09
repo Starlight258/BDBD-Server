@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -173,7 +174,9 @@ public class CarwashService {
                     double rate = carwash.getRate();
                     int price = carwash.getPrice();
 
-                    CarwashRequest.CarwashDistanceDTO dto = new CarwashRequest.CarwashDistanceDTO(carwash.getId(), carwash.getName(), carwash.getLocation(), distance, rate, price);
+                    File file = fileJPARepository.findFirstByCarwashIdAndIsDeletedFalseOrderByUploadedAtAsc(carwash.getId()).orElse(null);
+                    CarwashRequest.CarwashDistanceDTO dto = new CarwashRequest.CarwashDistanceDTO(carwash.getId(), carwash.getName(), carwash.getLocation(), distance, rate, price, file);
+
                     return dto;
                 })
                 .sorted(Comparator.comparingDouble(CarwashRequest.CarwashDistanceDTO::getDistance))
@@ -190,7 +193,9 @@ public class CarwashService {
                     double rate = carwash.getRate();
                     int price = carwash.getPrice();
 
-                    CarwashRequest.CarwashDistanceDTO dto = new CarwashRequest.CarwashDistanceDTO(carwash.getId(), carwash.getName(), carwash.getLocation(), distance, rate, price);
+                    File file = fileJPARepository.findFirstByCarwashIdAndIsDeletedFalseOrderByUploadedAtAsc(carwash.getId()).orElse(null);
+                    CarwashRequest.CarwashDistanceDTO dto = new CarwashRequest.CarwashDistanceDTO(carwash.getId(), carwash.getName(), carwash.getLocation(), distance, rate, price, file);
+
                     return dto;
                 })
                 .min(Comparator.comparingDouble(CarwashRequest.CarwashDistanceDTO::getDistance))
@@ -221,7 +226,10 @@ public class CarwashService {
                     double rate = carwash.getRate();
                     int price = carwash.getPrice();
 
-                    return new CarwashRequest.CarwashDistanceDTO(carwash.getId(), carwash.getName(), carwash.getLocation(), distance, rate, price);
+                    File file = fileJPARepository.findFirstByCarwashIdAndIsDeletedFalseOrderByUploadedAtAsc(carwash.getId()).orElse(null);
+                    CarwashRequest.CarwashDistanceDTO dto = new CarwashRequest.CarwashDistanceDTO(carwash.getId(), carwash.getName(), carwash.getLocation(), distance, rate, price, file);
+
+                    return dto;
                 })
                 .sorted(Comparator.comparingDouble(CarwashRequest.CarwashDistanceDTO::getDistance))
                 .collect(Collectors.toList());

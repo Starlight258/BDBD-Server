@@ -1,8 +1,11 @@
 package bdbe.bdbd.dto.carwash;
 
+import bdbe.bdbd._core.utils.DateUtils;
+import bdbe.bdbd.dto.reservation.ReservationResponse;
 import bdbe.bdbd.model.Code;
 import bdbe.bdbd.model.Code.DayType;
 import bdbe.bdbd.model.carwash.Carwash;
+import bdbe.bdbd.model.file.File;
 import bdbe.bdbd.model.optime.Optime;
 import bdbe.bdbd.model.location.Location;
 import bdbe.bdbd.model.member.Member;
@@ -29,7 +32,7 @@ public class CarwashRequest {
         @NotNull(message = "Location is required.")
         private LocationDTO location;
 
-        @NotBlank( message = "Price id required.")
+        @NotBlank( message = "Price is required.")
         private String price;
 
 
@@ -37,11 +40,11 @@ public class CarwashRequest {
 
         private List<Long> keywordId;
 
-        @NotBlank( message = "Description id required.")
+        @NotBlank( message = "Description is required.")
         @Size(max = 200, message = "Description cannot be longer than 200 characters." )
         private String description;
 
-        @NotBlank
+        @NotBlank(message = "Tel is required.")
         @Size(min = 9, max = 14)
         private String tel;
 
@@ -173,13 +176,34 @@ public class CarwashRequest {
         @NotNull(message = "Price is required.")
         private Integer price;
 
-        public CarwashDistanceDTO(Long id, String name, Location location, double distance, double rate, int price) {
+
+        private ImageDTO image;
+
+        public CarwashDistanceDTO(Long id, String name, Location location, double distance, double rate, int price, File file) {
             this.id = id;
             this.name = name;
             this.location = location;
             this.distance = distance;
             this.rate = rate;
             this.price = price;
+            this.image = (file != null) ? new ImageDTO(file) : null;
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class ImageDTO {
+        private Long id;
+        private String name;
+        private String url;
+        private String uploadedAt;
+
+        public ImageDTO(File file) {
+            this.id = file.getId();
+            this.name = file.getName();
+            this.url = file.getUrl();
+            this.uploadedAt = DateUtils.formatDateTime(file.getUploadedAt());
         }
     }
 
