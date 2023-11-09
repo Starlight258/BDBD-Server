@@ -5,10 +5,8 @@ import bdbe.bdbd._core.utils.ApiUtils;
 import bdbe.bdbd.dto.carwash.CarwashRequest;
 import bdbe.bdbd.dto.carwash.CarwashResponse;
 import bdbe.bdbd.service.carwash.CarwashService;
-import bdbe.bdbd.service.file.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
