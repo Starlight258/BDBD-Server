@@ -24,12 +24,12 @@ public class UserRequest {
         @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@#$%^&+=!~`<>,./?;:'\"\\[\\]{}\\\\()|_-])\\S*$", message = "It must contain letters, numbers, and special characters, and cannot contain spaces")
         private String password;
 
-        @Size(min = 2, max = 20, message = "Username must be between 2 and 20 characters")
         @NotBlank
+        @Size(min = 2, max = 20, message = "Username must be between 2 and 20 characters")
         private String username;
 
-        @Size(min = 9, max = 14, message = "Tel must be between 9 and 14 characters")
         @NotBlank
+        @Size(min = 9, max = 14, message = "Tel must be between 9 and 14 characters")
         private String tel;
 
         public Member toUserEntity(String encodedPassword) {
