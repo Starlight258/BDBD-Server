@@ -80,8 +80,8 @@ public class CarwashService {
 
     @Transactional
     public void save(CarwashRequest.SaveDTO saveDTO, MultipartFile[] images, Member sessionMember) {
-        Location location = saveDTO.toLocationEntity();
-        locationJPARepository.save(location);
+        Location location = saveDTO.toLocationEntity(); // DTO에서 Location 엔티티 생성
+        location = locationJPARepository.save(location); // Location 엔티티 저장
 
         Carwash carwash = saveDTO.toCarwashEntity(location, sessionMember);
         carwashJPARepository.save(carwash);
@@ -90,20 +90,21 @@ public class CarwashService {
         optimeJPARepository.saveAll(optimes);
 
         List<Long> keywordIdList = saveDTO.getKeywordId();
-        List<CarwashKeyword> carwashKeywordList = new ArrayList<>();
-        for (Long keywordId : keywordIdList) {
-            Keyword keyword = keywordJPARepository.findById(keywordId)
-                    .orElseThrow(() -> new IllegalArgumentException("Keyword not found"));
+        if (keywordIdList != null && !keywordIdList.isEmpty()) {
+            List<CarwashKeyword> carwashKeywordList = new ArrayList<>();
+            for (Long keywordId : keywordIdList) {
+                Keyword keyword = keywordJPARepository.findById(keywordId)
+                        .orElseThrow(() -> new IllegalArgumentException("Keyword not found"));
 
-            CarwashKeyword carwashKeyword = CarwashKeyword.builder().carwash(carwash).keyword(keyword).build();
-            carwashKeywordList.add(carwashKeyword);
+                CarwashKeyword carwashKeyword = CarwashKeyword.builder().carwash(carwash).keyword(keyword).build();
+                carwashKeywordList.add(carwashKeyword);
+            }
+            carwashKeywordJPARepository.saveAll(carwashKeywordList);
         }
-        carwashKeywordJPARepository.saveAll(carwashKeywordList);
 
         if (images != null && images.length > 0) {
             uploadAndSaveFiles(images, carwash);
         }
-
     }
 
     @Transactional
@@ -279,9 +280,10 @@ public class CarwashService {
 
         List<File> imageFiles = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwashId);
 
-        return new CarwashResponse.carwashDetailsDTO(carwash, location, keywordIds, weekOptime, endOptime,imageFiles);
+        return new CarwashResponse.carwashDetailsDTO(carwash, location, keywordIds, weekOptime, endOptime, imageFiles);
 
     }
+
     private static final Logger logger = LoggerFactory.getLogger(CarwashService.class);
 
     @Transactional
@@ -301,7 +303,6 @@ public class CarwashService {
         CarwashRequest.updateLocationDTO updateLocationDTO = updatedto.getLocationDTO();
         Location location = locationJPARepository.findById(carwash.getLocation().getId())
                 .orElseThrow(() -> new BadRequestError("location not found"));
-
 
         location.updateAddress(updateLocationDTO.getAddress(), updateLocationDTO.getPlaceName()
                 , updateLocationDTO.getLatitude(), updateLocationDTO.getLongitude());

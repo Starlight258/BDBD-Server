@@ -58,7 +58,6 @@ public class ReviewService {
                                 .orElseThrow(() -> new IllegalArgumentException("keyword not found"));
                         ReviewKeyword reviewKeyword = ReviewKeyword.builder().keyword(keyword).review(savedReview).build();
                         ReviewKeyword savedReviewKeyword = reviewKeywordJPARepository.save(reviewKeyword);
-                        System.out.println("reviewKeyword:" + savedReviewKeyword.toString());
                         return savedReviewKeyword;
                     })
                     .collect(Collectors.toList());

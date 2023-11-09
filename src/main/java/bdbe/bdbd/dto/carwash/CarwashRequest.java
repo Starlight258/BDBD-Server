@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -29,13 +30,14 @@ public class CarwashRequest {
         @Size(min = 2, max = 20, message = "Place name must be between 2 and 20 characters.")
         private String name;
 
-        @NotNull(message = "Location is required.")
+        @Valid @NotNull(message = "Location is required.")
         private LocationDTO location;
 
         @NotBlank( message = "Price is required.")
         private String price;
 
-
+        @Valid
+        @NotNull(message="optime is required.")
         private OperatingTimeDTO optime;
 
         private List<Long> keywordId;
@@ -45,7 +47,7 @@ public class CarwashRequest {
         private String description;
 
         @NotBlank(message = "Tel is required.")
-        @Size(min = 9, max = 14)
+        @Pattern(regexp = "^010\\d{8}$", message = "The telephone number format is invalid.")
         private String tel;
 
 
@@ -92,16 +94,6 @@ public class CarwashRequest {
         }
 
 
-
-        public String getFileExtension(String filename) {
-            int dotIndex = filename.lastIndexOf('.');
-            if (dotIndex == -1) {
-                return null;
-            }
-            return filename.substring(dotIndex + 1);
-        }
-
-
     }
 
     @Getter
@@ -120,12 +112,12 @@ public class CarwashRequest {
         @NotNull(message = "Latitude is required.")
         @DecimalMin(value = "-90.0", message = "Latitude must be greater than or equal to -90.")
         @DecimalMax(value = "90.0", message = "Latitude must be less than or equal to 90.")
-        private double latitude;
+        private Double latitude;
 
         @NotNull(message = "Longitude is required.")
         @DecimalMin(value = "-180.0", message = "Longitude must be greater than or equal to -180.")
         @DecimalMax(value = "180.0", message = "Longitude must be less than or equal to 180.")
-        private double longitude;
+        private Double longitude;
 
     }
 
@@ -133,9 +125,11 @@ public class CarwashRequest {
     @Setter
     public static class OperatingTimeDTO {
 
+        @Valid
         @NotNull(message = "Weekday is required.")
         private TimeSlot weekday;
 
+        @Valid
         @NotNull(message = "Weekend is required")
         private TimeSlot weekend;
 
@@ -176,7 +170,7 @@ public class CarwashRequest {
         @NotNull(message = "Price is required.")
         private Integer price;
 
-
+        @Valid
         private ImageDTO image;
 
         public CarwashDistanceDTO(Long id, String name, Location location, double distance, double rate, int price, File file) {
@@ -194,9 +188,13 @@ public class CarwashRequest {
     @Setter
     @ToString
     public static class ImageDTO {
+        @NotNull(message = "Id is required.")
         private Long id;
+        @NotBlank(message = "Name is required.")
         private String name;
+        @NotBlank(message = "Url is required.")
         private String url;
+        @NotBlank(message = "UploadedAt is required.")
         private String uploadedAt;
 
         public ImageDTO(File file) {
@@ -253,12 +251,16 @@ public class CarwashRequest {
         @NotNull(message = "Price is required.")
         private Integer price;
 
-        @NotBlank(message = "tel is required")
-        @Size(min = 9, max = 14)
+        @NotBlank(message = "Tel is required.")
+        @Pattern(regexp = "^010\\d{8}$", message = "The telephone number format is invalid.")
         private String tel;
 
+        @Valid
+        @NotNull(message = "Location is required")
         private updateLocationDTO locationDTO;
 
+        @Valid
+        @NotNull(message = "Optime is required")
         private updateOperatingTimeDTO optime;
 
         private List<Long> keywordId;
@@ -272,9 +274,11 @@ public class CarwashRequest {
     @Setter
     public static class updateOperatingTimeDTO {
 
+        @Valid
         @NotNull(message = "Weekday is required.")
         private CarwashRequest.updateOperatingTimeDTO.updateTimeSlot weekday;
 
+        @Valid
         @NotNull(message = "Weekend is required")
         private CarwashRequest.updateOperatingTimeDTO.updateTimeSlot weekend;
 
@@ -306,11 +310,11 @@ public class CarwashRequest {
         @NotNull(message = "Latitude is required.")
         @DecimalMin(value = "-90.0", message = "Latitude must be greater than or equal to -90")
         @DecimalMax(value = "90.0", message = "Latitude must be less than or equal to 90")
-        private double latitude;
+        private Double latitude;
 
         @NotNull(message = "Longitude is required.")
         @DecimalMin(value = "-180.0", message = "Longitude must be greater than or equal to -180")
         @DecimalMax(value = "180.0", message = "Longitude must be less than or equal to 180")
-        private double longitude;
+        private Double longitude;
     }
 }
