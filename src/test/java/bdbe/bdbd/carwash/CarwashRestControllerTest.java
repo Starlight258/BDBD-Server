@@ -1,14 +1,18 @@
 package bdbe.bdbd.carwash;
 
-import bdbe.bdbd.keyword.Keyword;
-import bdbe.bdbd.keyword.KeywordJPARepository;
-import bdbe.bdbd.keyword.KeywordType;
-import bdbe.bdbd.location.LocationJPARepository;
-import bdbe.bdbd.optime.OptimeJPARepository;
-import bdbe.bdbd.member.Member;
-import bdbe.bdbd.member.MemberJPARepository;
+import bdbe.bdbd.dto.carwash.CarwashRequest;
+import bdbe.bdbd.model.Code;
+import bdbe.bdbd.model.Code.KeywordType;
+import bdbe.bdbd.model.keyword.Keyword;
+import bdbe.bdbd.model.member.Member;
+import bdbe.bdbd.repository.carwash.CarwashJPARepository;
+import bdbe.bdbd.repository.keyword.KeywordJPARepository;
+import bdbe.bdbd.repository.location.LocationJPARepository;
+import bdbe.bdbd.repository.member.MemberJPARepository;
+import bdbe.bdbd.repository.optime.OptimeJPARepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,10 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -54,8 +57,6 @@ public class CarwashRestControllerTest {
     @Autowired
     private ObjectMapper om;
 
-    private Member member;
-
 
     @Test
     @DisplayName("전체 세차장 목록 조회")
@@ -64,7 +65,7 @@ public class CarwashRestControllerTest {
 
         // when
         ResultActions resultActions = mvc.perform(
-                get("/api/carwashes")
+                get("/api/public/carwashes")
         );
 
         // eye
@@ -151,7 +152,7 @@ public class CarwashRestControllerTest {
 
         // when
         ResultActions resultActions = mvc.perform(
-                get("/api/carwashes/nearby")
+                get("/api/public/carwashes/nearby")
                         .param("latitude", String.valueOf(testLatitude))
                         .param("longitude", String.valueOf(testLongitude))
         );
@@ -292,7 +293,6 @@ public class CarwashRestControllerTest {
         optimeDTO.setWeekend(weekend);
         updateCarwashDetailsDTO.setOptime(optimeDTO);
 
-        Long keywordId = keywordJPARepository.findByType(KeywordType.CARWASH).get(0).getId();
         updateCarwashDetailsDTO.setKeywordId(Arrays.asList(1L));
 
         MockMultipartFile image1 = new MockMultipartFile("images", "image1.jpg", "image/jpeg", "image1 content".getBytes());
