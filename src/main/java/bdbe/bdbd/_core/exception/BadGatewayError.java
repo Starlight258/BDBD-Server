@@ -9,16 +9,29 @@ import org.springframework.http.HttpStatus;
  * 게이트웨이나 프록시 역할을 하는 서버가 상위 서버로부터 잘못된 응답을 받았을 때 발생합니다.
  */
 @Getter
-public class BadGatewayError extends RuntimeException {
-    public BadGatewayError(String message) {
-        super(message);
+public class BadGatewayError extends ApiException {
+
+    public BadGatewayError(ErrorCode errorCode, Object errors) {
+        super(errorCode, errors, HttpStatus.BAD_GATEWAY);
     }
 
-    public ApiUtils.ApiResult<?> body(){
-        return ApiUtils.error(getMessage(), HttpStatus.BAD_GATEWAY);
-    }
+    public enum ErrorCode implements ApiException.ErrorCode {
+        GATEWAY_ERROR(3000, "gateway error");
 
-    public HttpStatus status(){
-        return HttpStatus.INTERNAL_SERVER_ERROR;
+        private final int code;
+        private final String message;
+
+        ErrorCode(int code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 }
