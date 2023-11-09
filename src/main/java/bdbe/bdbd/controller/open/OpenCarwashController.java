@@ -1,7 +1,6 @@
-package bdbe.bdbd.controller.carwash;
+package bdbe.bdbd.controller.open;
 
 import bdbe.bdbd._core.exception.BadRequestError;
-import bdbe.bdbd._core.security.CustomUserDetails;
 import bdbe.bdbd._core.utils.ApiUtils;
 import bdbe.bdbd.dto.carwash.CarwashRequest;
 import bdbe.bdbd.dto.carwash.CarwashResponse;
@@ -11,45 +10,29 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api")
-public class CarwashRestController {
+@RequestMapping("/api/open")
+public class OpenCarwashController {
 
     private final CarwashService carwashService;
 
-    @Autowired
-    private final FileService fileService;
-
-
     // 전체 세차장 목록 조회, 10개씩 페이징
-    @GetMapping("/public/carwashes")
+    @GetMapping("/carwashes")
     public ResponseEntity<?> findAll(@RequestParam(value = "page", defaultValue = "0") Integer page) {
         List<CarwashResponse.FindAllDTO> dtos = carwashService.findAll(page);
         ApiUtils.ApiResult<?> apiResult = ApiUtils.success(dtos);
         return ResponseEntity.ok(apiResult);
     }
 
-    @PostMapping(value = "/owner/carwashes/register")
-    public ResponseEntity<?> save(@Valid @RequestPart("carwash") CarwashRequest.SaveDTO saveDTOs,
-                                  Errors errors,
-                                  @RequestPart("images") MultipartFile[] images,
-                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
-        carwashService.save(saveDTOs, images, userDetails.getMember());
-        return ResponseEntity.ok(ApiUtils.success(null));
-    }
 
-    @GetMapping("/public/carwashes/search")
+    @GetMapping("/carwashes/search")
     public ResponseEntity<?> findCarwashesByKeywords(@RequestParam List<Long> keywordIds,
                                                      @RequestParam double latitude,
                                                      @RequestParam double longitude) {
@@ -76,7 +59,7 @@ public class CarwashRestController {
     }
 
 
-    @GetMapping("/public/carwashes/nearby")
+    @GetMapping("/carwashes/nearby")
     public ResponseEntity<?> findNearestCarwashesByUserLocation(@RequestParam double latitude, @RequestParam double longitude) {
         validateLatitudeAndLongitude(latitude, longitude);
 
@@ -87,7 +70,7 @@ public class CarwashRestController {
         return ResponseEntity.ok(ApiUtils.success(carwashes));
     }
 
-    @GetMapping("/public/carwashes/recommended")
+    @GetMapping("/carwashes/recommended")
     public ResponseEntity<?> findNearestCarwash(@RequestParam double latitude, @RequestParam double longitude) {
         validateLatitudeAndLongitude(latitude, longitude);
 
@@ -103,40 +86,10 @@ public class CarwashRestController {
         return ResponseEntity.ok(ApiUtils.success(carwashList));
     }
 
-    @GetMapping("/public/carwashes/{carwash_id}/info")
+    @GetMapping("/carwashes/{carwash_id}/info")
     public ResponseEntity<?> findById(@PathVariable("carwash_id") Long carwashId) {
         CarwashResponse.findByIdDTO findByIdDTO = carwashService.getfindById(carwashId);
         return ResponseEntity.ok(ApiUtils.success(findByIdDTO));
-    }
-
-    @GetMapping("/owner/carwashes/{carwash_id}/details") //세차장 정보 수정_세차장 기존 정보 불러오기
-    public ResponseEntity<?> findCarwashByDetails(@PathVariable("carwash_id") Long carwashId,
-                                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
-        CarwashResponse.carwashDetailsDTO carwashDetailsDTO = carwashService.findCarwashByDetails(carwashId, userDetails.getMember());
-        return ResponseEntity.ok(ApiUtils.success(carwashDetailsDTO));
-    }
-
-    @DeleteMapping("/owner/images/{image_id}")
-    public ResponseEntity<?> deleteImage(
-            @PathVariable("image_id") Long imageId,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
-        fileService.deleteFile(imageId, userDetails.getMember());
-        return ResponseEntity.ok(ApiUtils.success(null));
-    }
-
-    @PutMapping("/owner/carwashes/{carwash_id}/details")
-    public ResponseEntity<?> updateCarwashDetails(
-            @PathVariable("carwash_id") Long carwashId,
-            @Valid @RequestPart("updateData") CarwashRequest.updateCarwashDetailsDTO updatedto,
-            Errors errors,
-            @RequestPart(value = "images", required = true) MultipartFile[] images,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
-
-        CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO =
-                carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
-
-        return ResponseEntity.ok(ApiUtils.success(updateCarwashDetailsDTO));
     }
 
 }

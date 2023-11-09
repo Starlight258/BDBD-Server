@@ -28,7 +28,7 @@ public class ReviewRestController {
     }
 
     // 리뷰 조회 기능
-    @GetMapping("/public/carwashes/{carwashId}/reviews")
+    @GetMapping("/open/carwashes/{carwashId}/reviews")
     public ResponseEntity<?> getReviewsByCarwashId(@PathVariable("carwashId") Long carwashId) {
         ReviewResponse.ReviewResponseDTO dto = reviewService.getReviewsByCarwashId(carwashId);
 
@@ -36,7 +36,7 @@ public class ReviewRestController {
     }
 
     // 리뷰 키워드 불러오기
-    @GetMapping("/public/reviews")
+    @GetMapping("/open/reviews")
     public ResponseEntity<?> getReviewKeyword() {
         ReviewResponse.ReviewKeywordResponseDTO dto = reviewService.getReviewKeyword();
 

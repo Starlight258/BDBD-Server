@@ -71,11 +71,9 @@ public class SecurityConfig {
             FilterResponseUtils.forbidden(response, new ForbiddenError("Permission denied"));
         });
 
-        // 인증, 권한 필터 설정: 오너와 사용자 어드민 세가지로 url 접근 수정
+        // 인증, 권한 필터 설정
         http.authorizeRequests(authorize -> authorize
-                .antMatchers("/api/owner/join", "/api/owner/login").permitAll()
-                .antMatchers("/api/user/join", "/api/user/login").permitAll()
-                .antMatchers("/api/public/**").permitAll()
+                .antMatchers("/api/open/**").permitAll()
                 .antMatchers("/api/user/**").access("hasAnyRole('USER', 'OWNER')")
                 .antMatchers("/api/owner/**").access("hasRole('OWNER')")
                 .anyRequest().authenticated()); // 모든 다른 요청은 인증 필요

@@ -1,4 +1,4 @@
-package bdbe.bdbd.controller.pay;
+package bdbe.bdbd.controller.user;
 
 import bdbe.bdbd._core.security.CustomUserDetails;
 import bdbe.bdbd.dto.pay.PayRequest;
@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class PayController {
 
     private final PayService payService;
 
-    @PostMapping("/user/payment/ready/{bay_id}")
+    @PostMapping("/payment/ready/{bay_id}")
     public ResponseEntity<String> requestPaymentReady(
             @PathVariable("bay_id") Long bayId,
             @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest
@@ -32,7 +32,7 @@ public class PayController {
     }
 
 
-    @PostMapping("/user/payment/approve/{carwash_id}/{bay_id}")
+    @PostMapping("/payment/approve/{carwash_id}/{bay_id}")
     public ResponseEntity<ReservationResponse.findLatestOneResponseDTO> requestPaymentApproval(
             @PathVariable("carwash_id") Long carwashId,
             @PathVariable("bay_id") Long bayId,

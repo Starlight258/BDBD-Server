@@ -1,4 +1,4 @@
-package bdbe.bdbd.controller.bay;
+package bdbe.bdbd.controller.owner;
 
 import bdbe.bdbd._core.security.CustomUserDetails;
 import bdbe.bdbd._core.utils.ApiUtils;
@@ -15,12 +15,12 @@ import javax.validation.Valid;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/owner")
 public class BayRestController {
 
     private final BayService bayService;
 
-    @PostMapping("/owner/carwashes/{carwash_id}/bays")
+    @PostMapping("/carwashes/{carwash_id}/bays")
     public ResponseEntity<?> createBay(
             @PathVariable("carwash_id") Long carwashId,
             @Valid @RequestBody BayRequest.SaveDTO saveDTO,
@@ -30,7 +30,7 @@ public class BayRestController {
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
-    @PutMapping("/owner/bays/{bay_id}/status")
+    @PutMapping("/bays/{bay_id}/status")
     public ResponseEntity<?> updateStatus(
             @PathVariable("bay_id") Long bayId,
             @RequestParam int status,
