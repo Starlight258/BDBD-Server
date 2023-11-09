@@ -1,18 +1,18 @@
 package bdbe.bdbd.reservation;
 
-import bdbe.bdbd.bay.Bay;
-import bdbe.bdbd.bay.BayJPARepository;
-import bdbe.bdbd.carwash.Carwash;
-import bdbe.bdbd.carwash.CarwashJPARepository;
-import bdbe.bdbd.keyword.KeywordJPARepository;
-import bdbe.bdbd.location.LocationJPARepository;
-import bdbe.bdbd.optime.OptimeJPARepository;
-import bdbe.bdbd.reservation.ReservationRequest.SaveDTO;
-import bdbe.bdbd.reservation.ReservationRequest.UpdateDTO;
-import bdbe.bdbd.member.Member;
-import bdbe.bdbd.member.MemberJPARepository;
+import bdbe.bdbd.model.bay.Bay;
+import bdbe.bdbd.repository.bay.BayJPARepository;
+import bdbe.bdbd.model.carwash.Carwash;
+import bdbe.bdbd.repository.carwash.CarwashJPARepository;
+import bdbe.bdbd.repository.keyword.KeywordJPARepository;
+import bdbe.bdbd.repository.location.LocationJPARepository;
+import bdbe.bdbd.model.reservation.Reservation;
+import bdbe.bdbd.repository.optime.OptimeJPARepository;
+import bdbe.bdbd.repository.reservation.ReservationJPARepository;
+import bdbe.bdbd.dto.reservation.ReservationRequest.UpdateDTO;
+import bdbe.bdbd.model.member.Member;
+import bdbe.bdbd.repository.member.MemberJPARepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +24,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

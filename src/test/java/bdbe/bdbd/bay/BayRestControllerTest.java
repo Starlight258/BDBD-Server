@@ -1,8 +1,9 @@
 package bdbe.bdbd.bay;
 
-import bdbe.bdbd.carwash.Carwash;
-import bdbe.bdbd.carwash.CarwashJPARepository;
-import bdbe.bdbd.location.LocationJPARepository;
+import bdbe.bdbd.repository.carwash.CarwashJPARepository;
+import bdbe.bdbd.dto.bay.BayRequest;
+import bdbe.bdbd.repository.bay.BayJPARepository;
+import bdbe.bdbd.repository.location.LocationJPARepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
