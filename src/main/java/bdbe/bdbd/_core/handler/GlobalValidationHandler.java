@@ -8,6 +8,9 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
+
+import java.util.stream.Collectors;
 
 @Aspect
 @Component
@@ -23,12 +26,14 @@ public class GlobalValidationHandler {
             if (arg instanceof Errors) {
                 Errors errors = (Errors) arg;
 
-                if (errors.hasErrors()) { // 검증 오류 발생시 400
-                    throw new BadRequestError(
-                            String.format("%s:%s",
-                                    errors.getFieldErrors().get(0).getDefaultMessage(),
-                                    errors.getFieldErrors().get(0).getField())
-                    );
+                if (errors.hasErrors()) {
+                    BadRequestError.ErrorCode errorCode = BadRequestError.ErrorCode.VALIDATION_FAILED;
+                    String detailedErrorMessage = errors.getAllErrors()
+                            .stream()
+                            .map(error -> String.format("%s:%s", error.getDefaultMessage(), ((FieldError) error).getField()))
+                            .collect(Collectors.joining(", "));
+
+                    throw new BadRequestError(errorCode, detailedErrorMessage);
                 }
             }
         }

@@ -3,6 +3,8 @@ package bdbe.bdbd.service.member;
 
 import bdbe.bdbd._core.exception.BadRequestError;
 import bdbe.bdbd._core.exception.InternalServerError;
+import bdbe.bdbd._core.exception.NotFoundError;
+import bdbe.bdbd._core.exception.UnAuthorizedError;
 import bdbe.bdbd._core.security.JWTProvider;
 import bdbe.bdbd.dto.member.owner.OwnerResponse;
 import bdbe.bdbd.dto.member.user.UserRequest;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.Optional;
 
 @Transactional(readOnly = true)
@@ -32,17 +35,24 @@ public class UserService {
         try {
             memberJPARepository.save(requestDTO.toUserEntity(encodedPassword));
         } catch (Exception e) {
-            throw new InternalServerError("unknown server error");
+            throw new InternalServerError(
+                    InternalServerError.ErrorCode.INTERNAL_SERVER_ERROR,
+                    "unknown server error");
         }
     }
 
     public UserResponse.LoginResponse login(UserRequest.LoginDTO requestDTO) {
         Member memberPS = memberJPARepository.findByEmail(requestDTO.getEmail()).orElseThrow(
-                () -> new BadRequestError("email not found : " + requestDTO.getEmail())
-        );
+                () -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("Email", "email not found : " + requestDTO.getEmail())
+                ));
 
         if (!passwordEncoder.matches(requestDTO.getPassword(), memberPS.getPassword())) {
-            throw new BadRequestError("wrong password");
+            throw new UnAuthorizedError(
+                    UnAuthorizedError.ErrorCode.AUTHENTICATION_FAILED,
+                    Collections.singletonMap("Password", "Wrong password")
+            );
         }
 
         String jwt = JWTProvider.create(memberPS);
@@ -55,7 +65,10 @@ public class UserService {
     public void sameCheckEmail(String email) {
         Optional<Member> userOP = memberJPARepository.findByEmail(email);
         if (userOP.isPresent()) {
-            throw new BadRequestError("duplicate email exist : " + email);
+            throw new UnAuthorizedError(
+                    UnAuthorizedError.ErrorCode.AUTHENTICATION_FAILED,
+                    Collections.singletonMap("Password", "Wrong password")
+            );
         }
     }
 
@@ -64,7 +77,10 @@ public class UserService {
      */
     public OwnerResponse.UserInfoDTO findUserInfo(Member member) {
         Member findMember = memberJPARepository.findById(member.getId())
-                .orElseThrow(() -> new BadRequestError("member not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("MemberId", "Member is not found.")
+                ));
 
         return new OwnerResponse.UserInfoDTO(findMember);
     }
