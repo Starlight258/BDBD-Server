@@ -51,7 +51,11 @@ public class ReviewService {
         // 리뷰 키워드 저장
         List<Long> keywordIdList = dto.getKeywordIdList();
 
-        if (keywordIdList != null) {
+        if (keywordIdList != null && !keywordIdList.isEmpty()) {
+            if (keywordIdList.stream().anyMatch(id -> id < 1 || id > 7)) {
+                throw new IllegalArgumentException("Review Keyword ID must be between 1 and 7");
+            }
+
             keywordIdList.stream()
                     .map(id -> {
                         Keyword keyword = keywordJPARepository.findById(id)

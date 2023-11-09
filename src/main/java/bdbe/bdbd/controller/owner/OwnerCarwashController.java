@@ -92,11 +92,15 @@ public class OwnerCarwashController {
 
     @GetMapping("/sales")
     public ResponseEntity<?> findAllOwnerReservation(
-            @RequestParam(value = "carwash-id") List<Long> carwashIds,
+            @RequestParam(value = "carwash-id", required = false) List<Long> carwashIds,
             @RequestParam(value = "selected-date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate,
             @AuthenticationPrincipal CustomUserDetails userDetails
     )
     {
+        if (carwashIds == null || carwashIds.isEmpty()) {
+            OwnerResponse.SaleResponseDTO dto = ownerService.findCarwashList(userDetails.getMember());
+            return ResponseEntity.ok(ApiUtils.success(dto));
+        }
         OwnerResponse.SaleResponseDTO saleResponseDTO = ownerService.findSales(carwashIds, selectedDate, userDetails.getMember());
 
         return ResponseEntity.ok(ApiUtils.success(saleResponseDTO));
