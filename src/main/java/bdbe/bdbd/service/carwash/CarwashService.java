@@ -91,7 +91,6 @@ public class CarwashService {
 
         List<Long> keywordIdList = saveDTO.getKeywordId();
         if (keywordIdList != null && !keywordIdList.isEmpty()) {
-            // 키워드 ID 범위 검증
             if (keywordIdList.stream().anyMatch(id -> id < 8 || id > 14)) {
                 throw new BadRequestError("Carwash Keyword ID must be between 8 and 14");
             }

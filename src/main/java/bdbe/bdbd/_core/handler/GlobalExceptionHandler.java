@@ -1,8 +1,8 @@
 package bdbe.bdbd._core.handler;
 
 
-import bdbe.bdbd._core.utils.ApiUtils;
 import bdbe.bdbd._core.exception.*;
+import bdbe.bdbd._core.utils.ApiUtils;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import org.springframework.http.HttpStatus;
@@ -13,11 +13,9 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
-import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
