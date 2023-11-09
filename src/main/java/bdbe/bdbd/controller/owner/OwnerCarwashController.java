@@ -1,6 +1,5 @@
 package bdbe.bdbd.controller.owner;
 
-import bdbe.bdbd._core.exception.BadRequestError;
 import bdbe.bdbd._core.security.CustomUserDetails;
 import bdbe.bdbd._core.utils.ApiUtils;
 import bdbe.bdbd.dto.carwash.CarwashRequest;
@@ -11,7 +10,6 @@ import bdbe.bdbd.service.file.FileService;
 import bdbe.bdbd.service.member.OwnerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
