@@ -97,12 +97,18 @@ public class OwnerService {
     public OwnerResponse.SaleResponseDTO findSales(List<Long> carwashIds, LocalDate selectedDate, Member sessionMember) {
         validateCarwashOwnership(carwashIds, sessionMember);
 
-        List<Carwash> carwashList = carwashJPARepository.findCarwashesByMemberId(sessionMember.getId()); // 유저가 가진 모든 세차장 (dto에서 사용)
+        List<Carwash> carwashList = carwashJPARepository.findCarwashesByMemberId(sessionMember.getId());
 
         List<Reservation> reservationList = reservationJPARepository.findAllByCarwash_IdInOrderByStartTimeDesc(carwashIds, selectedDate);
         if (reservationList.isEmpty()) return new OwnerResponse.SaleResponseDTO(carwashList, new ArrayList<>());
 
         return new OwnerResponse.SaleResponseDTO(carwashList, reservationList);
+    }
+
+    public OwnerResponse.SaleResponseDTO findCarwashList(Member sessionMember) {
+        List<Carwash> carwashList = carwashJPARepository.findCarwashesByMemberId(sessionMember.getId());
+
+        return new OwnerResponse.SaleResponseDTO(carwashList, null);
     }
 
     public OwnerResponse.ReservationCarwashListDTO findBayReservation(Long bayId, Member sessionMember) {

@@ -82,7 +82,7 @@ public class CarwashService {
     @Transactional
     public void save(CarwashRequest.SaveDTO saveDTO, MultipartFile[] images, Member sessionMember) {
         Location location = saveDTO.toLocationEntity();
-        locationJPARepository.save(location);
+        location = locationJPARepository.save(location);
 
         Carwash carwash = saveDTO.toCarwashEntity(location, sessionMember);
         carwashJPARepository.save(carwash);
@@ -91,20 +91,29 @@ public class CarwashService {
         optimeJPARepository.saveAll(optimes);
 
         List<Long> keywordIdList = saveDTO.getKeywordId();
-        List<CarwashKeyword> carwashKeywordList = new ArrayList<>();
-        for (Long keywordId : keywordIdList) {
-            Keyword keyword = keywordJPARepository.findById(keywordId)
-                    .orElseThrow(() -> new IllegalArgumentException("Keyword not found"));
+        if (keywordIdList != null && !keywordIdList.isEmpty()) {
+            if (keywordIdList.stream().anyMatch(id -> id < 8 || id > 14)) {
+                throw new BadRequestError(
+                        BadRequestError.ErrorCode.VALIDATION_FAILED,
+                        Collections.singletonMap("message", "Carwash Keyword ID must be between 8 and 14")
+                );
+            }
+            List<CarwashKeyword> carwashKeywordList = new ArrayList<>();
+            for (Long keywordId : keywordIdList) {
+                Keyword keyword = keywordJPARepository.findById(keywordId)
+                        .orElseThrow(() -> new NotFoundError(
+                                NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                                Collections.singletonMap("message", "Carwash Keyword ID must be between 8 and 14")));
 
-            CarwashKeyword carwashKeyword = CarwashKeyword.builder().carwash(carwash).keyword(keyword).build();
-            carwashKeywordList.add(carwashKeyword);
+                CarwashKeyword carwashKeyword = CarwashKeyword.builder().carwash(carwash).keyword(keyword).build();
+                carwashKeywordList.add(carwashKeyword);
+            }
+            carwashKeywordJPARepository.saveAll(carwashKeywordList);
         }
-        carwashKeywordJPARepository.saveAll(carwashKeywordList);
 
         if (images != null && images.length > 0) {
             uploadAndSaveFiles(images, carwash);
         }
-
     }
 
     @Transactional
@@ -283,9 +292,10 @@ public class CarwashService {
 
         List<File> imageFiles = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwashId);
 
-        return new CarwashResponse.carwashDetailsDTO(carwash, location, keywordIds, weekOptime, endOptime,imageFiles);
+        return new CarwashResponse.carwashDetailsDTO(carwash, location, keywordIds, weekOptime, endOptime, imageFiles);
 
     }
+
     private static final Logger logger = LoggerFactory.getLogger(CarwashService.class);
 
     @Transactional
@@ -315,9 +325,8 @@ public class CarwashService {
                         Collections.singletonMap("LocationId", "Location not found")
                 ));
 
-
-        location.updateAddress(updateLocationDTO.getAddress(), updateLocationDTO.getPlaceName()
-                , updateLocationDTO.getLatitude(), updateLocationDTO.getLongitude());
+        location.updateAddress(updateLocationDTO.getAddress(),
+                updateLocationDTO.getLatitude(), updateLocationDTO.getLongitude());
         response.updateLocationPart(location);
 
         CarwashRequest.updateOperatingTimeDTO updateOperatingTimeDTO = updatedto.getOptime();

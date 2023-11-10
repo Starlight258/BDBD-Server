@@ -19,9 +19,6 @@ public class Location {
     @Column(columnDefinition = "BIGINT")
     private Long id;
 
-    @Column(name="place", length = 255, nullable = false)
-    private String place;
-
     @Column(name="address", length = 255, nullable = false)
     private String address;
 
@@ -33,11 +30,10 @@ public class Location {
 
 
     @Builder
-    public Location(Long id, String place, String address, double latitude, double longitude) {
+    public Location(Long id, String address, double latitude, double longitude) {
         validateLatitudeAndLongitude(latitude, longitude);
 
         this.id = id;
-        this.place = place;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -60,10 +56,9 @@ public class Location {
 
 
 
-    public void updateAddress(String address, String place, double latitude, double longitude) {
+    public void updateAddress(String address, double latitude, double longitude) {
         validateLatitudeAndLongitude(latitude, longitude);
 
-        this.place = place;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;

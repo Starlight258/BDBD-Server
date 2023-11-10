@@ -28,8 +28,8 @@ public class UserRequest {
         @Size(min = 2, max = 20, message = "Username must be between 2 and 20 characters")
         private String username;
 
-        @NotBlank(message = "tel is required.")
-        @Size(min = 9, max = 14, message = "Tel must be between 9 and 14 characters")
+        @NotBlank(message = "Tel is required.")
+        @Pattern(regexp = "^010\\d{8}$", message = "The telephone number format is invalid.")
         private String tel;
 
         public Member toUserEntity(String encodedPassword) {

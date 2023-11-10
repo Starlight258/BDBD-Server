@@ -73,7 +73,6 @@ public class PayService {
 
     public ResponseEntity<?> requestPaymentReady(PayRequest.PayReadyRequestDTO requestDto, ReservationRequest.SaveDTO saveDTO, Long bayId) {
 
-        System.out.println("request DTO : "+ requestDto.toString());
         Bay bay = bayJPARepository.findById(bayId)
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
@@ -100,6 +99,11 @@ public class PayService {
 
         int totalAmount = price;  //세금 포함 가격
 
+        if (totalAmount != requestDto.getTotal_amount())
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.WRONG_REQUEST_TRANSMISSION,
+                    Collections.singletonMap("pay", "Invalid pay amount")
+            );
         PayRequest.PayReadyRequestDTO dto = new PayRequest.PayReadyRequestDTO();
         dto.setTotal_amount(totalAmount);
 
