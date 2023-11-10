@@ -42,13 +42,6 @@ public class OpenMemberController {
 
     @PostMapping("/login/user")
     public ResponseEntity<?> loginUser(@RequestBody @Valid UserRequest.LoginDTO requestDTO, Errors errors) {
-        if (errors.hasErrors()) {
-            String errorMessage = errors.getAllErrors().get(0).getDefaultMessage();
-            throw new UnAuthorizedError(
-            UnAuthorizedError.ErrorCode.ACCESS_DENIED,
-                    Collections.singletonMap("Token", errorMessage)
-            );
-        }
         UserResponse.LoginResponse response = userService.login(requestDTO);
         return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(null));
     }
@@ -61,13 +54,6 @@ public class OpenMemberController {
 
     @PostMapping("/login/owner")
     public ResponseEntity<?> loginOwner(@RequestBody @Valid UserRequest.LoginDTO requestDTO, Errors errors) {
-        if (errors.hasErrors()) {
-            String errorMessage = errors.getAllErrors().get(0).getDefaultMessage();
-            throw new UnAuthorizedError(
-                    UnAuthorizedError.ErrorCode.ACCESS_DENIED,
-                    Collections.singletonMap("Token", errorMessage)
-            );
-        }
         UserResponse.LoginResponse response = ownerService.login(requestDTO);
         return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(null));
     }
