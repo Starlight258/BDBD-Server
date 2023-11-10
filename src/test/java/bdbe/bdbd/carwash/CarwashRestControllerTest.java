@@ -97,7 +97,6 @@ public class CarwashRestControllerTest {
         dto.setPrice("100");
 
         CarwashRequest.LocationDTO locationDTO = new CarwashRequest.LocationDTO();
-        locationDTO.setPlaceName("test 장소");
         locationDTO.setAddress("test 주소");
         locationDTO.setLatitude(1.234);
         locationDTO.setLongitude(5.678);
@@ -275,7 +274,6 @@ public class CarwashRestControllerTest {
 
         CarwashRequest.updateLocationDTO updateLocationDTO = new CarwashRequest.updateLocationDTO();
         updateLocationDTO.setAddress("풍영 주소");
-        updateLocationDTO.setPlaceName("풍영 이름");
         updateLocationDTO.setLatitude(1.121);
         updateLocationDTO.setLongitude(2.232);
         updateCarwashDetailsDTO.setLocationDTO(updateLocationDTO);
