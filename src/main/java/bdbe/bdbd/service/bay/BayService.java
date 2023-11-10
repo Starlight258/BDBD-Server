@@ -58,7 +58,10 @@ public class BayService {
 
     public void changeStatus(Long bayId, int status, Member member) {
         Bay bay = bayJPARepository.findById(bayId)
-                .orElseThrow(() -> new IllegalArgumentException("Bay not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("Bay", "Bay not found")
+                ));
 
         if (bay.getCarwash().getMember().getId() != member.getId()) {
             throw new ForbiddenError(

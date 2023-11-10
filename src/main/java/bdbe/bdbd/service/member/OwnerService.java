@@ -51,7 +51,7 @@ public class OwnerService {
         } catch (Exception e) {
             throw new InternalServerError(
                     InternalServerError.ErrorCode.INTERNAL_SERVER_ERROR,
-                    "unknown server error");
+                    Collections.singletonMap("error", "Unknown server error occurred."));
         }
     }
 

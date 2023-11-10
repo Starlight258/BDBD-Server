@@ -21,6 +21,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Collections;
+
 
 @Configuration
 public class SecurityConfig {
@@ -68,14 +70,16 @@ public class SecurityConfig {
         http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
             FilterResponseUtils.unAuthorized(response, new UnAuthorizedError(
                     UnAuthorizedError.ErrorCode.AUTHENTICATION_FAILED,
-                    "Not authenticated"));
+                    Collections.singletonMap("auth", "Not authenticated")
+            ));
         });
 
         // 권한 실패 처리
         http.exceptionHandling().accessDeniedHandler((request, response, accessDeniedException) -> {
             FilterResponseUtils.forbidden(response, new ForbiddenError(
                     ForbiddenError.ErrorCode.ROLE_BASED_ACCESS_ERROR,
-                    "Access is denied" + accessDeniedException.getMessage()));
+                    Collections.singletonMap("access", "Access is denied")
+            ));
         });
 
         // 인증, 권한 필터 설정

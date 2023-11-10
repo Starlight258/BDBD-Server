@@ -41,7 +41,7 @@ public class FileService {
         File file = fileJPARepository.findById(fileId)
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                        "file id :" + fileId + " not found"));
+                        Collections.singletonMap("fileId", "File id " + fileId + " not found.")));
         if (file.getCarwash().getMember().getId() != member.getId()){
             throw new ForbiddenError(
                     ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
