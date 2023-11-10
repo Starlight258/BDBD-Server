@@ -1,7 +1,6 @@
 package bdbe.bdbd._core.exception;
 
 
-import bdbe.bdbd._core.utils.ApiUtils;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 

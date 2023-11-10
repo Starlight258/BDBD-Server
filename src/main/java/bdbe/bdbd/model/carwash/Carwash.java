@@ -16,8 +16,8 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name="carwash")
-public class Carwash{
+@Table(name = "carwash")
+public class Carwash {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,18 +33,18 @@ public class Carwash{
     @Column(length = 50, nullable = false)
     private String tel;
 
-    @Column(length = 255, nullable = false)
+    @Column(nullable = false)
     private String des;
 
-    @Column(name="price", nullable = false)
+    @Column(name = "price", nullable = false)
     private int price;
 
     @OneToOne
-    @JoinColumn(name="l_id", nullable = false)
+    @JoinColumn(name = "l_id", nullable = false)
     private Location location;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="m_id",  nullable = false)
+    @JoinColumn(name = "m_id", nullable = false)
     private Member member;
 
     @OneToMany(mappedBy = "carwash")

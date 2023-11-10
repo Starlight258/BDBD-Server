@@ -1,7 +1,9 @@
 package bdbe.bdbd._core.handler;
 
 
-import bdbe.bdbd._core.exception.*;
+import bdbe.bdbd._core.exception.ApiException;
+import bdbe.bdbd._core.exception.BadRequestError;
+import bdbe.bdbd._core.exception.InternalServerError;
 import bdbe.bdbd._core.utils.ApiUtils;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
@@ -12,19 +14,18 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ApiUtils.ApiResult<?>> handleApiException(ApiException e) {
+
         return new ResponseEntity<>(e.body(), e.getStatus());
     }
 
@@ -39,8 +40,10 @@ public class GlobalExceptionHandler {
                 String.valueOf(errorCode.getCode()),
                 message
         );
+
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiUtils.ApiResult<?>> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
         Map<String, String> message = new HashMap<>(); // 맵으로 변경
@@ -70,6 +73,7 @@ public class GlobalExceptionHandler {
                 String.valueOf(errorCode.getCode()),
                 messages
         );
+
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
@@ -84,6 +88,7 @@ public class GlobalExceptionHandler {
                 String.valueOf(errorCode.getCode()),
                 message
         );
+
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
@@ -98,11 +103,12 @@ public class GlobalExceptionHandler {
                 String.valueOf(errorCode.getCode()),
                 message
         );
+
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiUtils.ApiResult<?>> unknownServerError(Exception e){
+    public ResponseEntity<ApiUtils.ApiResult<?>> unknownServerError(Exception e) {
         Map<String, String> message = new HashMap<>();
         message.put("error", e.getMessage());
 
@@ -112,6 +118,7 @@ public class GlobalExceptionHandler {
                 String.valueOf(errorCode.getCode()),
                 message
         );
+
         return new ResponseEntity<>(errorResult, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -156,8 +163,8 @@ public class GlobalExceptionHandler {
                 String.valueOf(errorCode.getCode()),
                 message
         );
+
         return new ResponseEntity<>(errorResult, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 
 }

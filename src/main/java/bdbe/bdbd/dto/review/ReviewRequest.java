@@ -1,9 +1,9 @@
 package bdbe.bdbd.dto.review;
 
 import bdbe.bdbd.model.carwash.Carwash;
-import bdbe.bdbd.model.review.Review;
-import bdbe.bdbd.model.reservation.Reservation;
 import bdbe.bdbd.model.member.Member;
+import bdbe.bdbd.model.reservation.Reservation;
+import bdbe.bdbd.model.review.Review;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -23,7 +23,7 @@ public class ReviewRequest {
         @NotNull(message = "ReservationId is required")
         private Long reservationId;
 
-        private List<Long> keywordIdList; // 필수가 아님
+        private List<Long> keywordIdList;
 
         @NotNull(message = "Rate is required")
         @Min(value = 1, message = "The rating must be at least 1 point")

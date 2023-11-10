@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class PayResponse {
-
+    // NOTE: 카카오페이 API 응답 명세에 따름
     @Getter
     @Setter
     public static class PayReadyResponseDTO {
@@ -44,6 +44,7 @@ public class PayResponse {
         private Integer discount;
         private Integer green_deposit;
     }
+
     @Getter
     @Setter
     public static class CardInfo {
@@ -63,6 +64,4 @@ public class PayResponse {
         private String interest_free_install;
         private String card_item_code;
     }
-
-
 }

@@ -1,7 +1,6 @@
 package bdbe.bdbd.dto.member.owner;
 
 import bdbe.bdbd._core.utils.DateUtils;
-import bdbe.bdbd.model.Code;
 import bdbe.bdbd.model.Code.DayType;
 import bdbe.bdbd.model.bay.Bay;
 import bdbe.bdbd.model.carwash.Carwash;
@@ -33,7 +32,7 @@ public class OwnerResponse {
                         .map(CarwashListDTO::new)
                         .collect(Collectors.toList());
             } else {
-                this.carwashList = Collections.emptyList(); // 또는 null 할당, 기본값 설정 등
+                this.carwashList = Collections.emptyList();
             }
 
             if (reservationList != null) {
@@ -41,7 +40,7 @@ public class OwnerResponse {
                         .map(ReservationCarwashDTO::new)
                         .collect(Collectors.toList());
             } else {
-                this.reservationList = Collections.emptyList(); // 또는 null 할당, 기본값 설정 등
+                this.reservationList = Collections.emptyList();
             }
         }
     }
@@ -142,10 +141,10 @@ public class OwnerResponse {
     @Setter
     @ToString
     public static class ReservationOverviewResponseDTO {
-        private List<CarwashManageByOwnerDTO> carwash = new ArrayList<>();
+        private List<CarwashManageByOwnerDTO> carwashList = new ArrayList<>();
 
         public void addCarwashManageByOwnerDTO(CarwashManageByOwnerDTO carwashManageByOwnerDTO) {
-            this.carwash.add(carwashManageByOwnerDTO);
+            this.carwashList.add(carwashManageByOwnerDTO);
         }
     }
 
@@ -249,9 +248,7 @@ public class OwnerResponse {
                     .filter(reservation -> reservation.getBay() != null && reservation.getBay().getId().equals(bay.getId()))
                     .map(BookedTimeDTO::new)
                     .collect(Collectors.toList());
-
         }
-
 
         @Getter
         @Setter
@@ -304,7 +301,6 @@ public class OwnerResponse {
             this.imageFiles = files.stream()
                     .map(FileDTO::new)
                     .collect(Collectors.toList());
-
         }
     }
 
@@ -331,6 +327,4 @@ public class OwnerResponse {
             this.name = member.getUsername();
         }
     }
-
-
 }

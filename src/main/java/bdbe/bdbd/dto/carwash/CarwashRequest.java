@@ -1,14 +1,12 @@
 package bdbe.bdbd.dto.carwash;
 
 import bdbe.bdbd._core.utils.DateUtils;
-import bdbe.bdbd.dto.reservation.ReservationResponse;
-import bdbe.bdbd.model.Code;
 import bdbe.bdbd.model.Code.DayType;
 import bdbe.bdbd.model.carwash.Carwash;
 import bdbe.bdbd.model.file.File;
-import bdbe.bdbd.model.optime.Optime;
 import bdbe.bdbd.model.location.Location;
 import bdbe.bdbd.model.member.Member;
+import bdbe.bdbd.model.optime.Optime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -30,20 +28,21 @@ public class CarwashRequest {
         @Size(min = 2, max = 20, message = "Place name must be between 2 and 20 characters.")
         private String name;
 
-        @Valid @NotNull(message = "Location is required.")
+        @Valid
+        @NotNull(message = "Location is required.")
         private LocationDTO location;
 
-        @NotBlank( message = "Price is required.")
+        @NotBlank(message = "Price is required.")
         private String price;
 
         @Valid
-        @NotNull(message="optime is required.")
+        @NotNull(message = "optime is required.")
         private OperatingTimeDTO optime;
 
         private List<Long> keywordId;
 
-        @NotBlank( message = "Description is required.")
-        @Size(max = 200, message = "Description cannot be longer than 200 characters." )
+        @NotBlank(message = "Description is required.")
+        @Size(max = 200, message = "Description cannot be longer than 200 characters.")
         private String description;
 
         @NotBlank(message = "Tel is required.")
@@ -57,7 +56,7 @@ public class CarwashRequest {
                     .rate(0)
                     .tel(tel)
                     .des(description)
-                    .price(Integer.parseInt(price))  // 문자열 price를 int로 변환
+                    .price(Integer.parseInt(price))
                     .location(location)
                     .member(member)
                     .build();
@@ -91,8 +90,6 @@ public class CarwashRequest {
 
             return optimeList;
         }
-
-
     }
 
     @Getter
@@ -113,7 +110,6 @@ public class CarwashRequest {
         @DecimalMin(value = "-180.0", message = "Longitude must be greater than or equal to -180.")
         @DecimalMax(value = "180.0", message = "Longitude must be less than or equal to 180.")
         private Double longitude;
-
     }
 
     @Getter
@@ -137,7 +133,6 @@ public class CarwashRequest {
 
             @NotNull(message = "End time is required")
             private LocalTime end;
-
         }
     }
 
@@ -260,11 +255,11 @@ public class CarwashRequest {
 
         private List<Long> keywordId;
 
-        @NotBlank( message = "Description is required.")
-        @Size(max = 200, message = "Description cannot be longer than 200 characters." )
+        @NotBlank(message = "Description is required.")
+        @Size(max = 200, message = "Description cannot be longer than 200 characters.")
         private String description;
-
     }
+
     @Getter
     @Setter
     public static class updateOperatingTimeDTO {

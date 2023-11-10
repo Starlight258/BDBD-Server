@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
+/**
+ * 사용자가 특정 세차장의 예약 정보를 조회하는 공개 API
+ */
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/open")
@@ -18,14 +20,12 @@ public class OpenReservationController {
 
     private final ReservationService reservationService;
 
-    // 세차장별 예약 내역 조회
-    @GetMapping("/carwashes/{carwash_id}/bays")
+    @GetMapping("/carwashes/{carwash-id}/bays")
     public ResponseEntity<?> findAllByCarwash(
-            @PathVariable("carwash_id") Long carwashId
-    )
-    {
+            @PathVariable("carwash-id") Long carwashId
+    ) {
         ReservationResponse.findAllResponseDTO dto = reservationService.findAllByCarwash(carwashId);
-        return ResponseEntity.ok(ApiUtils.success(dto));
 
+        return ResponseEntity.ok(ApiUtils.success(dto));
     }
 }

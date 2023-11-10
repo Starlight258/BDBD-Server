@@ -37,16 +37,16 @@ public class SecurityConfig {
         public void configure(HttpSecurity builder) throws Exception {
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
             builder.addFilter(new JwtAuthenticationFilter(authenticationManager));
+
             super.configure(builder);
         }
     }
 
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // CSRF 해제
-        http.csrf().disable(); // postman 접근해야 함!! - CSR 할때!!
+        http.csrf().disable();
 
         // iframe 거부
         http.headers().frameOptions().sameOrigin();
@@ -54,7 +54,7 @@ public class SecurityConfig {
         // cors 재설정
         http.cors().configurationSource(configurationSource());
 
-        // jSessionId 사용 거부 (5번을 설정하면 jsessionId가 거부되기 때문에 4번은 사실 필요 없다)
+        // jSessionId 사용 거부
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         // form 로긴 해제 (UsernamePasswordAuthenticationFilter 비활성화)
@@ -91,6 +91,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
     @Bean
     public HttpFirewall allowUrlEncodedSlashHttpFirewall() {
         StrictHttpFirewall firewall = new StrictHttpFirewall();
@@ -110,14 +111,14 @@ public class SecurityConfig {
         // 개발 환경용 CORS 설정
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*"); // GET, POST, PUT, DELETE, HEAD (Javascript 요청 허용)
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedOrigin("http://localhost:5173");
+        configuration.setAllowCredentials(true);
+        configuration.addExposedHeader("Authorization");
 
-        configuration.addAllowedOrigin("http://localhost:5173"); // 개발 환경 주소
-
-        configuration.setAllowCredentials(true); // 클라이언트에서 쿠키 요청 허용
-        configuration.addExposedHeader("Authorization"); // 권고사항
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 
@@ -127,31 +128,31 @@ public class SecurityConfig {
         // 운영 환경용 CORS 설정
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*"); // GET, POST, PUT, DELETE, HEAD (Javascript 요청 허용)
+        configuration.addAllowedMethod("*");
+        // USER, OWNER 배포 주소 (React)
+        configuration.addAllowedOriginPattern("https://k92309e2e8ca6a.user-app.krampoline.com");
+        configuration.addAllowedOriginPattern("https://kd1d9a4cf1cdea.user-app.krampoline.com");
+        configuration.setAllowCredentials(true);
+        configuration.addExposedHeader("Authorization");
 
-        configuration.addAllowedOriginPattern("https://k92309e2e8ca6a.user-app.krampoline.com"); // 모든 IP 주소 허용 (프론트엔드 IP만 허용 react)
-        configuration.addAllowedOriginPattern("https://kd1d9a4cf1cdea.user-app.krampoline.com"); // 모든 IP 주소 허용 (프론트엔드 IP만 허용 react)
-        configuration.setAllowCredentials(true); // 클라이언트에서 쿠키 요청 허용
-        configuration.addExposedHeader("Authorization"); // 권고사항
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
-
-
 
 
     public CorsConfigurationSource configurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*"); // GET, POST, PUT, DELETE, HEAD (Javascript 요청 허용)
-
-        configuration.addAllowedOriginPattern("*"); // 모든 IP 주소 허용 (프론트엔드 IP만 허용 react)
-
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedOriginPattern("*");
         configuration.setAllowCredentials(true); // 클라이언트에서 쿠키 요청 허용
         configuration.addExposedHeader("Authorization"); // 권고사항
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 }

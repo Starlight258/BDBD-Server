@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-
+/**
+ * 사용자 예약 관련 요청을 처리하는 사용자 API
+ * 예약 생성, 수정, 삭제 및 현재 및 최근 예약 정보 조회 기능 제공
+ */
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
@@ -21,60 +24,54 @@ public class UserReservationController {
 
     private final ReservationService reservationService;
 
-    @PostMapping("/carwashes/{bay_id}/payment")
+    @PostMapping("/carwashes/{bay-id}/payment")
     public ResponseEntity<?> findPayAmount(
-            @PathVariable("bay_id") Long bayId,
+            @PathVariable("bay-id") Long bayId,
             @Valid @RequestBody ReservationRequest.ReservationTimeDTO dto,
             Errors errors
-    )
-    {
+    ) {
         ReservationResponse.PayAmountDTO responseDTO = reservationService.findPayAmount(dto, bayId);
 
         return ResponseEntity.ok(ApiUtils.success(responseDTO));
     }
 
-    // 예약 수정하기
-    @PutMapping("/reservations/{reservation_id}")
+    @PutMapping("/reservations/{reservation-id}")
     public ResponseEntity<?> updateReservation(
-            @PathVariable("reservation_id") Long reservationId,
+            @PathVariable("reservation-id") Long reservationId,
             @Valid @RequestBody ReservationRequest.UpdateDTO dto,
             Errors errors,
             @AuthenticationPrincipal CustomUserDetails userDetails
-    )
-    {
+    ) {
         reservationService.update(dto, reservationId, userDetails.getMember());
+
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
-    // 예약 취소하기
-    @DeleteMapping("/reservations/{reservation_id}")
+    @DeleteMapping("/reservations/{reservation-id}")
     public ResponseEntity<?> deleteReservation(
-            @PathVariable("reservation_id") Long reservationId,
+            @PathVariable("reservation-id") Long reservationId,
             @AuthenticationPrincipal CustomUserDetails userDetails
-    )
-    {
+    ) {
         reservationService.delete(reservationId, userDetails.getMember());
+
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
-    // 현재 시간 기준 예약 내역 조회
     @GetMapping("/reservations/current-status")
-    public ResponseEntity<?> fetchCurrentStatusReservation(
+    public ResponseEntity<?> findCurrentStatusReservation(
             @AuthenticationPrincipal CustomUserDetails userDetails
-    )
-    {
-        ReservationResponse.fetchCurrentStatusReservationDTO dto = reservationService.fetchCurrentStatusReservation(userDetails.getMember());
+    ) {
+        ReservationResponse.fetchCurrentStatusReservationDTO dto = reservationService.findCurrentStatusReservation(userDetails.getMember());
+
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
 
-    // 최근 예약 내역 가져오기
     @GetMapping("/reservations/recent")
     public ResponseEntity<?> updateReservation(
             @AuthenticationPrincipal CustomUserDetails userDetails
-    )
-    {
+    ) {
         ReservationResponse.fetchRecentReservationDTO dto = reservationService.fetchRecentReservation(userDetails.getMember());
+
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
-
 }

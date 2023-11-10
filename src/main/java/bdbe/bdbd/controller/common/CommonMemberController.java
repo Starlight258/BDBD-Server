@@ -7,13 +7,16 @@ import bdbe.bdbd._core.utils.ApiUtils;
 import bdbe.bdbd.dto.member.owner.OwnerResponse;
 import bdbe.bdbd.service.member.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
-
+/**
+ * 사용자와 사장님의 요청을 처리하는 공통 API
+ */
 @RestController
 @RequestMapping("/api/common")
 @RequiredArgsConstructor
@@ -30,10 +33,9 @@ public class CommonMemberController {
                     Collections.singletonMap("Token", "Authentication is required to access this resource.")
             );
         }
-        OwnerResponse.UserInfoDTO dto = userService.findUserInfo(userDetails.getMember());
-        return ResponseEntity.ok(ApiUtils.success(dto));
-    }
+        OwnerResponse.UserInfoDTO userInfoDto = userService.findUserInfo(userDetails.getMember());
 
-    // 로그아웃 사용안함 - 프론트에서 JWT 토큰을 브라우저의 localstorage에서 삭제하면 됨.
+        return ResponseEntity.ok(ApiUtils.success(userInfoDto));
+    }
 }
 

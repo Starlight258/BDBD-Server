@@ -37,7 +37,6 @@ public class FileService {
         for (File file : existingFiles) {
             file.changeDeletedFlag(true);
         }
-
         fileJPARepository.saveAll(existingFiles);
 
         List<ReservationResponse.ImageDTO> updatedImages = new ArrayList<>();
@@ -59,6 +58,7 @@ public class FileService {
 
         return updatedImages;
     }
+
     private List<File> saveFileEntities(List<String> imageUrls, Carwash carwash) {
         List<File> files = new ArrayList<>();
         try {
@@ -89,14 +89,14 @@ public class FileService {
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
                         Collections.singletonMap("fileId", "File id " + fileId + " not found.")));
-        if (file.getCarwash().getMember().getId() != member.getId()){
+        if (file.getCarwash().getMember().getId() != member.getId()) {
             throw new ForbiddenError(
                     ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
                     Collections.singletonMap("MemberId", "Member is not the owner of the Carwash related to file.")
             );
 
         }
-        file.changeDeletedFlag(true); //삭제에 대한 플래그
+        file.changeDeletedFlag(true);
         fileJPARepository.save(file);
     }
 

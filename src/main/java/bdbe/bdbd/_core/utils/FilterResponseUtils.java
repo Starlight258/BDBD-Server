@@ -1,17 +1,22 @@
 package bdbe.bdbd._core.utils;
 
 
-import bdbe.bdbd._core.exception.UnAuthorizedError;
 import bdbe.bdbd._core.exception.ForbiddenError;
+import bdbe.bdbd._core.exception.UnAuthorizedError;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * HTTP 응답을 처리하기 위한 유틸리티 메서드
+ * 보안 관련 예외(예: 인증되지 않음, 접근 금지)가 발생했을 때, 적절한 HTTP 응답을 생성하고 클라이언트에 전송하는 역할 수행
+ * HTTP 상태 코드, 에러 메시지 등을 JSON 형식으로 변환하여 응답 본문에 포함함
+ */
 public class FilterResponseUtils {
 
-    private static final ObjectMapper om = new ObjectMapper(); // ObjectMapper는 재사용 가능하므로 클래스 변수로 선언
+    private static final ObjectMapper om = new ObjectMapper();
 
     public static void unAuthorized(HttpServletResponse resp, UnAuthorizedError e) throws IOException {
         String responseBody = om.writeValueAsString(ApiUtils.error(
@@ -19,6 +24,7 @@ public class FilterResponseUtils {
                 String.valueOf(e.getErrorCode().getCode()),
                 e.getErrors()
         ));
+
         sendResponse(resp, responseBody, e.getStatus());
     }
 
@@ -28,6 +34,7 @@ public class FilterResponseUtils {
                 String.valueOf(e.getErrorCode().getCode()),
                 e.getErrors()
         ));
+
         sendResponse(resp, responseBody, e.getStatus());
     }
 

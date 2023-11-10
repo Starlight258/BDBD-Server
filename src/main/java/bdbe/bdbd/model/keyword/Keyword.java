@@ -1,7 +1,6 @@
 package bdbe.bdbd.model.keyword;
 
 import bdbe.bdbd._core.utils.KeywordTypeConverter;
-import bdbe.bdbd.model.Code;
 import bdbe.bdbd.model.Code.KeywordType;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -13,14 +12,14 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name="keyword")
-public class Keyword { //키워드
+@Table(name = "keyword")
+public class Keyword {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private Long id;
 
-    @Column(name="name", length = 50, nullable = false)
+    @Column(name = "name", length = 50, nullable = false)
     private String name;
 
 

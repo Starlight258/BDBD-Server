@@ -1,7 +1,7 @@
 package bdbe.bdbd.repository.keyword.carwashKeyword;
 
-import bdbe.bdbd.model.keyword.carwashKeyword.CarwashKeyword;
 import bdbe.bdbd.model.keyword.Keyword;
+import bdbe.bdbd.model.keyword.carwashKeyword.CarwashKeyword;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

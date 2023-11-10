@@ -17,7 +17,6 @@ public class BayResponse {
         private Long rId;
         private Long userId;
 
-
         public FindAllDTO(Carwash carwash) {
             this.id = carwash.getId();
             this.des = carwash.getDes();
@@ -37,7 +36,5 @@ public class BayResponse {
         public KeywordResponseDTO(String keywordName) {
             this.keywordName = keywordName;
         }
-
     }
-
 }

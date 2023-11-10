@@ -1,11 +1,11 @@
 package bdbe.bdbd.dto.carwash;
 
 import bdbe.bdbd._core.utils.DateUtils;
+import bdbe.bdbd.dto.reservation.ReservationResponse;
 import bdbe.bdbd.model.carwash.Carwash;
+import bdbe.bdbd.model.file.File;
 import bdbe.bdbd.model.location.Location;
 import bdbe.bdbd.model.optime.Optime;
-import bdbe.bdbd.model.file.File;
-import bdbe.bdbd.dto.reservation.ReservationResponse;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -49,7 +49,6 @@ public class CarwashResponse {
     }
 
 
-
     @Getter
     @Setter
     public static class findByIdDTO {
@@ -60,10 +59,10 @@ public class CarwashResponse {
         private int bayCnt;
         private OperatingTimeDTOResponse optime;
         private CarwashResponse.locationDTO locationDTO;
-        private List<Long> keywordId;
+        private List<Long> keywordIdList;
         private String description;
         private String tel;
-        private List<FileDTO> imageFiles;
+        private List<FileDTO> imageFileList;
 
         public findByIdDTO(Carwash carwash, int reviewCnt, int bayCnt, Location location, List<Long> keywordId, Optime weekOptime, Optime endOptime, List<File> files) {
             this.id = carwash.getId();
@@ -73,20 +72,21 @@ public class CarwashResponse {
             this.bayCnt = bayCnt;
             this.optime = toOptimeListDTO(weekOptime, endOptime);
             this.locationDTO = toLocationDTO(location);
-            this.keywordId = keywordId;
+            this.keywordIdList = keywordId;
             this.description = carwash.getDes();
             this.tel = carwash.getTel();
-            this.imageFiles = files.stream().filter(file -> !file.isDeleted()).map(FileDTO::new).collect(Collectors.toList());
+            this.imageFileList = files.stream().filter(file -> !file.isDeleted()).map(FileDTO::new).collect(Collectors.toList());
         }
 
         public OperatingTimeDTOResponse toOptimeListDTO(Optime weekOptime, Optime endOptime) {
             OperatingTimeDTOResponse dto = new OperatingTimeDTOResponse();
-            OperatingTimeDTOResponse.TimeSlotResponse weekSlot= new OperatingTimeDTOResponse.TimeSlotResponse();
+
+            OperatingTimeDTOResponse.TimeSlotResponse weekSlot = new OperatingTimeDTOResponse.TimeSlotResponse();
             weekSlot.setStart(DateUtils.formatTime(weekOptime.getStartTime()));
             weekSlot.setEnd(DateUtils.formatTime(weekOptime.getEndTime()));
             dto.setWeekday(weekSlot);
 
-            OperatingTimeDTOResponse.TimeSlotResponse endSlot= new OperatingTimeDTOResponse.TimeSlotResponse();
+            OperatingTimeDTOResponse.TimeSlotResponse endSlot = new OperatingTimeDTOResponse.TimeSlotResponse();
             endSlot.setStart(DateUtils.formatTime(endOptime.getStartTime()));
             endSlot.setEnd(DateUtils.formatTime(endOptime.getEndTime()));
             dto.setWeekend(endSlot);
@@ -98,9 +98,11 @@ public class CarwashResponse {
         public locationDTO toLocationDTO(Location location) {
             locationDTO locationDTO = new locationDTO();
             locationDTO.setAddress(location.getAddress());
+
             return locationDTO;
         }
     }
+
     @Getter
     @Setter
     public static class OperatingTimeDTOResponse {
@@ -112,7 +114,6 @@ public class CarwashResponse {
         public static class TimeSlotResponse {
             private String start;
             private String end;
-
         }
     }
 
@@ -126,10 +127,11 @@ public class CarwashResponse {
 
     @Getter
     @Setter
-    public static class FileDTO{
+    public static class FileDTO {
         private Long id;
         private String name;
         private String url;
+
         public FileDTO(File file) {
             this.id = file.getId();
             this.name = file.getName();
@@ -146,10 +148,9 @@ public class CarwashResponse {
         private String tel;
         private detailLocationDTO locationDTO;
         private detailsOperatingTimeDTO optime;
-        private List<Long> keywordId;
+        private List<Long> keywordIdList;
         private String description;
-        private List<FileDTO> imageFiles;
-
+        private List<FileDTO> imageFileList;
 
         public carwashDetailsDTO(Carwash carwash, Location location, List<Long> keywordId, Optime weekOptime, Optime endOptime, List<File> files) {
             this.id = carwash.getId();
@@ -158,9 +159,9 @@ public class CarwashResponse {
             this.tel = carwash.getTel();
             this.locationDTO = toLocationDTO(location);
             this.optime = toOptimeListDTO(weekOptime, endOptime);
-            this.keywordId = keywordId;
+            this.keywordIdList = keywordId;
             this.description = carwash.getDes();
-            this.imageFiles = files.stream()
+            this.imageFileList = files.stream()
                     .filter(file -> !file.isDeleted())  // 삭제되지 않은 파일만 포함
                     .map(FileDTO::new)
                     .collect(Collectors.toList());
@@ -168,12 +169,13 @@ public class CarwashResponse {
 
         public detailsOperatingTimeDTO toOptimeListDTO(Optime weekOptime, Optime endOptime) {
             detailsOperatingTimeDTO dto = new detailsOperatingTimeDTO();
-            detailsOperatingTimeDTO.detailsTimeSlot weekSlot= new detailsOperatingTimeDTO.detailsTimeSlot();
+
+            detailsOperatingTimeDTO.detailsTimeSlot weekSlot = new detailsOperatingTimeDTO.detailsTimeSlot();
             weekSlot.setStart(DateUtils.formatTime(weekOptime.getStartTime()));
             weekSlot.setEnd(DateUtils.formatTime(weekOptime.getEndTime()));
             dto.setWeekday(weekSlot);
 
-            detailsOperatingTimeDTO.detailsTimeSlot endSlot= new detailsOperatingTimeDTO.detailsTimeSlot();
+            detailsOperatingTimeDTO.detailsTimeSlot endSlot = new detailsOperatingTimeDTO.detailsTimeSlot();
             endSlot.setStart(DateUtils.formatTime(endOptime.getStartTime()));
             endSlot.setEnd(DateUtils.formatTime(endOptime.getEndTime()));
             dto.setWeekend(endSlot);
@@ -185,9 +187,11 @@ public class CarwashResponse {
         public detailLocationDTO toLocationDTO(Location location) {
             detailLocationDTO detailLocationDTO = new detailLocationDTO();
             detailLocationDTO.setAddress(location.getAddress());
+
             return detailLocationDTO;
         }
     }
+
     @Getter
     @Setter
     public static class detailsOperatingTimeDTO {
@@ -199,7 +203,6 @@ public class CarwashResponse {
         public static class detailsTimeSlot {
             private String start;
             private String end;
-
         }
     }
 
@@ -207,7 +210,6 @@ public class CarwashResponse {
     @Setter
     public static class detailLocationDTO {
         private String address;
-
     }
 
     @Getter
@@ -223,6 +225,7 @@ public class CarwashResponse {
         private List<Long> keywordId;
         private String description;
         private List<ReservationResponse.ImageDTO> images;
+
         public void updateCarwashPart(Carwash carwash) {
             this.id = carwash.getId();
             this.name = carwash.getName();
@@ -246,8 +249,8 @@ public class CarwashResponse {
             endSlot.setStart(DateUtils.formatTime(weekendOptime.getStartTime()));
             endSlot.setEnd(DateUtils.formatTime(weekendOptime.getEndTime()));
             dto.setWeekend(endSlot);
-            this.optime = dto;
 
+            this.optime = dto;
         }
 
         public void updateKeywordPart(List<Long> keywordId) {
@@ -259,9 +262,11 @@ public class CarwashResponse {
             dto.setAddress(location.getAddress());
             dto.setLatitude(location.getLatitude());
             dto.setLongitude(location.getLongitude());
+
             this.locationDTO = dto;
         }
     }
+
     @Getter
     @Setter
     public static class updateOperatingTimeDTO {
@@ -273,7 +278,6 @@ public class CarwashResponse {
         public static class updateTimeSlot {
             private String start;
             private String end;
-
         }
     }
 
@@ -283,7 +287,5 @@ public class CarwashResponse {
         private String address;
         private double latitude;
         private double longitude;
-
     }
-
 }

@@ -1,6 +1,5 @@
 package bdbe.bdbd.model.member;
 
-import bdbe.bdbd.model.Code;
 import bdbe.bdbd.model.Code.MemberRole;
 import lombok.*;
 
@@ -10,7 +9,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @ToString
-@Table(name="member")
+@Table(name = "member")
 public class Member {
 
     @Id
@@ -23,7 +22,7 @@ public class Member {
     private MemberRole role;
 
     @Column(length = 100, nullable = false, unique = true)
-    private String email; // 인증시 필요한 필드
+    private String email;
 
     @Column(length = 45, nullable = false)
     private String username;
@@ -44,9 +43,4 @@ public class Member {
         this.role = role;
         this.tel = tel;
     }
-
-    public void updatePassword(String password) {
-        this.password = password;
-    }
-
 }

@@ -12,32 +12,36 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-
+/**
+ * 세차장의 '베이'(세차 작업 공간) 관련 기능을 처리하는 사장님 API
+ * - 베이 생성: 특정 세차장에 새로운 베이를 생성합니다.
+ * - 베이 상태 업데이트: 특정 베이의 상태(예: 사용 가능, 사용 불가 등)를 업데이트합니다.
+ */
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/owner")
-public class BayRestController {
+public class OwnerBayRestController {
 
     private final BayService bayService;
 
-    @PostMapping("/carwashes/{carwash_id}/bays")
+    @PostMapping("/carwashes/{carwash-id}/bays")
     public ResponseEntity<?> createBay(
-            @PathVariable("carwash_id") Long carwashId,
+            @PathVariable("carwash-id") Long carwashId,
             @Valid @RequestBody BayRequest.SaveDTO saveDTO,
             Errors errors,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         bayService.createBay(saveDTO, carwashId, userDetails.getMember());
+
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
-    @PutMapping("/bays/{bay_id}/status")
+    @PutMapping("/bays/{bay-id}/status")
     public ResponseEntity<?> updateStatus(
-            @PathVariable("bay_id") Long bayId,
+            @PathVariable("bay-id") Long bayId,
             @RequestParam int status,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         bayService.changeStatus(bayId, status, userDetails.getMember());
+
         return ResponseEntity.ok(ApiUtils.success(null));
     }
-
-
 }

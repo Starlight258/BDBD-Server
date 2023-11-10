@@ -85,7 +85,7 @@ public class CarwashService {
     }
 
     @Transactional
-    public void save(CarwashRequest.SaveDTO saveDTO, MultipartFile[] images, Member sessionMember) {
+    public void saveCarwash(CarwashRequest.SaveDTO saveDTO, MultipartFile[] images, Member sessionMember) {
         Location location = saveDTO.toLocationEntity();
         location = locationJPARepository.save(location);
 
@@ -169,7 +169,6 @@ public class CarwashService {
                     Collections.singletonMap("KeywordId", "KeywordId is invalid")
             );
         }
-
         List<CarwashKeyword> carwashKeywords = carwashKeywordJPARepository.findByKeywordIn(selectedKeywords);
 
         Set<Long> carwashIdsWithSelectedKeywords = carwashKeywords.stream()
@@ -197,7 +196,7 @@ public class CarwashService {
         return result;
     }
 
-    public CarwashResponse.findByIdDTO getfindById(Long carwashId) {
+    public CarwashResponse.findByIdDTO findById(Long carwashId) {
 
         Carwash carwash = carwashJPARepository.findById(carwashId)
                 .orElseThrow(() -> new NotFoundError(
@@ -348,6 +347,7 @@ public class CarwashService {
             List<ReservationResponse.ImageDTO> updatedImages = fileService.uploadAndSaveFiles(images, carwash);
             response.setImages(updatedImages);
         }
+
         return response;
     }
 
