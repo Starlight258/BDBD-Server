@@ -14,8 +14,8 @@ import java.util.Map;
 @Getter
 public class NotFoundError extends ApiException {
 
-    public NotFoundError(ErrorCode errorCode, Map<String, String> errors) {
-        super(errorCode, errors, HttpStatus.NOT_FOUND);
+    public NotFoundError(ErrorCode errorCode, Map<String, String> message) {
+        super(errorCode, message, HttpStatus.NOT_FOUND);
     }
 
     public enum ErrorCode implements ApiException.ErrorCode {

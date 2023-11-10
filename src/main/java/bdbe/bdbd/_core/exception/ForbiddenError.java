@@ -14,8 +14,8 @@ import java.util.Map;
 @Getter
 public class ForbiddenError extends ApiException {
 
-    public ForbiddenError(ErrorCode errorCode, Map<String, String> errors) {
-        super(errorCode, errors, HttpStatus.FORBIDDEN);
+    public ForbiddenError(ErrorCode errorCode, Map<String, String> message) {
+        super(errorCode, message, HttpStatus.FORBIDDEN);
     }
 
     public enum ErrorCode implements ApiException.ErrorCode {

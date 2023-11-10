@@ -14,8 +14,8 @@ import java.util.Map;
 @Getter
 public class BadRequestError extends ApiException {
 
-    public BadRequestError(ErrorCode errorCode, Map<String, String> errors) {
-        super(errorCode, errors, HttpStatus.BAD_REQUEST);
+    public BadRequestError(ErrorCode errorCode, Map<String, String> message) {
+        super(errorCode, message, HttpStatus.BAD_REQUEST);
     }
 
     public enum ErrorCode implements ApiException.ErrorCode {
