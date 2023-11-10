@@ -71,17 +71,13 @@ public class OwnerCarwashController {
     @PutMapping("/carwashes/{carwash_id}/details")
     public ResponseEntity<?> updateCarwashDetails(
             @PathVariable("carwash_id") Long carwashId,
-            @RequestPart(value = "updateData", required = false) Optional<CarwashRequest.updateCarwashDetailsDTO> updateDTO,
-
-            @RequestPart(value = "images", required = false) MultipartFile[] images,
+            @Valid @RequestPart("updateData") CarwashRequest.updateCarwashDetailsDTO updatedto,
+            Errors errors,
+            @RequestPart(value = "images", required = true) MultipartFile[] images,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO =
-                carwashService.updateCarwashDetails(
-                        carwashId,
-                        updateDTO.orElse(null), // updateDTO가 Optional이므로 orElse(null)을 사용
-                        images,
-                        userDetails.getMember());
+                carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
 
         return ResponseEntity.ok(ApiUtils.success(updateCarwashDetailsDTO));
     }
