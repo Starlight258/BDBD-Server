@@ -10,16 +10,29 @@ import org.springframework.http.HttpStatus;
  * 서버에 에러가 발생할 때 발생합니다.
  */
 @Getter
-public class InternalServerError extends RuntimeException {
-    public InternalServerError(String message) {
-        super(message);
+public class InternalServerError extends ApiException {
+
+    public InternalServerError(ErrorCode errorCode, Object errors) {
+        super(errorCode, errors, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public ApiUtils.ApiResult<?> body(){
-        return ApiUtils.error(getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    public enum ErrorCode implements ApiException.ErrorCode {
+        INTERNAL_SERVER_ERROR(2000, "Server Error");
 
-    public HttpStatus status(){
-        return HttpStatus.INTERNAL_SERVER_ERROR;
+        private final int code;
+        private final String message;
+
+        ErrorCode(int code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 }

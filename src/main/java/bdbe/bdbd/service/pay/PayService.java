@@ -1,6 +1,9 @@
 package bdbe.bdbd.service.pay;
 
 import bdbe.bdbd._core.exception.BadRequestError;
+import bdbe.bdbd._core.exception.InternalServerError;
+import bdbe.bdbd._core.exception.NotFoundError;
+import bdbe.bdbd._core.exception.UnAuthorizedError;
 import bdbe.bdbd._core.utils.ApiUtils;
 import bdbe.bdbd.model.bay.Bay;
 import bdbe.bdbd.repository.bay.BayJPARepository;
@@ -34,6 +37,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Map;
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
@@ -70,11 +74,17 @@ public class PayService {
     public ResponseEntity<?> requestPaymentReady(PayRequest.PayReadyRequestDTO requestDto, ReservationRequest.SaveDTO saveDTO, Long bayId) {
 
         Bay bay = bayJPARepository.findById(bayId)
-                .orElseThrow(() -> new BadRequestError("bay id:" + bayId + " not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("BayId", "Bay not found"+ bayId)
+                ));
         // 예약 시간 검증
         Long carwashId = bay.getCarwash().getId();
         Carwash carwash = carwashJpaRepository.findById(carwashId)
-                .orElseThrow(() -> new BadRequestError("carwash id:" + carwashId + " not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "Carwash not found"+ carwashId)
+                ));
 
         LocalDateTime startTime = saveDTO.getStartTime();
         LocalDateTime endTime = saveDTO.getEndTime();
@@ -117,7 +127,7 @@ public class PayService {
         String url = "https://kapi.kakao.com/v1/payment/ready";
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String errorMessage;
+        ApiUtils.ApiResult<?> errorResult;
 
         try {
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
@@ -130,18 +140,35 @@ public class PayService {
 
             return ResponseEntity.ok(successResult);
         } catch (HttpClientErrorException e) {
-            errorMessage = getString(objectMapper, e.getResponseBodyAsString());
-            ApiUtils.ApiResult<?> errorResult = ApiUtils.error(errorMessage, HttpStatus.BAD_REQUEST);
+            HttpStatus status = e.getStatusCode();
+            String errorMessage = getString(objectMapper, e.getResponseBodyAsString());
 
-            return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
+            UnAuthorizedError error = new UnAuthorizedError(
+                    UnAuthorizedError.ErrorCode.AUTHENTICATION_FAILED,
+                    errorMessage
+            );
+            errorResult = error.body();
+
+            return new ResponseEntity<>(errorResult, status);
         } catch (HttpServerErrorException e) {
-            errorMessage = getString(objectMapper, e.getResponseBodyAsString());
-            ApiUtils.ApiResult<?> errorResult = ApiUtils.error(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+            HttpStatus status = e.getStatusCode();
+            String errorMessage = getString(objectMapper, e.getResponseBodyAsString());
 
-            return new ResponseEntity<>(errorResult, HttpStatus.INTERNAL_SERVER_ERROR);
+            InternalServerError error = new InternalServerError(
+                    InternalServerError.ErrorCode.INTERNAL_SERVER_ERROR,
+                    errorMessage
+            );
+            errorResult = error.body();
+
+            return new ResponseEntity<>(errorResult, status);
         } catch (RestClientException e) {
-            errorMessage = getString(objectMapper, e.getMessage());
-            ApiUtils.ApiResult<?> errorResult = ApiUtils.error(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+            String errorMessage = getString(objectMapper, e.getMessage());
+
+            InternalServerError error = new InternalServerError(
+                    InternalServerError.ErrorCode.INTERNAL_SERVER_ERROR,
+                    errorMessage
+            );
+            errorResult = error.body();
 
             return new ResponseEntity<>(errorResult, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -171,7 +198,10 @@ public class PayService {
 
         // 예약 시간 검증하기
         Carwash carwash = carwashJpaRepository.findById(carwashId)
-                .orElseThrow(() -> new BadRequestError("carwash id:" + carwashId + " not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "Carwash not found"+ carwashId)
+                ));
         LocalDateTime startTime = saveDTO.getStartTime();
         LocalDateTime endTime = saveDTO.getEndTime();
         Optime optime = reservationService.findOptime(carwash, startTime);
@@ -200,7 +230,10 @@ public class PayService {
             reservation = reservationService.save(saveDTO, carwashId, bayId, member);  // 변수 이름 변경
         } else {
             log.error("Payment approval failed: " + paymentApprovalResponse.getBody());
-            throw new BadRequestError("Payment approval failed");
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("PayResponse", "Payment approval failed")
+            );
         }
         ReservationResponse.findLatestOneResponseDTO responseDto = reservationService.fetchLatestReservation(reservation.getId());
         return ResponseEntity.ok(responseDto);

@@ -1,9 +1,6 @@
 package bdbe.bdbd.service.member;
 
-import bdbe.bdbd._core.exception.BadRequestError;
-import bdbe.bdbd._core.exception.ForbiddenError;
-import bdbe.bdbd._core.exception.InternalServerError;
-import bdbe.bdbd._core.exception.UnAuthorizedError;
+import bdbe.bdbd._core.exception.*;
 import bdbe.bdbd._core.security.JWTProvider;
 import bdbe.bdbd.dto.member.owner.OwnerResponse;
 import bdbe.bdbd.model.bay.Bay;
@@ -52,23 +49,33 @@ public class OwnerService {
         try {
             memberJPARepository.save(requestDTO.toOwnerEntity(encodedPassword));
         } catch (Exception e) {
-            throw new InternalServerError("unknown server error");
+            throw new InternalServerError(
+                    InternalServerError.ErrorCode.INTERNAL_SERVER_ERROR,
+                    "unknown server error");
         }
     }
 
 
     public UserResponse.LoginResponse login(UserRequest.LoginDTO requestDTO) {
         Member memberPS = memberJPARepository.findByEmail(requestDTO.getEmail()).orElseThrow(
-                () -> new BadRequestError("email not found : " + requestDTO.getEmail())
-        );
+                () -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("Email", "email not found : " + requestDTO.getEmail())
+                ));
 
         if (!passwordEncoder.matches(requestDTO.getPassword(), memberPS.getPassword())) {
-            throw new BadRequestError("wrong password");
+            throw new UnAuthorizedError(
+                    UnAuthorizedError.ErrorCode.AUTHENTICATION_FAILED,
+                    Collections.singletonMap("Password", "Wrong password")
+            );
         }
 
         String userRole = String.valueOf(memberPS.getRole());
         if (!"ROLE_OWNER".equals(userRole) && !"ROLE_ADMIN".equals(userRole)) {
-            throw new UnAuthorizedError("can't access this page");
+            throw new UnAuthorizedError(
+                    UnAuthorizedError.ErrorCode.ACCESS_DENIED,
+                    Collections.singletonMap("Role", "Cannot access page by your Role")
+            );
         }
 
         String jwt = JWTProvider.create(memberPS);
@@ -81,7 +88,9 @@ public class OwnerService {
     public void sameCheckEmail(String email) {
         Optional<Member> userOP = memberJPARepository.findByEmail(email);
         if (userOP.isPresent()) {
-            throw new BadRequestError("duplicate email exist : " + email);
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.DUPLICATE_RESOURCE,
+                    Collections.singletonMap("Email", "Duplicate email exist : " + email));
         }
     }
 
@@ -117,18 +126,31 @@ public class OwnerService {
         List<Long> userCarwashIds = carwashJPARepository.findCarwashIdsByMemberId(sessionMember.getId());
 
         if (!userCarwashIds.containsAll(carwashIds)) {
-            throw new ForbiddenError("User is not the owner of the carwash. ");
+            throw new ForbiddenError(
+                    ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
+                    Collections.singletonMap("MemberId", "Member is not the owner of the carwash.")
+            );
         }
     }
 
     private void validateBayOwnership(Long bayId, Member sessionMember) {
         Bay bay = bayJPARepository.findById(bayId)
-                .orElseThrow(() -> new BadRequestError("Bay with id " + bayId + " not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("BayId", "Bay with id " + bayId + " not found")
+                        ));
+
         Long carwashId = bay.getCarwash().getId();
         Carwash carwash = carwashJPARepository.findById(carwashId)
-                .orElseThrow(() -> new BadRequestError("carwash with id" + carwashId + " not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "Carwash not found"+ carwashId )
+                ));
         if (carwash.getMember().getId() != sessionMember.getId()) {
-            throw new ForbiddenError("User is not the owner of the carwash. ");
+            throw new ForbiddenError(
+                    ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
+                    Collections.singletonMap("MemberId", "Member is not the owner of the carwash.")
+            );
         }
     }
 
@@ -137,7 +159,10 @@ public class OwnerService {
         // 해당 유저가 운영하는 세차장의 id인지 확인
         List<Carwash> carwashList = carwashJPARepository.findAllByIdInAndMember_Id(carwashIds, sessionMember.getId());
         if (carwashIds.size() != carwashList.size())
-            throw new ForbiddenError("User is not the owner of the carwash.");
+            throw new ForbiddenError(
+                    ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
+                    Collections.singletonMap("MemberId", "Member is not the owner of the carwash.")
+            );
 
         // 매출 구하기 - 예약 삭제된 것 제외
         Map<String, Long> response = new HashMap<>();
@@ -169,7 +194,10 @@ public class OwnerService {
     public OwnerResponse.CarwashManageDTO fetchCarwashReservationOverview(Long carwashId, Member sessionMember) {
         // 세차장의 주인이 맞는지 확인하며 조회
         Carwash carwash = carwashJPARepository.findByIdAndMember_Id(carwashId, sessionMember.getId())
-                .orElseThrow(() -> new ForbiddenError("User is not the owner of the carwash."));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "Carwash not found"+ carwashId )
+                ));
 
         LocalDate firstDayOfCurrentMonth = LocalDate.now().withDayOfMonth(1);
 
@@ -214,8 +242,10 @@ public class OwnerService {
         List<OwnerResponse.CarwashInfoDTO> carwashInfoDTOList = new ArrayList<>();
         for (Long carwashId : carwashIds) {
             Carwash carwash = carwashJPARepository.findById(carwashId)
-                    .orElseThrow(() -> new EntityNotFoundException("Carwash not found with id: " + carwashId));
-
+                    .orElseThrow(() -> new NotFoundError(
+                            NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                            Collections.singletonMap("CarwashId", "Carwash not found"+ carwashId )
+                    ));
             Long monthlySales = reservationJPARepository.findTotalRevenueByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
 
             Long monthlyReservations = reservationJPARepository.findMonthlyReservationCountByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);

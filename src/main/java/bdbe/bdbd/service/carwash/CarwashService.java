@@ -3,6 +3,7 @@ package bdbe.bdbd.service.carwash;
 
 import bdbe.bdbd._core.exception.BadRequestError;
 import bdbe.bdbd._core.exception.ForbiddenError;
+import bdbe.bdbd._core.exception.NotFoundError;
 import bdbe.bdbd._core.utils.Haversine;
 import bdbe.bdbd.model.Code.DayType;
 import bdbe.bdbd.repository.carwash.CarwashJPARepository;
@@ -268,7 +269,10 @@ public class CarwashService {
         Carwash carwash = carwashJPARepository.findById(carwashId)
                 .orElseThrow(() -> new IllegalArgumentException("carwash not found"));
         if (carwash.getMember().getId() != member.getId())
-            throw new ForbiddenError("User is not the owner of the carwash.");
+            throw new ForbiddenError(
+                    ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
+                    Collections.singletonMap("MemberId", "Member is not the owner of the carwash.")
+            );
 
         Location location = locationJPARepository.findById(carwash.getLocation().getId())
                 .orElseThrow(() -> new NoSuchElementException("location not found"));
@@ -293,9 +297,15 @@ public class CarwashService {
     public CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetails(Long carwashId, CarwashRequest.updateCarwashDetailsDTO updatedto, MultipartFile[] images, Member member) {
         updateCarwashDetailsResponseDTO response = new updateCarwashDetailsResponseDTO();
         Carwash carwash = carwashJPARepository.findById(carwashId)
-                .orElseThrow(() -> new BadRequestError("carwash not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "Carwash not found")
+                ));
         if (carwash.getMember().getId() != member.getId()) {
-            throw new ForbiddenError("User is not the owner of the carwash.");
+            throw new ForbiddenError(
+                    ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
+                    Collections.singletonMap("MemberId", "Member is not the owner of the carwash.")
+            );
         }
         carwash.setName(updatedto.getName());
         carwash.setTel(updatedto.getTel());
@@ -305,7 +315,10 @@ public class CarwashService {
 
         CarwashRequest.updateLocationDTO updateLocationDTO = updatedto.getLocationDTO();
         Location location = locationJPARepository.findById(carwash.getLocation().getId())
-                .orElseThrow(() -> new BadRequestError("location not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("LocationId", "Location not found")
+                ));
 
         location.updateAddress(updateLocationDTO.getAddress(), updateLocationDTO.getPlaceName()
                 , updateLocationDTO.getLatitude(), updateLocationDTO.getLongitude());
@@ -342,7 +355,10 @@ public class CarwashService {
 
         List<Keyword> keywordList = keywordJPARepository.findAllById(keywordsToAdd);
         if (keywordList.size() != keywordsToAdd.size()) {
-            throw new BadRequestError("Some keywords could not be found");
+            throw new NotFoundError(
+                    NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                    Collections.singletonMap("KeywordId", "Keyword not found")
+            );
         }
 
         List<CarwashKeyword> newCarwashKeywords = new ArrayList<>();

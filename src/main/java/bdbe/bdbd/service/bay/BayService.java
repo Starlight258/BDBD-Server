@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+
 @Transactional
 @RequiredArgsConstructor
 @Service
@@ -23,10 +25,16 @@ public class BayService {
 
     public void createBay(BayRequest.SaveDTO dto, Long carwashId, Member member) {
         Carwash carwash = carwashJPARepository.findById(carwashId)
-                .orElseThrow(() -> new NotFoundError("Carwash not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "Carwash not found")
+                ));
 
         if (carwash.getMember().getId() != member.getId()) {
-            throw new ForbiddenError("User is not the owner of the carwash.");
+            throw new ForbiddenError(
+                    ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
+                    Collections.singletonMap("MemberId", "Member is not the owner of the carwash.")
+            );
         }
 
         int bayNum = dto.getBayNum();
@@ -35,7 +43,11 @@ public class BayService {
                 .anyMatch(bay -> bay.getBayNum() == bayNum);
 
         if (exists) {
-            throw new BadRequestError("Bay number " + bayNum + " is already in use.");
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("BayNum", "Bay number " + bayNum + " is already in use.")
+            );
+
         }
 
         Bay bay = dto.toBayEntity(carwash);
@@ -49,7 +61,10 @@ public class BayService {
                 .orElseThrow(() -> new IllegalArgumentException("Bay not found"));
 
         if (bay.getCarwash().getMember().getId() != member.getId()) {
-            throw new ForbiddenError("User is not the owner of the carwash bay.");
+            throw new ForbiddenError(
+                    ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
+                    Collections.singletonMap("MemberId", "Member is not the owner of the carwash.")
+            );
         }
         bay.changeStatus(status);
     }

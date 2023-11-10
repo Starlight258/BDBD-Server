@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -50,10 +51,16 @@ public class OpenCarwashController {
 
     private void validateLatitudeAndLongitude(double latitude, double longitude) {
         if (latitude < -90 || latitude > 90) {
-            throw new BadRequestError("Invalid latitude value. Latitude must be between -90 and 90.");
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("latitude", "Invalid latitude value : Latitude must be between -90 and 90.")
+            );
         }
         if (longitude < -180 || longitude > 180) {
-            throw new BadRequestError("Invalid longitude value. Longitude must be between -180 and 180.");
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("longitude", "Invalid longitude value : Longitude must be between -180 and 180.")
+            );
         }
     }
 
