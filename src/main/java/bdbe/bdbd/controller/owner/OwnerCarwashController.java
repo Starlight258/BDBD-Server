@@ -43,6 +43,17 @@ public class OwnerCarwashController {
                                   @RequestPart(value = "images", required = false) Optional<MultipartFile[]> images,
                                   @AuthenticationPrincipal CustomUserDetails userDetails) {
 
+        if (images.isPresent()){
+            for (MultipartFile file : images.get()) {
+                if (file.isEmpty()) {
+                    throw new BadRequestError(
+                            BadRequestError.ErrorCode.MISSING_PART,
+                            Collections.singletonMap("images", "Empty image file is not allowed")
+                    );
+                }
+            }
+        }
+
         carwashService.save(saveDTOs, images.orElse(null), userDetails.getMember());
         
         return ResponseEntity.ok(ApiUtils.success(null));
