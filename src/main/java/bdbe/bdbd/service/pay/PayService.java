@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,6 +45,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PayService {
 
     @Value("${kakao.admin.key}")
@@ -58,18 +60,13 @@ public class PayService {
     @Value("${payment.fail-url}")
     private String fail_url;
 
+    private final ReservationService reservationService;
 
-    @Autowired
-    private ReservationService reservationService;
+    private final RestTemplate restTemplate;
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final CarwashJPARepository carwashJpaRepository;
 
-    @Autowired
-    private CarwashJPARepository carwashJpaRepository;
-
-    @Autowired
-    private BayJPARepository bayJPARepository;
+    private final BayJPARepository bayJPARepository;
 
     public ResponseEntity<?> requestPaymentReady(PayRequest.PayReadyRequestDTO requestDto, ReservationRequest.SaveDTO saveDTO, Long bayId) {
 

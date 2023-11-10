@@ -1,6 +1,5 @@
 package bdbe.bdbd._core.security;
 
-import bdbe.bdbd.model.Code;
 import bdbe.bdbd.model.Code.MemberRole;
 import bdbe.bdbd.model.member.Member;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
@@ -32,6 +31,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
         if (jwt == null) {
             chain.doFilter(request, response);
+
             return;
         }
 
@@ -55,22 +55,26 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
         } catch (SignatureVerificationException sve) {
             sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid token signature");
+
             return;
         } catch (TokenExpiredException tee) {
             sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "JWT has expired");
+
             return;
         } catch (Exception e) {
             sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+
             return;
         }
+
         chain.doFilter(request, response);
     }
+
     private void sendErrorResponse(HttpServletResponse response, int status, String message) {
         response.setStatus(status);
         try {
             response.getWriter().write(message);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
