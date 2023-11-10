@@ -308,9 +308,11 @@ public class OwnerResponse {
     @Setter
     @ToString
     public static class ReservationCarwashListDTO {
+        private int bayNo;
         private List<ReservationCarwashDTO> reservationList;
 
-        public ReservationCarwashListDTO(List<Reservation> reservationList) {
+        public ReservationCarwashListDTO(List<Reservation> reservationList, int bayNo) {
+            this.bayNo = bayNo;
             this.reservationList = reservationList.stream().map(ReservationCarwashDTO::new).collect(Collectors.toList());
         }
     }
