@@ -63,12 +63,16 @@ public class SecurityConfig {
 
         // 인증 실패 처리
         http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
-            FilterResponseUtils.unAuthorized(response, new UnAuthorizedError("Not authenticated"));
+            FilterResponseUtils.unAuthorized(response, new UnAuthorizedError(
+                    UnAuthorizedError.ErrorCode.AUTHENTICATION_FAILED,
+                    "Not authenticated"));
         });
 
         // 권한 실패 처리
         http.exceptionHandling().accessDeniedHandler((request, response, accessDeniedException) -> {
-            FilterResponseUtils.forbidden(response, new ForbiddenError("Permission denied"));
+            FilterResponseUtils.forbidden(response, new ForbiddenError(
+                    ForbiddenError.ErrorCode.ROLE_BASED_ACCESS_ERROR,
+                    "Access is denied" + accessDeniedException.getMessage()));
         });
 
         // 인증, 권한 필터 설정

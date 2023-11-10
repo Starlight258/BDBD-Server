@@ -13,15 +13,15 @@ public class FilterResponseUtils {
         ObjectMapper om = new ObjectMapper();
         String responseBody = om.writeValueAsString(e.body());
         resp.getWriter().println(responseBody);
-        resp.setStatus(e.status().value());
+        resp.setStatus(e.getStatus().value());
         resp.setContentType("application/json; charset=utf-8");
     }
 
     public static void forbidden(HttpServletResponse resp, ForbiddenError e) throws IOException {
-        resp.setStatus(e.status().value());
-        resp.setContentType("application/json; charset=utf-8");
         ObjectMapper om = new ObjectMapper();
         String responseBody = om.writeValueAsString(e.body());
         resp.getWriter().println(responseBody);
+        resp.setStatus(e.getStatus().value());
+        resp.setContentType("application/json; charset=utf-8");
     }
 }

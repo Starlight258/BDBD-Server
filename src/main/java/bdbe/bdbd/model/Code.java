@@ -1,7 +1,10 @@
 package bdbe.bdbd.model;
 
+import bdbe.bdbd._core.exception.BadRequestError;
 import bdbe.bdbd._core.exception.NotFoundError;
 import lombok.Getter;
+
+import java.util.Collections;
 
 public class Code {
     @Getter
@@ -34,7 +37,10 @@ public class Code {
                     return type;
                 }
             }
-            throw new NotFoundError("Unknown enum value: " + value);
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.WRONG_REQUEST_TRANSMISSION,
+                    Collections.singletonMap("Value", "Unknown enum value"+value)
+            );
         }
     }
 

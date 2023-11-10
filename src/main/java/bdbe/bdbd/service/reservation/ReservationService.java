@@ -32,6 +32,7 @@ import javax.persistence.EntityNotFoundException;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -63,13 +64,22 @@ public class ReservationService {
     public void update(ReservationRequest.UpdateDTO dto, Long reservationId, Member member) {
         Reservation reservation = reservationJPARepository.findById(reservationId)
                 .filter(r -> !r.isDeleted())
-                .orElseThrow(() -> new NotFoundError("Reservation with id " + reservationId + " not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("ReservationId", "Reservation not found")
+                ));
         if (reservation.getMember().getId() != member.getId())
-            throw new ForbiddenError("You do not have permission to modify this reservation.");
+            throw new ForbiddenError(
+                    ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
+                    Collections.singletonMap("MemberId", "Member is not have permission to modify this reservation.")
+            );
         // 세차장 id 확인
         Long carwashId = reservation.getBay().getCarwash().getId();
         Carwash carwash = carwashJPARepository.findById(carwashId)
-                .orElseThrow(() -> new NotFoundError("Carwash with id " + carwashId + " not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "Carwash not found"+ carwashId )
+                ));
         // 예약시간 검증
         Long bayId = reservation.getBay().getId();
         LocalDateTime startTime = dto.getStartTime();
@@ -84,10 +94,16 @@ public class ReservationService {
     public void delete(Long reservationId, Member member) {
         Reservation reservation = reservationJPARepository.findById(reservationId)
                 .filter(r -> !r.isDeleted())
-                .orElseThrow(() -> new NotFoundError("Reservation with id " + reservationId + " not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("ReservationId", "Reservation not found")
+                ));
 
         if (reservation.getMember().getId() != member.getId())
-            throw new ForbiddenError("You do not have permission to delete this reservation.");
+            throw new ForbiddenError(
+                    ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
+                    Collections.singletonMap("MemberId", "Member is not have permission to modify this reservation.")
+            );
 
         reservation.changeDeletedFlag(true);
     }
@@ -95,7 +111,10 @@ public class ReservationService {
 
     private Carwash findCarwashById(Long id) {
         return carwashJPARepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("carwash not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "Carwash not found")
+                ));
     }
 
     public Optime findOptime(Carwash carwash, LocalDateTime startTime) {
@@ -105,7 +124,10 @@ public class ReservationService {
         return optimeList.stream()
                 .filter(o -> o.getDayType() == dayType)
                 .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("carwash optime doesn't exist"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("Optime", "Optime not found")
+                ));
     }
 
     public void validateReservationTime(LocalDateTime startTime, LocalDateTime endTime, Optime optime, Long bayId) {
@@ -114,26 +136,38 @@ public class ReservationService {
         LocalTime requestStartTimePart = startTime.toLocalTime();
         LocalTime requestEndTimePart = endTime.toLocalTime();
 
-        // 예약 시작 및 종료 시간의 분이 0 또는 30인지 확인
+// 예약 시간이 30분 단위인지 확인
         if (startTime.getMinute() % 30 != 0 || endTime.getMinute() % 30 != 0) {
-            throw new BadRequestError("Reservation time must be in 30-minute increments.");
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("time", "Reservation time must be in 30-minute increments.")
+            );
         }
 
-        // 종료 시간이 시작 시간보다 최소 30분 이후인지 확인
+// 종료 시간이 시작 시간보다 최소 30분 이후인지 확인
         long minutesBetween = Duration.between(startTime, endTime).toMinutes();
         if (minutesBetween < 30) {
-            throw new BadRequestError("Reservation duration must be at least 30 minutes.");
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("duration", "Reservation duration must be at least 30 minutes.")
+            );
         }
 
-        // 종료 시간과 시작 시간의 차이가 30분 단위인지 확인
+// 종료 시간과 시작 시간의 차이가 30분 단위인지 확인
         if (minutesBetween % 30 != 0) {
-            throw new BadRequestError("Reservation duration must be a multiple of 30 minutes.");
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("duration", "Reservation duration must be a multiple of 30 minutes.")
+            );
         }
 
-        // 예약이 운영시간을 넘지 않도록 함
+// 예약이 운영시간을 넘지 않도록 함
         if (!((opStartTime.isBefore(requestStartTimePart) || opStartTime.equals(requestStartTimePart)) &&
                 (opEndTime.isAfter(requestEndTimePart) || opEndTime.equals(requestEndTimePart)))) {
-            throw new BadRequestError("Reservation time is out of operating hours");
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("operatingHours", "Reservation time is out of operating hours")
+            );
         }
         // 이미 예약된 시간은 피하도록 함
         List<Reservation> reservationList = reservationJPARepository.findByBay_IdAndIsDeletedFalse(bayId);
@@ -149,21 +183,30 @@ public class ReservationService {
                 });
 
         if (isOverlapping) {
-            throw new BadRequestError("Reservation time overlaps with an existing reservation.");
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.DUPLICATE_RESOURCE,
+                    Collections.singletonMap("Reservation time", "Reservation time overlaps with an existing reservation.")
+                    );
         }
 
     }
 
     private Bay findBayById(Long id) {
         return bayJPARepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("bay not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("BayId", "Bay not found")
+                ));
     }
 
 
     public ReservationResponse.findAllResponseDTO findAllByCarwash(Long carwashId) {
         // 세차장 존재하는지 확인
         carwashJPARepository.findById(carwashId)
-                .orElseThrow(() -> new BadRequestError("carwash not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "Carwash not found"+ carwashId )
+                ));
         //베이에서 해당 세차장 id와 관련된 베이 객체 모두 찾기
         List<Bay> bayList = bayJPARepository.findByCarwashId(carwashId);
         // id만 추출하기
@@ -178,16 +221,28 @@ public class ReservationService {
         // 가장 최근의 예약 찾기
         Reservation reservation = reservationJPARepository.findById(reservationId)
                 .filter(r -> !r.isDeleted())
-                .orElseThrow(() -> new NoSuchElementException("no reservation found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("ReservationId", "Reservation not found")
+                ));
         // 예약과 관련된 베이 찾기
         Bay bay = bayJPARepository.findById(reservation.getBay().getId())
-                .orElseThrow(() -> new NoSuchElementException("no bay found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("BayId", "Bay not found")
+                ));
         // 베이가 속해있는 세차장 찾기
         Carwash carwash = carwashJPARepository.findById(bay.getCarwash().getId())
-                .orElseThrow(() -> new NoSuchElementException("no carwash found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "Carwash not found")
+                ));
         // 세차장이 위치한 위치 찾기
         Location location = locationJPARepository.findById(carwash.getLocation().getId())
-                .orElseThrow(() -> new NoSuchElementException("no location found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("LocationId", "Location not found")
+                ));
 
         File file = fileJPARepository.findFirstByCarwashIdAndIsDeletedFalseOrderByUploadedAtAsc(carwash.getId()).orElse(null);
 
@@ -207,9 +262,15 @@ public class ReservationService {
         // 예약 분류하기
         for (Reservation reservation : reservationList) {
             Bay bay = bayJPARepository.findById(reservation.getBay().getId())
-                    .orElseThrow(() -> new BadRequestError("Bay not found"));
+                    .orElseThrow(() -> new NotFoundError(
+                            NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                            Collections.singletonMap("BayId", "Bay not found")
+                    ));
             Carwash carwash = carwashJPARepository.findById(bay.getCarwash().getId())
-                    .orElseThrow(() -> new BadRequestError("Carwash not found"));
+                    .orElseThrow(() -> new NotFoundError(
+                            NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                            Collections.singletonMap("CarwashId", "Carwash not found")
+                    ));
 
             LocalDateTime startDateTime = reservation.getStartTime();
             LocalDate reservationDate = startDateTime.toLocalDate();
@@ -228,7 +289,10 @@ public class ReservationService {
             } else if (reservationDate.isAfter(today)) {
                 upcoming.add(new ReservationInfoDTO(reservation, bay, carwash));
             } else {
-                throw new BadRequestError("reservation id: " + reservation.getId() + " not found");
+                throw new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("ReservationId", "Reservation not found")
+                );
             }
         }
         return new ReservationResponse.fetchCurrentStatusReservationDTO(current, upcoming, completed);
@@ -241,9 +305,15 @@ public class ReservationService {
         List<ReservationResponse.RecentReservation> recentReservations = new ArrayList<>();
         for (Reservation reservation : reservationList) {
             Bay bay = bayJPARepository.findById(reservation.getBay().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Bay not found"));
+                    .orElseThrow(() -> new NotFoundError(
+                            NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                            Collections.singletonMap("BayId", "Bay not found")
+                    ));
             Carwash carwash = carwashJPARepository.findById(bay.getCarwash().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Carwash not found"));
+                    .orElseThrow(() -> new NotFoundError(
+                            NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                            Collections.singletonMap("CarwashId", "Carwash not found")
+                    ));
             List<File> carwashImages = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwash.getId());
             File carwashImage = carwashImages.stream().findFirst().orElse(null);
 
@@ -255,11 +325,17 @@ public class ReservationService {
 
     public ReservationResponse.PayAmountDTO findPayAmount(ReservationRequest.ReservationTimeDTO dto, Long bayId) {
         Bay bay = bayJPARepository.findById(bayId)
-                .orElseThrow(() -> new BadRequestError("bay not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("BayId", "Bay not found")
+                ));
 
         Long carwashId = bay.getCarwash().getId();
         Carwash carwash = carwashJPARepository.findById(carwashId)
-                .orElseThrow(() -> new BadRequestError("carwash id: " + carwashId + " not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "Carwash not found")
+                ));
         // 예약 시간 검증
         LocalDateTime startTime = dto.getStartTime();
         LocalDateTime endTime = dto.getEndTime();

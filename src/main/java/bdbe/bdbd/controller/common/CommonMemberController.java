@@ -1,6 +1,7 @@
 package bdbe.bdbd.controller.common;
 
 
+import bdbe.bdbd._core.exception.UnAuthorizedError;
 import bdbe.bdbd._core.security.CustomUserDetails;
 import bdbe.bdbd._core.utils.ApiUtils;
 import bdbe.bdbd.dto.member.owner.OwnerResponse;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
 
 @RestController
 @RequestMapping("/api/common")
@@ -22,8 +25,10 @@ public class CommonMemberController {
     public ResponseEntity<?> findUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         if (userDetails == null || userDetails.getMember() == null) {
-            // 인증 정보가 없는 경우 적절한 상태 코드와 메시지를 반환
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiUtils.error("Authentication is required to access this resource.", HttpStatus.UNAUTHORIZED));
+            throw new UnAuthorizedError(
+                    UnAuthorizedError.ErrorCode.ACCESS_DENIED,
+                    Collections.singletonMap("Token", "Authentication is required to access this resource.")
+            );
         }
         OwnerResponse.UserInfoDTO dto = userService.findUserInfo(userDetails.getMember());
         return ResponseEntity.ok(ApiUtils.success(dto));

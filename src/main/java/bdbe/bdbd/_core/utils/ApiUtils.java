@@ -11,20 +11,24 @@ public class ApiUtils {
         return new ApiResult<>(true, response, null);
     }
 
-    public static ApiResult<?> error(String message, HttpStatus status) {
-        return new ApiResult<>(false, null, new ApiError(message, status.value()));
+    public static ApiResult<?> error(String status, String code, String message) {
+        return new ApiResult<>(false, null, new ApiError(status, code, message));
     }
 
-    @Getter @Setter @AllArgsConstructor
+    @Getter
+    @Setter
+    @AllArgsConstructor
     public static class ApiResult<T> {
         private final boolean success;
         private final T response;
         private final ApiError error;
     }
 
-    @Getter @Setter @AllArgsConstructor
+    @Getter
+    @Setter
+    @AllArgsConstructor
     public static class ApiError {
+        private final String status;
+        private final String code;
         private final String message;
-        private final int status;
-    }
-}
+    }}

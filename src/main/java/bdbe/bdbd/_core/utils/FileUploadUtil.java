@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 @Slf4j
 @Service
@@ -88,7 +89,12 @@ public class FileUploadUtil {
 
     public FileResponse.SimpleFileResponseDTO uploadFile(MultipartFile multipartFile, Long carwashId) throws Exception {
         Carwash carwash = carwashRepository.findById(carwashId)
-                .orElseThrow(() -> new NotFoundError("Carwash not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "Carwash not found")
+                ));
+
+
         log.info("start to convert file");
         File file = convertMultiPartToFile(multipartFile);
         log.info("start to generate fileName");
@@ -136,7 +142,10 @@ public class FileUploadUtil {
     public List<FileResponse.SimpleFileResponseDTO> uploadFiles(MultipartFile[] multipartFiles, Long carwashId) throws Exception {
         logger.info("start!");
         Carwash carwash = carwashRepository.findById(carwashId)
-                .orElseThrow(() -> new NotFoundError("Carwash not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "Carwash not found"+ carwashId )
+                ));
         logger.info("file list");
         List<FileResponse.SimpleFileResponseDTO> fileResponseList = new ArrayList<>();
         for (MultipartFile multipartFile : multipartFiles) {
