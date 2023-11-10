@@ -7,16 +7,18 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.amazonaws.services.s3.model.ObjectMetadata;
 
 import java.io.IOException;
 import java.util.*;
 
-
+/**
+ * 파일을 Amazon S3에 업로드하는 기능 제공
+ */
 @Service
 @Slf4j
 public class FileUploadUtil {
@@ -88,6 +90,7 @@ public class FileUploadUtil {
         metadata.setContentDisposition("inline");
 
         s3Client.putObject(bucketName, keyName, file.getInputStream(), metadata);
+
         return s3Client.getUrl(bucketName, keyName).toExternalForm();
     }
 
@@ -104,6 +107,7 @@ public class FileUploadUtil {
                         Collections.singletonMap("File", "File upload failed: " + e.getMessage()));
             }
         }
+
         return uploadResults;
     }
 }

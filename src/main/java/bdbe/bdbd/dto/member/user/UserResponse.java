@@ -5,9 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class UserResponse {
-
-    @Getter @Setter
-    public static class FindById{
+    @Getter
+    @Setter
+    public static class FindById {
         private long id;
         private String username;
         private String email;
@@ -19,7 +19,8 @@ public class UserResponse {
         }
     }
 
-    @Getter @Setter
+    @Getter
+    @Setter
     public static class LoginResponse {
         private String jwtToken;
         private String redirectUrl;
@@ -29,5 +30,4 @@ public class UserResponse {
             this.redirectUrl = redirectUrl;
         }
     }
-
 }

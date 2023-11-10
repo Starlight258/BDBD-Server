@@ -26,6 +26,7 @@ public class JWTProvider {
                 .withClaim("id", member.getId())
                 .withClaim("role", member.getRole().name())
                 .sign(Algorithm.HMAC512(SECRET));
+
         return TOKEN_PREFIX + jwt;
     }
 
@@ -33,6 +34,7 @@ public class JWTProvider {
         jwt = jwt.replace(TOKEN_PREFIX, "");
         DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC512(SECRET))
                 .build().verify(jwt);
+
         return decodedJWT;
     }
 

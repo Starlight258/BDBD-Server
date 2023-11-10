@@ -12,14 +12,14 @@ import java.util.Collections;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name="location")
+@Table(name = "location")
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private Long id;
 
-    @Column(name="address", length = 255, nullable = false)
+    @Column(name = "address", nullable = false)
     private String address;
 
     @Column(nullable = false)
@@ -31,33 +31,13 @@ public class Location {
 
     @Builder
     public Location(Long id, String address, double latitude, double longitude) {
-        validateLatitudeAndLongitude(latitude, longitude);
-
         this.id = id;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    private void validateLatitudeAndLongitude(double latitude, double longitude) {
-        if (latitude < -90 || latitude > 90) {
-            throw new BadRequestError(
-                    BadRequestError.ErrorCode.VALIDATION_FAILED,
-                    Collections.singletonMap("Invalid latitude value", "Latitude must be between -90 and 90.")
-            );
-        }
-        if (longitude < -180 || longitude > 180) {
-            throw new BadRequestError(
-                    BadRequestError.ErrorCode.VALIDATION_FAILED,
-                    Collections.singletonMap("Invalid longitude value", "Longitude must be between -90 and 90.")
-            );
-        }
-    }
-
-
-
     public void updateAddress(String address, double latitude, double longitude) {
-        validateLatitudeAndLongitude(latitude, longitude);
 
         this.address = address;
         this.latitude = latitude;

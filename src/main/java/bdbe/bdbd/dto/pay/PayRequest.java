@@ -65,6 +65,7 @@ public class PayRequest {
         @Valid
         private ReservationRequest.SaveDTO saveDTO;
     }
+
     @Getter
     @Setter
     public static class PaymentApprovalRequestDTO {
@@ -79,5 +80,4 @@ public class PayRequest {
         @NotNull(message = "BayId is required")
         private Long bayId;
     }
-
 }

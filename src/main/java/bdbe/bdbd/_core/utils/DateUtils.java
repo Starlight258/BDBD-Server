@@ -1,18 +1,20 @@
 package bdbe.bdbd._core.utils;
 
 
-import bdbe.bdbd.model.Code;
 import bdbe.bdbd.model.Code.DayType;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+/**
+ * 날짜와 시간 관련 유틸리티 메서드 제공
+ */
 
 public class DateUtils {
 
     public static DayType getDayType(DayOfWeek dayOfWeek) {
-        if(dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
             return DayType.WEEKEND;
         } else {
             return DayType.WEEKDAY;

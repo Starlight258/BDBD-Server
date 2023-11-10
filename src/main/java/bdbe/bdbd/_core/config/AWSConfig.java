@@ -27,15 +27,14 @@ public class AWSConfig {
     @Value("${cloud.aws.region.static}")
     private String region;
 
-    @Value("krmp-proxy.9rum.cc")
+    @Value("${cloud.aws.proxy.host}")
     private String proxyHost;
 
-    @Value("3128")
+    @Value("${cloud.aws.proxy.port}")
     private int proxyPort;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
-
 
     @Bean
     @Profile("!prod")
@@ -55,11 +54,9 @@ public class AWSConfig {
         log.info("Initializing AmazonS3 client for 'prod' profile.");
 
         ClientConfiguration clientConfiguration = new ClientConfiguration();
-        // 연결 타임아웃 시간을 60초로 설정
-        clientConfiguration.setConnectionTimeout(60000);  // 10,000 ms = 10 s
+        clientConfiguration.setConnectionTimeout(60000);  // 60,000 ms = 60 s
+        clientConfiguration.setSocketTimeout(60000);
 
-        // 소켓 타임아웃 시간을 60초로 설정
-        clientConfiguration.setSocketTimeout(60000);  // 10,000 ms = 10 s
         if (!StringUtils.isEmpty(proxyHost) && proxyPort > 0) {
             log.info("Setting up proxy: Host = {}, Port = {}", proxyHost, proxyPort);
             clientConfiguration.setProxyHost(proxyHost);

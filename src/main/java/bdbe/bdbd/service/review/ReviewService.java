@@ -2,23 +2,23 @@ package bdbe.bdbd.service.review;
 
 import bdbe.bdbd._core.exception.BadRequestError;
 import bdbe.bdbd._core.exception.NotFoundError;
-import bdbe.bdbd.model.Code.KeywordType;
-import bdbe.bdbd.model.carwash.Carwash;
-import bdbe.bdbd.repository.carwash.CarwashJPARepository;
 import bdbe.bdbd.dto.review.ReviewRequest;
 import bdbe.bdbd.dto.review.ReviewResponse;
-import bdbe.bdbd.model.keyword.Keyword;
-import bdbe.bdbd.repository.keyword.KeywordJPARepository;
-import bdbe.bdbd.model.review.Review;
-import bdbe.bdbd.repository.review.ReviewJPARepository;
-import bdbe.bdbd.model.reservation.Reservation;
-import bdbe.bdbd.repository.reservation.ReservationJPARepository;
 import bdbe.bdbd.dto.review.ReviewResponse.ReviewByCarwashIdDTO;
 import bdbe.bdbd.dto.review.ReviewResponse.ReviewKeywordResponseDTO;
 import bdbe.bdbd.dto.review.ReviewResponse.ReviewResponseDTO;
+import bdbe.bdbd.model.Code.KeywordType;
+import bdbe.bdbd.model.carwash.Carwash;
+import bdbe.bdbd.model.keyword.Keyword;
 import bdbe.bdbd.model.keyword.reviewKeyword.ReviewKeyword;
-import bdbe.bdbd.repository.keyword.reviewKeyword.ReviewKeywordJPARepository;
 import bdbe.bdbd.model.member.Member;
+import bdbe.bdbd.model.reservation.Reservation;
+import bdbe.bdbd.model.review.Review;
+import bdbe.bdbd.repository.carwash.CarwashJPARepository;
+import bdbe.bdbd.repository.keyword.KeywordJPARepository;
+import bdbe.bdbd.repository.keyword.reviewKeyword.ReviewKeywordJPARepository;
+import bdbe.bdbd.repository.reservation.ReservationJPARepository;
+import bdbe.bdbd.repository.review.ReviewJPARepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,16 +48,16 @@ public class ReviewService {
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
                         Collections.singletonMap("CarwashId", "CarwashId not found")
                 ));
+
         Reservation reservation = reservationJPARepository.findById(dto.getReservationId())
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
                         Collections.singletonMap("ReservationId", "Reservation not found")
                 ));
-        Review review = dto.toReviewEntity(member, carwash, reservation);
-        log.info("review: {}", review);
 
+        Review review = dto.toReviewEntity(member, carwash, reservation);
         Review savedReview = reviewJPARepository.save(review);
-        // 리뷰 키워드 저장
+
         List<Long> keywordIdList = dto.getKeywordIdList();
 
         if (keywordIdList != null && !keywordIdList.isEmpty()) {
@@ -77,37 +77,39 @@ public class ReviewService {
                                 ));
                         ReviewKeyword reviewKeyword = ReviewKeyword.builder().keyword(keyword).review(savedReview).build();
                         ReviewKeyword savedReviewKeyword = reviewKeywordJPARepository.save(reviewKeyword);
+
                         return savedReviewKeyword;
                     })
                     .collect(Collectors.toList());
         }
-
         updateAverageRate(dto, carwash);
 
     }
 
     private void updateAverageRate(ReviewRequest.SaveDTO dto, Carwash carwash) {
-        // 세차장에 평점 저장
         double clientRate = dto.getRate();
         double carwashRate = carwash.getRate();
-        long num = reviewJPARepository.countByCarwash_Id(carwash.getId());
+        long reviewCnt = reviewJPARepository.countByCarwash_Id(carwash.getId());
 
-        //평균 구하기
+
         double totalScore = 0;
         totalScore += clientRate;
-        totalScore += (carwashRate * (num - 1));
-        double rate = totalScore / num;
+        totalScore += (carwashRate * (reviewCnt - 1));
+        double rate = totalScore / reviewCnt;
+
         carwash.updateRate(rate);
     }
 
     public ReviewResponseDTO getReviewsByCarwashId(Long carwashId) {
         ReviewResponse.ReviewOverviewDTO overviewDTO = new ReviewResponse.ReviewOverviewDTO();
         List<Review> reviews = reviewJPARepository.findByCarwash_Id(carwashId);
+
         setOverviewDTO(overviewDTO, carwashId, reviews);
 
         Map<Long, Integer> keywordCountMap = countKeywordFrequency(reviews);
 
         setReviewKeywordCounts(overviewDTO, keywordCountMap);
+
         List<ReviewByCarwashIdDTO> carwashDTOs = createCarwashDTOs(reviews);
 
         return new ReviewResponseDTO(overviewDTO, carwashDTOs);
@@ -119,6 +121,7 @@ public class ReviewService {
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
                         Collections.singletonMap("CarwashId", "CarwashId not found")
                 ));
+
         overviewDTO.setRate(carwash.getRate());
         overviewDTO.setTotalCnt(reviews.size());
     }
@@ -132,6 +135,7 @@ public class ReviewService {
                         keywordCountMap.getOrDefault(reviewKeyword.getKeyword().getId(), 0) + 1);
             }
         }
+
         return keywordCountMap;
     }
 
@@ -139,7 +143,7 @@ public class ReviewService {
         List<ReviewResponse.ReviewKeywordCnt> keywordCounts = keywordCountMap.entrySet().stream()
                 .map(entry -> new ReviewResponse.ReviewKeywordCnt(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
-        overviewDTO.setReviewKeyword(keywordCounts);
+        overviewDTO.setReviewKeywordList(keywordCounts);
     }
 
     private List<ReviewByCarwashIdDTO> createCarwashDTOs(List<Review> reviews) {
@@ -151,11 +155,9 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-
     public ReviewKeywordResponseDTO getReviewKeyword() {
         List<Keyword> keywordList = keywordJPARepository.findByType(KeywordType.REVIEW);
 
         return new ReviewKeywordResponseDTO(keywordList);
     }
-
 }
