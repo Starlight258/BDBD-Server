@@ -1,6 +1,5 @@
 package bdbe.bdbd._core.exception;
 
-import bdbe.bdbd._core.utils.ApiUtils;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -23,7 +22,6 @@ public class BadRequestError extends ApiException {
         WRONG_REQUEST_TRANSMISSION(1002, "Wrong Request Transmission"),
         MISSING_PART(1003, "Missing essential part"),
         DUPLICATE_RESOURCE(1004, "Duplicate Resource");
-
 
         private final int code;
         private final String message;

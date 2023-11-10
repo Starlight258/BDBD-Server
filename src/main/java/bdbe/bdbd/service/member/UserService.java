@@ -28,7 +28,7 @@ public class UserService {
 
     @Transactional
     public void join(UserRequest.JoinDTO requestDTO) {
-        sameCheckEmail(requestDTO.getEmail());
+        checkSameEmail(requestDTO.getEmail());
 
         String encodedPassword = passwordEncoder.encode(requestDTO.getPassword());
 
@@ -42,39 +42,35 @@ public class UserService {
     }
 
     public UserResponse.LoginResponse login(UserRequest.LoginDTO requestDTO) {
-        Member memberPS = memberJPARepository.findByEmail(requestDTO.getEmail()).orElseThrow(
+        Member member = memberJPARepository.findByEmail(requestDTO.getEmail()).orElseThrow(
                 () -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
                         Collections.singletonMap("Email", "email not found : " + requestDTO.getEmail())
                 ));
 
-        if (!passwordEncoder.matches(requestDTO.getPassword(), memberPS.getPassword())) {
+        if (!passwordEncoder.matches(requestDTO.getPassword(), member.getPassword())) {
             throw new UnAuthorizedError(
                     UnAuthorizedError.ErrorCode.AUTHENTICATION_FAILED,
                     Collections.singletonMap("Password", "Wrong password")
             );
         }
 
-        String jwt = JWTProvider.create(memberPS);
+        String jwt = JWTProvider.create(member);
         String redirectUrl = "/user/home";
 
         return new UserResponse.LoginResponse(jwt, redirectUrl);
     }
 
 
-    public void sameCheckEmail(String email) {
-        Optional<Member> userOP = memberJPARepository.findByEmail(email);
-        if (userOP.isPresent()) {
-            throw new UnAuthorizedError(
-                    UnAuthorizedError.ErrorCode.AUTHENTICATION_FAILED,
-                    Collections.singletonMap("Password", "Wrong password")
-            );
+    public void checkSameEmail(String email) {
+        Optional<Member> memberOptional = memberJPARepository.findByEmail(email);
+        if (memberOptional.isPresent()) {
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.DUPLICATE_RESOURCE,
+                    Collections.singletonMap("Email", "Duplicate email exist : " + email));
         }
     }
 
-    /*
-        토큰으로 전달받은 Member 객체의 ID를 이용하여 데이터베이스에서 해당 멤버의 전체 정보를 조회하는 메서드
-     */
     public OwnerResponse.UserInfoDTO findUserInfo(Member member) {
         Member findMember = memberJPARepository.findById(member.getId())
                 .orElseThrow(() -> new NotFoundError(

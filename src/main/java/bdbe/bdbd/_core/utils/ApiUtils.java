@@ -3,11 +3,14 @@ package bdbe.bdbd._core.utils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * API 응답을 생성하는데 사용되는 유틸리티 메서드와 내부 클래스 제공
+ * 성공적인 API 응답과 에러 응답을 생성하는 정적 메서드를 포함
+ */
 public class ApiUtils {
 
     public static <T> ApiResult<T> success(T response) {
@@ -15,6 +18,7 @@ public class ApiUtils {
     }
 
     public static ApiResult<?> error(String status, String code, Map<String, String> message) {
+
         return new ApiResult<>(false, null, new ApiError(status, code, message));
     }
 
@@ -33,13 +37,13 @@ public class ApiUtils {
     public static class ApiError {
         private final String status;
         private final String code;
-        private final Map<String, String> message; // 필드 이름 변경
+        private final Map<String, String> message;
 
         public ApiError(String status, String code, String message) {
             this.status = status;
             this.code = code;
             this.message = new HashMap<>();
-            this.message.put("defaultMessage", message); // 기본 메시지 처리
+            this.message.put("defaultMessage", message);
         }
     }
 }

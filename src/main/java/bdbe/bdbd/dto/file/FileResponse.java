@@ -24,5 +24,4 @@ public class FileResponse {
             this.carwashId = carwashId;
         }
     }
-
 }

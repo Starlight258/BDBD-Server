@@ -1,6 +1,5 @@
 package bdbe.bdbd.model.optime;
 
-import bdbe.bdbd.model.Code;
 import bdbe.bdbd.model.Code.DayType;
 import bdbe.bdbd.model.carwash.Carwash;
 import lombok.AccessLevel;
@@ -14,25 +13,25 @@ import java.time.LocalTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name="optime")
-public class Optime{
+@Table(name = "optime")
+public class Optime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="day_type", length = 10, nullable = false)
+    @Column(name = "day_type", length = 10, nullable = false)
     private DayType dayType; // 요일명 (평일, 주말, 휴일)
 
-    @Column(name="start_time", nullable = false)
+    @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
 
-    @Column(name="end_time", nullable = false)
+    @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="c_id",  nullable = false)
+    @JoinColumn(name = "c_id", nullable = false)
     private Carwash carwash;
 
     @Builder

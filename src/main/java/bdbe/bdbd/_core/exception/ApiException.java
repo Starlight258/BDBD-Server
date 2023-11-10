@@ -30,6 +30,7 @@ public abstract class ApiException extends RuntimeException {
 
     public interface ErrorCode {
         int getCode();
+
         String getMessage();
     }
 }

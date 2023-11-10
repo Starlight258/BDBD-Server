@@ -30,13 +30,13 @@ public class Reservation {
     @Column(nullable = false)
     private int price;
 
-    @Column(name="start_time", nullable = false)
+    @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
-    @Column(name="end_time", nullable = false)
+    @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;
 
-    @Column(name="is_deleted", nullable = false)
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 
     @CreatedDate
@@ -48,11 +48,11 @@ public class Reservation {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="b_id",  nullable = false)
+    @JoinColumn(name = "b_id", nullable = false)
     private Bay bay;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="m_id",  nullable = false)
+    @JoinColumn(name = "m_id", nullable = false)
     private Member member;
 
 

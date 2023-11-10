@@ -1,5 +1,8 @@
 package bdbe.bdbd._core.utils;
 
+/**
+ * 헤버사인 공식을 사용하여 지구 표면 상의 두 점 사이의 대략적인 거리를 계산
+ */
 public class Haversine {
     private static final int EARTH_RADIUS = 6371;
 

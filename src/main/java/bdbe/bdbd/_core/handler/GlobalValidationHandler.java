@@ -13,7 +13,6 @@ import org.springframework.validation.ObjectError;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Aspect
 @Component
@@ -41,6 +40,7 @@ public class GlobalValidationHandler {
                             validationErrors.put(error.getObjectName(), error.getDefaultMessage());
                         }
                     }
+
                     throw new BadRequestError(errorCode, validationErrors);
                 }
             }

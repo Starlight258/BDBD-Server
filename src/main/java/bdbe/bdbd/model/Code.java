@@ -1,7 +1,6 @@
 package bdbe.bdbd.model;
 
 import bdbe.bdbd._core.exception.BadRequestError;
-import bdbe.bdbd._core.exception.NotFoundError;
 import lombok.Getter;
 
 import java.util.Collections;
@@ -34,12 +33,13 @@ public class Code {
         public static KeywordType fromValue(int value) {
             for (KeywordType type : KeywordType.values()) {
                 if (type.getValue() == value) {
+
                     return type;
                 }
             }
             throw new BadRequestError(
                     BadRequestError.ErrorCode.WRONG_REQUEST_TRANSMISSION,
-                    Collections.singletonMap("Value", "Unknown enum value"+value)
+                    Collections.singletonMap("Value", "Unknown enum value" + value)
             );
         }
     }

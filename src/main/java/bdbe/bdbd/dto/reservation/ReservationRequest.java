@@ -20,6 +20,7 @@ public class ReservationRequest {
     public static class ReservationTimeDTO {
         @NotNull(message = "Start time is required")
         private LocalDateTime startTime;
+
         @NotNull(message = "End time is required")
         private LocalDateTime endTime;
     }
@@ -28,7 +29,6 @@ public class ReservationRequest {
     @Setter
     @ToString
     public static class SaveDTO {
-
         @NotNull(message = "Start time is required")
         private LocalDateTime startTime;
 
@@ -36,10 +36,10 @@ public class ReservationRequest {
         private LocalDateTime endTime;
 
         public Reservation toReservationEntity(Carwash carwash, Bay bay, Member member) {
-            int perPrice = carwash.getPrice();
             LocalDateTime startTime = this.startTime;
             LocalDateTime endTime = this.endTime;
 
+            int perPrice = carwash.getPrice();
             int minutesDifference = (int) ChronoUnit.MINUTES.between(startTime, endTime); //시간 차 계산
             int blocksOf30Minutes = minutesDifference / 30; //30분 단위로 계산
             int price = perPrice * blocksOf30Minutes;
@@ -58,12 +58,10 @@ public class ReservationRequest {
     @Setter
     @ToString
     public static class UpdateDTO {
-
         @NotNull(message = "Start time is required")
         private LocalDateTime startTime;
 
         @NotNull(message = "End time is required")
         private LocalDateTime endTime;
-
     }
 }
