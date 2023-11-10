@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,10 +42,11 @@ public class OwnerCarwashController {
     @PostMapping(value = "/carwashes/register")
     public ResponseEntity<?> save(@Valid @RequestPart("carwash") CarwashRequest.SaveDTO saveDTOs,
                                   Errors errors,
-                                  @RequestPart("images") MultipartFile[] images,
+                                  @RequestPart(value = "images", required = false) Optional<MultipartFile[]> images,
                                   @AuthenticationPrincipal CustomUserDetails userDetails) {
-        carwashService.save(saveDTOs, images, userDetails.getMember());
 
+        carwashService.save(saveDTOs, images.orElse(null), userDetails.getMember());
+        
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
