@@ -150,7 +150,7 @@ public class OwnerCarwashController {
         return ResponseEntity.ok(ApiUtils.success(map));
     }
 
-    @GetMapping("/reservation/{bay-id}")
+    @GetMapping("/reservations/{bay-id}")
     public ResponseEntity<?> fetchOwnerReservation(
             @PathVariable("bay-id") Long bayId,
             @AuthenticationPrincipal CustomUserDetails userDetails
