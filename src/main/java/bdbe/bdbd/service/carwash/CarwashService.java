@@ -169,14 +169,12 @@ public class CarwashService {
                     Collections.singletonMap("KeywordId", "KeywordId is invalid")
             );
         }
-        List<CarwashKeyword> carwashKeywords = carwashKeywordJPARepository.findByKeywordIn(selectedKeywords);
-
-        Set<Long> carwashIdsWithSelectedKeywords = carwashKeywords.stream()
-                .map(carwashKeyword -> carwashKeyword.getCarwash().getId())
-                .collect(Collectors.toSet());
-
         List<CarwashRequest.CarwashDistanceDTO> result = carwashesWithin10Km.stream()
-                .filter(carwash -> carwashIdsWithSelectedKeywords.contains(carwash.getId()))
+                .filter(carwash -> {
+                    List<Long> keywordIdsForCarwash = findKeywordIdsByCarwashId(carwash.getId());
+                    return searchRequest.getKeywordIds().stream()
+                            .allMatch(keywordIdsForCarwash::contains);
+                })
                 .map(carwash -> {
                     double distance = Haversine.distance(
                             searchRequest.getLatitude(), searchRequest.getLongitude(),
@@ -194,6 +192,10 @@ public class CarwashService {
                 .collect(Collectors.toList());
 
         return result;
+    }
+
+    public List<Long> findKeywordIdsByCarwashId(Long carwashId) {
+        return carwashKeywordJPARepository.findKeywordIdsByCarwashId(carwashId);
     }
 
     public CarwashResponse.findByIdDTO findById(Long carwashId) {
