@@ -43,10 +43,16 @@ public interface ReservationJPARepository extends JpaRepository<Reservation, Lon
     @Query("SELECT COUNT(r) FROM Reservation r WHERE r.bay.carwash.id = :carwashId AND FUNCTION('YEAR', r.startTime) = FUNCTION('YEAR', :selectedDate) AND FUNCTION('MONTH', r.startTime) = FUNCTION('MONTH', :selectedDate) AND r.isDeleted = false")
     Long findMonthlyReservationCountByCarwashIdAndDate(@Param("carwashId") Long carwashId, @Param("selectedDate") LocalDate selectedDate);
 
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.bay.id = :bayId AND FUNCTION('YEAR', r.startTime) = FUNCTION('YEAR', :selectedDate) AND FUNCTION('MONTH', r.startTime) = FUNCTION('MONTH', :selectedDate) AND r.isDeleted = false")
+    Long findMonthlyReservationCountByBayIdAndDate(@Param("bayId") Long bayId, @Param("selectedDate") LocalDate selectedDate);
+
     @Query("SELECT COALESCE(SUM(r.price), 0) FROM Reservation r WHERE r.bay.carwash.id IN :carwashIds AND FUNCTION('YEAR', r.startTime) = FUNCTION('YEAR', :selectedDate) AND FUNCTION('MONTH', r.startTime) = FUNCTION('MONTH', :selectedDate) AND r.isDeleted = false")
     Long findTotalRevenueByCarwashIdsAndDate(@Param("carwashIds") List<Long> carwashIds, @Param("selectedDate") LocalDate selectedDate);
 
 
     @Query("SELECT COALESCE(SUM(r.price), 0) FROM Reservation r WHERE r.bay.carwash.id = :carwashId AND FUNCTION('YEAR', r.startTime) = FUNCTION('YEAR', :selectedDate) AND FUNCTION('MONTH', r.startTime) = FUNCTION('MONTH', :selectedDate) AND r.isDeleted = false")
     Long findTotalRevenueByCarwashIdAndDate(@Param("carwashId") Long carwashId, @Param("selectedDate") LocalDate selectedDate);
+
+    @Query("SELECT COALESCE(SUM(r.price), 0) FROM Reservation r WHERE r.bay.id = :bayId AND FUNCTION('YEAR', r.startTime) = FUNCTION('YEAR', :selectedDate) AND FUNCTION('MONTH', r.startTime) = FUNCTION('MONTH', :selectedDate) AND r.isDeleted = false")
+    Long findTotalRevenueByBayIdAndDate(@Param("bayId") Long bayId, @Param("selectedDate") LocalDate selectedDate);
 }

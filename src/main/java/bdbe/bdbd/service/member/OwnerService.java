@@ -113,8 +113,15 @@ public class OwnerService {
         validateBayOwnership(bayId, sessionMember);
 
         List<Reservation> reservationList = reservationJPARepository.findByBay_IdWithJoinsAndIsDeletedFalse(bayId);
+        Bay bay = bayJPARepository.findById(bayId)
+                .orElseThrow(() -> {
+                    throw new NotFoundError(
+                            NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                            Collections.singletonMap("Bay", "bay not found")
+                    );
+                });
 
-        return new OwnerResponse.ReservationCarwashListDTO(reservationList);
+        return new OwnerResponse.ReservationCarwashListDTO(reservationList, bay.getBayNum());
     }
 
     private void validateCarwashOwnership(List<Long> carwashIds, Member sessionMember) {

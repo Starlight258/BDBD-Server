@@ -3,6 +3,7 @@ package bdbe.bdbd.controller.owner;
 import bdbe.bdbd._core.security.CustomUserDetails;
 import bdbe.bdbd._core.utils.ApiUtils;
 import bdbe.bdbd.dto.bay.BayRequest;
+import bdbe.bdbd.dto.bay.BayResponse;
 import bdbe.bdbd.service.bay.BayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,12 +37,20 @@ public class OwnerBayRestController {
     }
 
     @PutMapping("/bays/{bay-id}/status")
-    public ResponseEntity<?> updateStatus(
+    public ResponseEntity<?> findBayRevenue(
             @PathVariable("bay-id") Long bayId,
             @RequestParam int status,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         bayService.changeStatus(bayId, status, userDetails.getMember());
 
         return ResponseEntity.ok(ApiUtils.success(null));
+    }
+
+    @GetMapping("/bays/{bay-id}/revenue")
+    public ResponseEntity<?> findBayRevenue(
+            @PathVariable("bay-id") Long bayId) {
+        BayResponse.BayRevenueResponseDTO dto = bayService.findBayRevenue(bayId);
+
+        return ResponseEntity.ok(ApiUtils.success(dto));
     }
 }
