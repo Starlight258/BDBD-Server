@@ -239,29 +239,29 @@ public class CarwashRequest {
     @ToString
     public static class updateCarwashDetailsDTO {
 
-        @NotBlank(message = "Name is required.")
-        @Size(min = 2, max = 20, message = "Place name must be between 2 and 20 characters.")
+//        @NotBlank(message = "Name is required.")
+//        @Size(min = 2, max = 20, message = "Place name must be between 2 and 20 characters.")
         private String name;
 
-        @NotNull(message = "Price is required.")
+//        @NotNull(message = "Price is required.")
         private Integer price;
 
-        @NotBlank(message = "Tel is required.")
-        @Pattern(regexp = "^010\\d{8}$", message = "The telephone number format is invalid.")
+//        @NotBlank(message = "Tel is required.")
+//        @Pattern(regexp = "^010\\d{8}$", message = "The telephone number format is invalid.")
         private String tel;
 
-        @Valid
-        @NotNull(message = "Location is required")
+//        @Valid
+//        @NotNull(message = "Location is required")
         private updateLocationDTO locationDTO;
 
-        @Valid
-        @NotNull(message = "Optime is required")
+//        @Valid
+//        @NotNull(message = "Optime is required")
         private updateOperatingTimeDTO optime;
 
         private List<Long> keywordId;
 
-        @NotBlank( message = "Description is required.")
-        @Size(max = 200, message = "Description cannot be longer than 200 characters." )
+//        @NotBlank( message = "Description is required.")
+//        @Size(max = 200, message = "Description cannot be longer than 200 characters." )
         private String description;
 
     }
