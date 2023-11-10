@@ -100,8 +100,10 @@ public class PayService {
         int totalAmount = price;  //세금 포함 가격
 
         if (totalAmount != requestDto.getTotal_amount())
-            throw new BadRequestError("Invalid pay amount");
-
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.WRONG_REQUEST_TRANSMISSION,
+                    Collections.singletonMap("pay", "Invalid pay amount")
+            );
         PayRequest.PayReadyRequestDTO dto = new PayRequest.PayReadyRequestDTO();
         dto.setTotal_amount(totalAmount);
 

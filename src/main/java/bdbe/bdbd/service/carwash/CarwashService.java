@@ -93,12 +93,17 @@ public class CarwashService {
         List<Long> keywordIdList = saveDTO.getKeywordId();
         if (keywordIdList != null && !keywordIdList.isEmpty()) {
             if (keywordIdList.stream().anyMatch(id -> id < 8 || id > 14)) {
-                throw new BadRequestError("Carwash Keyword ID must be between 8 and 14");
+                throw new BadRequestError(
+                        BadRequestError.ErrorCode.VALIDATION_FAILED,
+                        Collections.singletonMap("message", "Carwash Keyword ID must be between 8 and 14")
+                );
             }
             List<CarwashKeyword> carwashKeywordList = new ArrayList<>();
             for (Long keywordId : keywordIdList) {
                 Keyword keyword = keywordJPARepository.findById(keywordId)
-                        .orElseThrow(() -> new BadRequestError("Keyword not found"));
+                        .orElseThrow(() -> new NotFoundError(
+                                NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                                Collections.singletonMap("message", "Carwash Keyword ID must be between 8 and 14")));
 
                 CarwashKeyword carwashKeyword = CarwashKeyword.builder().carwash(carwash).keyword(keyword).build();
                 carwashKeywordList.add(carwashKeyword);
