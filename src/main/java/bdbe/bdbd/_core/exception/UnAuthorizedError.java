@@ -6,6 +6,8 @@ import bdbe.bdbd._core.utils.ApiUtils;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+import java.util.Map;
+
 /**
  * HTTP 상태 코드 401 (Unauthorized) : 권한 없음
  * 인증이 되지 않았을때 발생합니다.
@@ -13,7 +15,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class UnAuthorizedError extends ApiException {
 
-    public UnAuthorizedError(ErrorCode errorCode, Object errors) {
+    public UnAuthorizedError(ErrorCode errorCode, Map<String, String> errors) {
         super(errorCode, errors, HttpStatus.UNAUTHORIZED);
     }
 

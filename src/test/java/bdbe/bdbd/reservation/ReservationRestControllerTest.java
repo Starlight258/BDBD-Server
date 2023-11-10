@@ -1,5 +1,6 @@
 package bdbe.bdbd.reservation;
 
+import bdbe.bdbd._core.exception.NotFoundError;
 import bdbe.bdbd.model.bay.Bay;
 import bdbe.bdbd.repository.bay.BayJPARepository;
 import bdbe.bdbd.model.carwash.Carwash;
@@ -28,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -94,7 +96,10 @@ public class ReservationRestControllerTest {
         String responseBody = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         System.out.println("응답 Body : " + responseBody);
         reservation = reservationJPARepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("reservation id : " + reservationId + "not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("ReservationId", "Reservation not found"+reservationId)
+                ));
         resultActions.andExpect(jsonPath("$.success").value("true"));
 
 
@@ -139,7 +144,11 @@ public class ReservationRestControllerTest {
         Bay bay = bayJPARepository.findByCarwashId(carwash.getId()).get(0);
         System.out.println("bayId : " + bay.getId());
 
-        Member member = memberJPARepository.findByEmail("user@nate.com").orElseThrow(()->new IllegalArgumentException("user not found"));
+        Member member = memberJPARepository.findByEmail("user@nate.com")
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("UserId", "UserId not found")
+                ));
         // 예약 1
         Reservation reservation = Reservation.builder()
                 .price(5000)
@@ -178,7 +187,10 @@ public class ReservationRestControllerTest {
     public void fetchLatestReservation_test() throws Exception {
         //given
         Member member = memberJPARepository.findByEmail("user@nate.com")
-                .orElseThrow(()-> new IllegalArgumentException("user not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("UserId", "UserId not found")
+                ));
         Bay savedBay = bayJPARepository.findFirstBy();
 
         // 예약 1

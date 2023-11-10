@@ -9,7 +9,10 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Aspect
@@ -28,12 +31,17 @@ public class GlobalValidationHandler {
 
                 if (errors.hasErrors()) {
                     BadRequestError.ErrorCode errorCode = BadRequestError.ErrorCode.VALIDATION_FAILED;
-                    String detailedErrorMessage = errors.getAllErrors()
-                            .stream()
-                            .map(error -> String.format("%s:%s", error.getDefaultMessage(), ((FieldError) error).getField()))
-                            .collect(Collectors.joining(", "));
+                    Map<String, String> validationErrors = new HashMap<>();
 
-                    throw new BadRequestError(errorCode, detailedErrorMessage);
+                    for (ObjectError error : errors.getAllErrors()) {
+                        if (error instanceof FieldError) {
+                            FieldError fieldError = (FieldError) error;
+                            validationErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
+                        } else {
+                            validationErrors.put(error.getObjectName(), error.getDefaultMessage());
+                        }
+                    }
+                    throw new BadRequestError(errorCode, validationErrors);
                 }
             }
         }

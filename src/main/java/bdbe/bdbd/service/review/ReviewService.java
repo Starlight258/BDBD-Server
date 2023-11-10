@@ -1,5 +1,7 @@
 package bdbe.bdbd.service.review;
 
+import bdbe.bdbd._core.exception.BadRequestError;
+import bdbe.bdbd._core.exception.NotFoundError;
 import bdbe.bdbd.model.Code.KeywordType;
 import bdbe.bdbd.model.carwash.Carwash;
 import bdbe.bdbd.repository.carwash.CarwashJPARepository;
@@ -22,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,9 +44,15 @@ public class ReviewService {
     @Transactional
     public void createReview(ReviewRequest.SaveDTO dto, Member member) {
         Carwash carwash = carwashJPARepository.findById(dto.getCarwashId())
-                .orElseThrow(() -> new IllegalArgumentException("Carwash not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "CarwashId not found")
+                ));
         Reservation reservation = reservationJPARepository.findById(dto.getReservationId())
-                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("ReservationId", "Reservation not found")
+                ));
         Review review = dto.toReviewEntity(member, carwash, reservation);
         log.info("review: {}", review);
 
@@ -53,13 +62,19 @@ public class ReviewService {
 
         if (keywordIdList != null && !keywordIdList.isEmpty()) {
             if (keywordIdList.stream().anyMatch(id -> id < 1 || id > 7)) {
-                throw new IllegalArgumentException("Review Keyword ID must be between 1 and 7");
+                throw new BadRequestError(
+                        BadRequestError.ErrorCode.VALIDATION_FAILED,
+                        Collections.singletonMap("KeywordId", "Review Keyword ID must be between 1 and 7")
+                );
             }
 
             keywordIdList.stream()
                     .map(id -> {
                         Keyword keyword = keywordJPARepository.findById(id)
-                                .orElseThrow(() -> new IllegalArgumentException("keyword not found"));
+                                .orElseThrow(() -> new NotFoundError(
+                                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                                        Collections.singletonMap("KeywordId", "KeywordId not found")
+                                ));
                         ReviewKeyword reviewKeyword = ReviewKeyword.builder().keyword(keyword).review(savedReview).build();
                         ReviewKeyword savedReviewKeyword = reviewKeywordJPARepository.save(reviewKeyword);
                         return savedReviewKeyword;
@@ -100,7 +115,10 @@ public class ReviewService {
 
     private void setOverviewDTO(ReviewResponse.ReviewOverviewDTO overviewDTO, Long carwashId, List<Review> reviews) {
         Carwash carwash = carwashJPARepository.findById(carwashId)
-                .orElseThrow(() -> new IllegalArgumentException("carwash not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "CarwashId not found")
+                ));
         overviewDTO.setRate(carwash.getRate());
         overviewDTO.setTotalCnt(reviews.size());
     }
