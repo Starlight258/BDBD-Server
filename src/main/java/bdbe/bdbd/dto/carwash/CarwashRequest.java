@@ -46,7 +46,6 @@ public class CarwashRequest {
         private String description;
 
         @NotBlank(message = "Tel is required.")
-        @Pattern(regexp = "^010\\d{8}$", message = "The telephone number format is invalid.")
         private String tel;
 
 
@@ -242,7 +241,6 @@ public class CarwashRequest {
         private Integer price;
 
         @NotBlank(message = "Tel is required.")
-        @Pattern(regexp = "^010\\d{8}$", message = "The telephone number format is invalid.")
         private String tel;
 
         @Valid
