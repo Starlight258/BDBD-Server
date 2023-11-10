@@ -15,5 +15,4 @@ public interface BayJPARepository extends JpaRepository<Bay, Long> {
 
     List<Bay> findByCarwashId(Long carwashId);
 
-
 }

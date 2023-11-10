@@ -26,11 +26,11 @@ public class Review {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="m_id",  nullable = false)
+    @JoinColumn(name = "m_id", nullable = false)
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="c_id",  nullable = false)
+    @JoinColumn(name = "c_id", nullable = false)
     private Carwash carwash;
 
     @OneToOne

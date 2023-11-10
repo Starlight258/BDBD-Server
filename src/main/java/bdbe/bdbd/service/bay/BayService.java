@@ -4,12 +4,12 @@ package bdbe.bdbd.service.bay;
 import bdbe.bdbd._core.exception.BadRequestError;
 import bdbe.bdbd._core.exception.ForbiddenError;
 import bdbe.bdbd._core.exception.NotFoundError;
-import bdbe.bdbd.model.carwash.Carwash;
-import bdbe.bdbd.repository.carwash.CarwashJPARepository;
 import bdbe.bdbd.dto.bay.BayRequest;
 import bdbe.bdbd.model.bay.Bay;
+import bdbe.bdbd.model.carwash.Carwash;
 import bdbe.bdbd.model.member.Member;
 import bdbe.bdbd.repository.bay.BayJPARepository;
+import bdbe.bdbd.repository.carwash.CarwashJPARepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,11 +47,9 @@ public class BayService {
                     BadRequestError.ErrorCode.VALIDATION_FAILED,
                     Collections.singletonMap("BayNum", "Bay number " + bayNum + " is already in use.")
             );
-
         }
 
         Bay bay = dto.toBayEntity(carwash);
-
         bayJPARepository.save(bay);
     }
 

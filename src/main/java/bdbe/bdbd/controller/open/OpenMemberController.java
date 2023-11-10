@@ -16,18 +16,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-
+/**
+ * USER와 OWNER의 가입 및 로그인 기능을 포함하는 공개 API
+ */
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/open")
 public class OpenMemberController {
 
     private final UserService userService;
+
     private final OwnerService ownerService;
 
     @PostMapping("/member/check")
-    public ResponseEntity<?> check(@RequestBody @Valid UserRequest.EmailCheckDTO emailCheckDTO, Errors errors) {
-        userService.sameCheckEmail(emailCheckDTO.getEmail());
+    public ResponseEntity<?> checkMember(@RequestBody @Valid UserRequest.EmailCheckDTO emailCheckDTO, Errors errors) {
+        userService.checkSameEmail(emailCheckDTO.getEmail());
 
         return ResponseEntity.ok(ApiUtils.success(null));
     }
@@ -48,14 +51,14 @@ public class OpenMemberController {
 
     @PostMapping("/join/owner")
     public ResponseEntity<?> joinOwner(@RequestBody @Valid UserRequest.JoinDTO requestDTO, Errors errors) {
-        ownerService.join(requestDTO);
+        ownerService.joinOwner(requestDTO);
 
         return ResponseEntity.ok().body(ApiUtils.success(null));
     }
 
     @PostMapping("/login/owner")
     public ResponseEntity<?> loginOwner(@RequestBody @Valid UserRequest.LoginDTO requestDTO, Errors errors) {
-        UserResponse.LoginResponse response = ownerService.login(requestDTO);
+        UserResponse.LoginResponse response = ownerService.loginOwner(requestDTO);
 
         return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(null));
     }

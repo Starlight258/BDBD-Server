@@ -5,24 +5,22 @@ import bdbe.bdbd._core.exception.InternalServerError;
 import bdbe.bdbd._core.exception.NotFoundError;
 import bdbe.bdbd._core.exception.UnAuthorizedError;
 import bdbe.bdbd._core.utils.ApiUtils;
-import bdbe.bdbd.model.bay.Bay;
-import bdbe.bdbd.repository.bay.BayJPARepository;
-import bdbe.bdbd.model.carwash.Carwash;
-import bdbe.bdbd.repository.carwash.CarwashJPARepository;
 import bdbe.bdbd.dto.pay.PayRequest;
+import bdbe.bdbd.dto.reservation.ReservationRequest;
+import bdbe.bdbd.dto.reservation.ReservationResponse;
+import bdbe.bdbd.model.bay.Bay;
+import bdbe.bdbd.model.carwash.Carwash;
 import bdbe.bdbd.model.member.Member;
 import bdbe.bdbd.model.optime.Optime;
 import bdbe.bdbd.model.reservation.Reservation;
-import bdbe.bdbd.dto.reservation.ReservationRequest;
-import bdbe.bdbd.dto.reservation.ReservationResponse;
+import bdbe.bdbd.repository.bay.BayJPARepository;
+import bdbe.bdbd.repository.carwash.CarwashJPARepository;
 import bdbe.bdbd.service.reservation.ReservationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -35,13 +33,10 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Map;
-
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Slf4j
 @Service
@@ -73,37 +68,39 @@ public class PayService {
         Bay bay = bayJPARepository.findById(bayId)
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                        Collections.singletonMap("BayId", "Bay not found"+ bayId)
+                        Collections.singletonMap("BayId", "Bay not found" + bayId)
                 ));
-        // 예약 시간 검증
+
         Long carwashId = bay.getCarwash().getId();
         Carwash carwash = carwashJpaRepository.findById(carwashId)
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                        Collections.singletonMap("CarwashId", "Carwash not found"+ carwashId)
+                        Collections.singletonMap("CarwashId", "Carwash not found" + carwashId)
                 ));
 
         LocalDateTime startTime = saveDTO.getStartTime();
         LocalDateTime endTime = saveDTO.getEndTime();
         Optime optime = reservationService.findOptime(carwash, startTime);
+
         reservationService.validateReservationTime(startTime, endTime, optime, bayId);
 
-        // 금액 계산하기
         int perPrice = carwash.getPrice();
         int minutesDifference = (int) ChronoUnit.MINUTES.between(startTime, endTime);
         int blocksOf30Minutes = minutesDifference / 30;
         int price = perPrice * blocksOf30Minutes;
 
-        int totalAmount = price;  //세금 포함 가격
+        int totalAmount = price;
 
         if (totalAmount != requestDto.getTotal_amount())
             throw new BadRequestError(
                     BadRequestError.ErrorCode.WRONG_REQUEST_TRANSMISSION,
                     Collections.singletonMap("pay", "Invalid pay amount")
             );
+
         PayRequest.PayReadyRequestDTO dto = new PayRequest.PayReadyRequestDTO();
         dto.setTotal_amount(totalAmount);
 
+        // API 요청 보내기
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set("Authorization", "KakaoAK " + adminKey);
@@ -126,14 +123,14 @@ public class PayService {
         String url = "https://kapi.kakao.com/v1/payment/ready";
 
         ObjectMapper objectMapper = new ObjectMapper();
-        ApiUtils.ApiResult<?> errorResult;
 
         try {
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                     url,
                     HttpMethod.POST,
                     new HttpEntity<>(parameters, headers),
-                    new ParameterizedTypeReference<Map<String, Object>>() {}
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    }
             );
             ApiUtils.ApiResult<Map<String, Object>> successResult = ApiUtils.success(response.getBody());
 
@@ -187,15 +184,15 @@ public class PayService {
             Member member,
             ReservationRequest.SaveDTO saveDTO) {
 
-        // 예약 시간 검증하기
         Carwash carwash = carwashJpaRepository.findById(carwashId)
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                        Collections.singletonMap("CarwashId", "Carwash not found"+ carwashId)
+                        Collections.singletonMap("CarwashId", "Carwash not found" + carwashId)
                 ));
         LocalDateTime startTime = saveDTO.getStartTime();
         LocalDateTime endTime = saveDTO.getEndTime();
         Optime optime = reservationService.findOptime(carwash, startTime);
+
         reservationService.validateReservationTime(startTime, endTime, optime, bayId);
 
         // API 요청 보내기
@@ -227,8 +224,8 @@ public class PayService {
             );
         }
         ReservationResponse.findLatestOneResponseDTO responseDto = reservationService.fetchLatestReservation(reservation.getId());
-        return ResponseEntity.ok(responseDto);
 
+        return ResponseEntity.ok(responseDto);
     }
 
 }

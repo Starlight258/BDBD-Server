@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+/**
+ * 세차장 관련 기능을 제공하는 공개 API
+ */
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -30,6 +32,20 @@ public class OpenCarwashController {
         return ResponseEntity.ok(apiResult);
     }
 
+    private void validateLatitudeAndLongitude(double latitude, double longitude) {
+        if (latitude < -90 || latitude > 90) {
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("latitude", "Invalid latitude value : Latitude must be between -90 and 90.")
+            );
+        }
+        if (longitude < -180 || longitude > 180) {
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("longitude", "Invalid longitude value : Longitude must be between -180 and 180.")
+            );
+        }
+    }
 
     @GetMapping("/carwashes/search")
     public ResponseEntity<?> findCarwashesByKeywords(@RequestParam List<Long> keywordIds,
@@ -45,21 +61,6 @@ public class OpenCarwashController {
         List<CarwashRequest.CarwashDistanceDTO> carwashes = carwashService.findCarwashesByKeywords(searchRequest);
 
         return ResponseEntity.ok(ApiUtils.success(carwashes));
-    }
-
-    private void validateLatitudeAndLongitude(double latitude, double longitude) {
-        if (latitude < -90 || latitude > 90) {
-            throw new BadRequestError(
-                    BadRequestError.ErrorCode.VALIDATION_FAILED,
-                    Collections.singletonMap("latitude", "Invalid latitude value : Latitude must be between -90 and 90.")
-            );
-        }
-        if (longitude < -180 || longitude > 180) {
-            throw new BadRequestError(
-                    BadRequestError.ErrorCode.VALIDATION_FAILED,
-                    Collections.singletonMap("longitude", "Invalid longitude value : Longitude must be between -180 and 180.")
-            );
-        }
     }
 
     @GetMapping("/carwashes/nearby")
@@ -92,13 +93,12 @@ public class OpenCarwashController {
         return ResponseEntity.ok(ApiUtils.success(carwashList));
     }
 
-    @GetMapping("/carwashes/{carwash_id}/info")
-    public ResponseEntity<?> findById(@PathVariable("carwash_id") Long carwashId) {
-        CarwashResponse.findByIdDTO foundCarwashDto = carwashService.getfindById(carwashId);
+    @GetMapping("/carwashes/{carwash-id}/info")
+    public ResponseEntity<?> findById(@PathVariable("carwash-id") Long carwashId) {
+        CarwashResponse.findByIdDTO foundCarwashDto = carwashService.findById(carwashId);
 
         return ResponseEntity.ok(ApiUtils.success(foundCarwashDto));
     }
-
 }
 
 

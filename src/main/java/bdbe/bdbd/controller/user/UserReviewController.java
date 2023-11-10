@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.validation.Valid;
-
+/**
+ * 사용자 리뷰 관련 요청을 처리하는 사용자 API
+ *  - 리뷰 작성 기능
+ */
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/user")
@@ -22,12 +24,10 @@ public class UserReviewController {
 
     private final ReviewService reviewService;
 
-    // 리뷰 등록 기능
     @PostMapping("/reviews")
-    public ResponseEntity<?> createReview (@RequestBody @Valid ReviewRequest.SaveDTO saveDTO, Errors errors, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<?> createReview(@RequestBody @Valid ReviewRequest.SaveDTO saveDTO, Errors errors, @AuthenticationPrincipal CustomUserDetails userDetails) {
         reviewService.createReview(saveDTO, userDetails.getMember());
 
         return ResponseEntity.ok(ApiUtils.success(null));
     }
-
 }

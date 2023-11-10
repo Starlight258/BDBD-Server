@@ -1,13 +1,16 @@
 package bdbe.bdbd.model.file;
 
 import bdbe.bdbd.model.carwash.Carwash;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class File {
     @Id
@@ -21,7 +24,7 @@ public class File {
 
     private LocalDateTime uploadedAt;
 
-    @Column(name="is_deleted", nullable = false)
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 
 
@@ -31,19 +34,15 @@ public class File {
 
 
     @Builder
-    public File(String name, String url, LocalDateTime uploadedAt, Carwash carwash) {
+    public File(Long id, String name, String url, LocalDateTime uploadedAt, Carwash carwash) {
+        this.id = id;
         this.name = name;
         this.url = url;
         this.uploadedAt = uploadedAt;
         this.carwash = carwash;
-
-    }
-
-    public File() {
     }
 
     public void changeDeletedFlag(boolean flag) {
         this.isDeleted = flag;
     }
-
 }

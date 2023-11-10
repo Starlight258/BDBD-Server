@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+/**
+ * 리뷰 조회 기능을 제공하는 공개 API
+ */
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/open")
@@ -17,20 +19,17 @@ public class OpenReviewController {
 
     private final ReviewService reviewService;
 
-    // 리뷰 조회 기능
-    @GetMapping("/carwashes/{carwashId}/reviews")
-    public ResponseEntity<?> getReviewsByCarwashId(@PathVariable("carwashId") Long carwashId) {
+    @GetMapping("/carwashes/{carwash-id}/reviews")
+    public ResponseEntity<?> getReviewsByCarwashId(@PathVariable("carwash-id") Long carwashId) {
         ReviewResponse.ReviewResponseDTO dto = reviewService.getReviewsByCarwashId(carwashId);
 
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
 
-    // 리뷰 키워드 불러오기
     @GetMapping("/reviews")
     public ResponseEntity<?> getReviewKeyword() {
         ReviewResponse.ReviewKeywordResponseDTO dto = reviewService.getReviewKeyword();
 
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
-
 }

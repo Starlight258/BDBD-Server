@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 /**
- * User, Owner의 공통 API 요청을 처리
+ * 사용자와 사장님의 요청을 처리하는 공통 API
  */
 @RestController
 @RequestMapping("/api/common")
@@ -37,6 +37,5 @@ public class CommonMemberController {
 
         return ResponseEntity.ok(ApiUtils.success(userInfoDto));
     }
-
 }
 

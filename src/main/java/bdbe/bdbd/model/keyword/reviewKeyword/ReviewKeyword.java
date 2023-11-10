@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name="review_keyword")
+@Table(name = "review_keyword")
 public class ReviewKeyword { //키워드
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,11 +20,11 @@ public class ReviewKeyword { //키워드
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="r_id",  nullable = false)
+    @JoinColumn(name = "r_id", nullable = false)
     private Review review;
 
     @ManyToOne
-    @JoinColumn(name="k_id",  nullable = false)
+    @JoinColumn(name = "k_id", nullable = false)
     private Keyword keyword;
 
     @Builder

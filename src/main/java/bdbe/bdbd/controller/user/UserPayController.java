@@ -2,8 +2,8 @@ package bdbe.bdbd.controller.user;
 
 import bdbe.bdbd._core.security.CustomUserDetails;
 import bdbe.bdbd.dto.pay.PayRequest;
-import bdbe.bdbd.service.pay.PayService;
 import bdbe.bdbd.dto.reservation.ReservationResponse;
+import bdbe.bdbd.service.pay.PayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,21 +11,22 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-
+/**
+ * 결제 관련 요청을 처리하는 사용자 API
+ */
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
-public class PayController {
+public class UserPayController {
 
     private final PayService payService;
 
-    @PostMapping("/payment/ready/{bay_id}")
+    @PostMapping("/payment/ready/{bay-id}")
     public ResponseEntity<?> requestPaymentReady(
-            @PathVariable("bay_id") Long bayId,
-            @RequestBody @Valid  PayRequest.PaymentReadyRequest paymentReadyRequest,
+            @PathVariable("bay-id") Long bayId,
+            @Valid @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest,
             Errors errors
     ) {
-        System.out.println("error");
         return payService.requestPaymentReady(
                 paymentReadyRequest.getRequestDto(),
                 paymentReadyRequest.getSaveDTO(),
@@ -34,14 +35,13 @@ public class PayController {
     }
 
 
-    @PostMapping("/payment/approve/{carwash_id}/{bay_id}")
+    @PostMapping("/payment/approve/{carwash-id}/{bay-id}")
     public ResponseEntity<ReservationResponse.findLatestOneResponseDTO> requestPaymentApproval(
-            @PathVariable("carwash_id") Long carwashId,
-            @PathVariable("bay_id") Long bayId,
+            @PathVariable("carwash-id") Long carwashId,
+            @PathVariable("bay-id") Long bayId,
             @Valid @RequestBody PayRequest.PaymentApprovalRequestDTO requestDTO,
             Errors errors,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-
         return payService.requestPaymentApproval(
                 requestDTO.getPayApprovalRequestDTO(),
                 carwashId,

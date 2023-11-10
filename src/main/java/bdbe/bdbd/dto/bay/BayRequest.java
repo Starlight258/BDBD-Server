@@ -25,7 +25,5 @@ public class BayRequest {
                     .status(1) // 활성화 상태로 생성
                     .build();
         }
-
     }
-
 }

@@ -10,5 +10,4 @@ public interface FileJPARepository extends JpaRepository<File, Long> {
     List<File> findByCarwash_IdAndIsDeletedFalse(Long carwashId);
 
     Optional<File> findFirstByCarwashIdAndIsDeletedFalseOrderByUploadedAtAsc(Long carwashId);
-
 }

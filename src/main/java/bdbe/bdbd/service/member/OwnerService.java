@@ -40,8 +40,8 @@ public class OwnerService {
     private final FileJPARepository fileJPARepository;
 
     @Transactional
-    public void join(UserRequest.JoinDTO requestDTO) {
-        sameCheckEmail(requestDTO.getEmail());
+    public void joinOwner(UserRequest.JoinDTO requestDTO) {
+        checkSameEmail(requestDTO.getEmail());
 
         String encodedPassword = passwordEncoder.encode(requestDTO.getPassword());
 
@@ -55,38 +55,37 @@ public class OwnerService {
     }
 
 
-    public UserResponse.LoginResponse login(UserRequest.LoginDTO requestDTO) {
-        Member memberPS = memberJPARepository.findByEmail(requestDTO.getEmail()).orElseThrow(
+    public UserResponse.LoginResponse loginOwner(UserRequest.LoginDTO requestDTO) {
+        Member member = memberJPARepository.findByEmail(requestDTO.getEmail()).orElseThrow(
                 () -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
                         Collections.singletonMap("Email", "email not found : " + requestDTO.getEmail())
                 ));
 
-        if (!passwordEncoder.matches(requestDTO.getPassword(), memberPS.getPassword())) {
+        if (!passwordEncoder.matches(requestDTO.getPassword(), member.getPassword())) {
             throw new UnAuthorizedError(
                     UnAuthorizedError.ErrorCode.AUTHENTICATION_FAILED,
                     Collections.singletonMap("Password", "Wrong password")
             );
         }
 
-        String userRole = String.valueOf(memberPS.getRole());
+        String userRole = String.valueOf(member.getRole());
         if (!"ROLE_OWNER".equals(userRole) && !"ROLE_ADMIN".equals(userRole)) {
             throw new UnAuthorizedError(
                     UnAuthorizedError.ErrorCode.ACCESS_DENIED,
                     Collections.singletonMap("Role", "Cannot access page by your Role")
             );
         }
-
-        String jwt = JWTProvider.create(memberPS);
+        String jwt = JWTProvider.create(member);
         String redirectUrl = "/owner/home";
 
         return new UserResponse.LoginResponse(jwt, redirectUrl);
     }
 
 
-    public void sameCheckEmail(String email) {
-        Optional<Member> userOP = memberJPARepository.findByEmail(email);
-        if (userOP.isPresent()) {
+    public void checkSameEmail(String email) {
+        Optional<Member> memberOptional = memberJPARepository.findByEmail(email);
+        if (memberOptional.isPresent()) {
             throw new BadRequestError(
                     BadRequestError.ErrorCode.DUPLICATE_RESOURCE,
                     Collections.singletonMap("Email", "Duplicate email exist : " + email));
@@ -118,13 +117,10 @@ public class OwnerService {
         return new OwnerResponse.ReservationCarwashListDTO(reservationList);
     }
 
-    /*
-        owner가 해당 세차장의 주인인지 확인
-     */
     private void validateCarwashOwnership(List<Long> carwashIds, Member sessionMember) {
-        List<Long> userCarwashIds = carwashJPARepository.findCarwashIdsByMemberId(sessionMember.getId());
+        List<Long> userCarwashIdList = carwashJPARepository.findCarwashIdsByMemberId(sessionMember.getId());
 
-        if (!userCarwashIds.containsAll(carwashIds)) {
+        if (!userCarwashIdList.containsAll(carwashIds)) {
             throw new ForbiddenError(
                     ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
                     Collections.singletonMap("MemberId", "Member is not the owner of the carwash.")
@@ -137,14 +133,15 @@ public class OwnerService {
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
                         Collections.singletonMap("BayId", "Bay with id " + bayId + " not found")
-                        ));
+                ));
 
         Long carwashId = bay.getCarwash().getId();
         Carwash carwash = carwashJPARepository.findById(carwashId)
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                        Collections.singletonMap("CarwashId", "Carwash not found"+ carwashId )
+                        Collections.singletonMap("CarwashId", "Carwash not found" + carwashId)
                 ));
+
         if (carwash.getMember().getId() != sessionMember.getId()) {
             throw new ForbiddenError(
                     ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
@@ -163,10 +160,8 @@ public class OwnerService {
                     Collections.singletonMap("MemberId", "Member is not the owner of the carwash.")
             );
 
-        // 매출 구하기 - 예약 삭제된 것 제외
         Map<String, Long> response = new HashMap<>();
         Long revenue = reservationJPARepository.findTotalRevenueByCarwashIdsAndDate(carwashIds, selectedDate);
-
         response.put("revenue", revenue);
 
         return response;
@@ -174,7 +169,9 @@ public class OwnerService {
 
     public OwnerResponse.ReservationOverviewResponseDTO fetchOwnerReservationOverview(Member sessionMember) {
         List<Carwash> carwashList = carwashJPARepository.findByMember_Id(sessionMember.getId());
+
         OwnerResponse.ReservationOverviewResponseDTO response = new OwnerResponse.ReservationOverviewResponseDTO();
+
         for (Carwash carwash : carwashList) {
             List<Bay> bayList = bayJPARepository.findByCarwashId(carwash.getId());
             List<Optime> optimeList = optimeJPARepository.findByCarwash_Id(carwash.getId());
@@ -182,20 +179,20 @@ public class OwnerService {
             Date today = java.sql.Date.valueOf(LocalDate.now());
             List<Reservation> reservationList = reservationJPARepository.findTodaysReservationsByCarwashId(carwash.getId(), today);
 
-            List<File> carwashImages = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwash.getId());
-            OwnerResponse.CarwashManageByOwnerDTO dto = new OwnerResponse.CarwashManageByOwnerDTO(carwash, bayList, optimeList, reservationList, carwashImages);
+            List<File> carwashImageList = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwash.getId());
+
+            OwnerResponse.CarwashManageByOwnerDTO dto = new OwnerResponse.CarwashManageByOwnerDTO(carwash, bayList, optimeList, reservationList, carwashImageList);
             response.addCarwashManageByOwnerDTO(dto);
         }
 
         return response;
     }
 
-    public OwnerResponse.CarwashManageDTO fetchCarwashReservationOverview(Long carwashId, Member sessionMember) {
-        // 세차장의 주인이 맞는지 확인하며 조회
+    public OwnerResponse.CarwashManageDTO findCarwashReservationOverview(Long carwashId, Member sessionMember) {
         Carwash carwash = carwashJPARepository.findByIdAndMember_Id(carwashId, sessionMember.getId())
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                        Collections.singletonMap("CarwashId", "Carwash not found"+ carwashId )
+                        Collections.singletonMap("CarwashId", "Carwash not found" + carwashId)
                 ));
 
         LocalDate firstDayOfCurrentMonth = LocalDate.now().withDayOfMonth(1);
@@ -209,8 +206,9 @@ public class OwnerService {
         Date today = java.sql.Date.valueOf(LocalDate.now());
         List<Reservation> reservationList = reservationJPARepository.findTodaysReservationsByCarwashId(carwash.getId(), today);
 
-        List<File> carwashImages = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwash.getId());
-        File carwashImage = carwashImages.stream().findFirst().orElse(null);
+        List<File> carwashImageList = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwash.getId());
+        File carwashImage = carwashImageList.stream().findFirst().orElse(null);
+
         OwnerResponse.CarwashManageDTO dto = new OwnerResponse.CarwashManageDTO(carwash, monthlySales, monthlyReservations, bayList, optimeList, reservationList, carwashImage);
 
         return dto;
@@ -218,39 +216,39 @@ public class OwnerService {
 
     public double calculateGrowthPercentage(Long currentValue, Long previousValue) {
         if (previousValue == 0 && currentValue == 0) {
-            return 0;  // 이전 값과 현재 값이 모두 0인 경우 성장률은 0%로 간주
+            return 0;
         } else if (previousValue == 0) {
-            return 100;  // 이전 값이 0이고 현재 값이 0이 아닌 경우 성장률은 100%로 간주
+            return 100;
         }
         return ((double) (currentValue - previousValue) / previousValue) * 100;
     }
 
     public OwnerDashboardDTO fetchOwnerHomepage(Member sessionMember) {
-        List<Long> carwashIds = carwashJPARepository.findCarwashIdsByMemberId(sessionMember.getId());
+        List<Long> carwashIdList = carwashJPARepository.findCarwashIdsByMemberId(sessionMember.getId());
         LocalDate firstDayOfCurrentMonth = LocalDate.now().withDayOfMonth(1);
         LocalDate firstDayOfPreviousMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1);
 
-        Long currentMonthSales = reservationJPARepository.findTotalRevenueByCarwashIdsAndDate(carwashIds, firstDayOfCurrentMonth);
-        Long previousMonthSales = reservationJPARepository.findTotalRevenueByCarwashIdsAndDate(carwashIds, firstDayOfPreviousMonth);
-        Long currentMonthReservations = reservationJPARepository.findMonthlyReservationCountByCarwashIdsAndDate(carwashIds, firstDayOfCurrentMonth);
-        Long previousMonthReservations = reservationJPARepository.findMonthlyReservationCountByCarwashIdsAndDate(carwashIds, firstDayOfPreviousMonth);
+        Long currentMonthSales = reservationJPARepository.findTotalRevenueByCarwashIdsAndDate(carwashIdList, firstDayOfCurrentMonth);
+        Long previousMonthSales = reservationJPARepository.findTotalRevenueByCarwashIdsAndDate(carwashIdList, firstDayOfPreviousMonth);
+        Long currentMonthReservations = reservationJPARepository.findMonthlyReservationCountByCarwashIdsAndDate(carwashIdList, firstDayOfCurrentMonth);
+        Long previousMonthReservations = reservationJPARepository.findMonthlyReservationCountByCarwashIdsAndDate(carwashIdList, firstDayOfPreviousMonth);
 
         double salesGrowthPercentage = calculateGrowthPercentage(currentMonthSales, previousMonthSales); // 전월대비 판매 성장률 (단위: %)
         double reservationGrowthPercentage = calculateGrowthPercentage(currentMonthReservations, previousMonthReservations); // 전월대비 예약 성장률 (단위: %)
 
         List<OwnerResponse.CarwashInfoDTO> carwashInfoDTOList = new ArrayList<>();
-        for (Long carwashId : carwashIds) {
+        for (Long carwashId : carwashIdList) {
             Carwash carwash = carwashJPARepository.findById(carwashId)
                     .orElseThrow(() -> new NotFoundError(
                             NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                            Collections.singletonMap("CarwashId", "Carwash not found"+ carwashId )
+                            Collections.singletonMap("CarwashId", "Carwash not found" + carwashId)
                     ));
             Long monthlySales = reservationJPARepository.findTotalRevenueByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
 
             Long monthlyReservations = reservationJPARepository.findMonthlyReservationCountByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
-            List<File> carwashImages = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwashId);
+            List<File> carwashImageList = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwashId);
 
-            OwnerResponse.CarwashInfoDTO dto = new OwnerResponse.CarwashInfoDTO(carwash, monthlySales, monthlyReservations, carwashImages);
+            OwnerResponse.CarwashInfoDTO dto = new OwnerResponse.CarwashInfoDTO(carwash, monthlySales, monthlyReservations, carwashImageList);
             carwashInfoDTOList.add(dto);
         }
         return new OwnerDashboardDTO(currentMonthSales, salesGrowthPercentage, currentMonthReservations, reservationGrowthPercentage, carwashInfoDTOList);

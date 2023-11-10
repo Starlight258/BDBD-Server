@@ -29,7 +29,7 @@ public class ReservationResponse {
                         BayResponseDTO bayResponseDTO = new BayResponseDTO();
                         bayResponseDTO.setBayId(bay.getId());
                         bayResponseDTO.setBayNo(bay.getBayNum());
-                        // 해당 베이의 예약 모두 담기
+
                         List<BookedTimeDTO> bookedTimes = reservationList.stream()
                                 .filter(reservation -> reservation.getBay().getId().equals(bay.getId()))
                                 .map(reservation -> {
@@ -38,8 +38,10 @@ public class ReservationResponse {
                                     bookedTimeDTO.setEndTime(DateUtils.formatDateTime(reservation.getEndTime()));
                                     return bookedTimeDTO;
                                 }).collect(Collectors.toList());
-                        bayResponseDTO.setBayBookedTime(bookedTimes);
+                        bayResponseDTO.setBayBookedTimeList(bookedTimes);
+
                         return bayResponseDTO;
+
                     }).collect(Collectors.toList());
         }
 
@@ -49,25 +51,29 @@ public class ReservationResponse {
         public static class BayResponseDTO {
             private Long bayId;
             private int bayNo;
-            private List<BookedTimeDTO> bayBookedTime;
+            private List<BookedTimeDTO> bayBookedTimeList;
         }
+
         @Getter
         @Setter
         @ToString
-        public static class BookedTimeDTO{
+        public static class BookedTimeDTO {
             private String startTime;
             private String endTime;
         }
 
     }
+
     @Getter
     @Setter
     @ToString
     public static class findLatestOneResponseDTO {
         private ReservationDTO reservation;
         private CarwashDTO carwash;
+
         public findLatestOneResponseDTO(Reservation reservation, Bay bay, Carwash carwash, Location location, File carwashImage) {
             ReservationDTO reservationDTO = new ReservationDTO();
+
             TimeDTO timeDTO = new TimeDTO();
             timeDTO.start = DateUtils.formatDateTime(reservation.getStartTime());
             timeDTO.end = DateUtils.formatDateTime(reservation.getEndTime());
@@ -75,18 +81,22 @@ public class ReservationResponse {
             reservationDTO.price = reservation.getPrice();
             reservationDTO.bayNo = bay.getBayNum();
             reservationDTO.reservationId = reservation.getId();
+
             this.reservation = reservationDTO;
 
             CarwashDTO carwashDTO = new CarwashDTO();
             carwashDTO.name = carwash.getName();
+
             LocationDTO locationDTO = new LocationDTO();
             locationDTO.latitude = location.getLatitude();
             locationDTO.longitude = location.getLongitude();
             carwashDTO.location = locationDTO;
-            carwashDTO.carwashImages = (carwashImage != null) ? Collections.singletonList(new ImageDTO(carwashImage)) : Collections.emptyList();
+            carwashDTO.imageList = (carwashImage != null) ? Collections.singletonList(new ImageDTO(carwashImage)) : Collections.emptyList();
+
             this.carwash = carwashDTO;
         }
     }
+
     @Getter
     @Setter
     @ToString
@@ -96,28 +106,32 @@ public class ReservationResponse {
         private int price;
         private int bayNo;
     }
+
     @Getter
     @Setter
     @ToString
     public static class CarwashDTO {
         private String name;
         private LocationDTO location;
-        private List<ImageDTO> carwashImages;
+        private List<ImageDTO> imageList;
     }
+
     @Getter
     @Setter
     @ToString
-    public static class TimeDTO{
+    public static class TimeDTO {
         private String start;
         private String end;
     }
+
     @Getter
     @Setter
     @ToString
-    public static class LocationDTO{
+    public static class LocationDTO {
         private double latitude;
         private double longitude;
     }
+
     @Getter
     @Setter
     @ToString
@@ -139,14 +153,14 @@ public class ReservationResponse {
     @Setter
     @ToString
     public static class fetchCurrentStatusReservationDTO {
-        private List<ReservationInfoDTO> current;
-        private List<ReservationInfoDTO> upcoming;
-        private List<ReservationInfoDTO> completed;
+        private List<ReservationInfoDTO> currentReservationList;
+        private List<ReservationInfoDTO> upcomingReservationList;
+        private List<ReservationInfoDTO> completeReservationList;
 
         public fetchCurrentStatusReservationDTO(List<ReservationInfoDTO> current, List<ReservationInfoDTO> upcoming, List<ReservationInfoDTO> completed) {
-            this.current = current;
-            this.upcoming = upcoming;
-            this.completed = completed;
+            this.currentReservationList = current;
+            this.upcomingReservationList = upcoming;
+            this.completeReservationList = completed;
         }
     }
 
@@ -154,10 +168,10 @@ public class ReservationResponse {
     @Setter
     @ToString
     public static class fetchRecentReservationDTO {
-        private List<RecentReservation> recent;
+        private List<RecentReservation> recentReservationList;
 
         public fetchRecentReservationDTO(List<RecentReservation> recent) {
-            this.recent = recent;
+            this.recentReservationList = recent;
         }
     }
 
@@ -179,10 +193,9 @@ public class ReservationResponse {
     }
 
 
-
     @Getter
     @Setter
-    public static class ReservationInfoDTO{
+    public static class ReservationInfoDTO {
         private Long id;
         private TimeDTO time;
         private Long carwashId;
@@ -190,16 +203,20 @@ public class ReservationResponse {
         private int bayNum;
         private int price;
         private ImageDTO image;
+
         public ReservationInfoDTO(Reservation reservation, Bay bay, Carwash carwash) {
             this.id = reservation.getId();
+
             TimeDTO timeDTO = new TimeDTO();
             timeDTO.start = DateUtils.formatDateTime(reservation.getStartTime());
             timeDTO.end = DateUtils.formatDateTime(reservation.getEndTime());
+
             this.time = timeDTO;
             this.carwashId = carwash.getId();
             this.carwashName = carwash.getName();
             this.bayNum = bay.getBayNum();
             this.price = reservation.getPrice();
+
             List<File> activeFiles = carwash.getFileList().stream()
                     .filter(file -> !file.isDeleted())
                     .collect(Collectors.toList());
