@@ -13,8 +13,8 @@ import java.util.Map;
 @Getter
 public class BadGatewayError extends ApiException {
 
-    public BadGatewayError(ForbiddenError.ErrorCode errorCode, Map<String, String> errors) {
-        super(errorCode, errors, HttpStatus.BAD_GATEWAY);
+    public BadGatewayError(ForbiddenError.ErrorCode errorCode, Map<String, String> message) {
+        super(errorCode, message, HttpStatus.BAD_GATEWAY);
     }
 
     public enum ErrorCode implements ApiException.ErrorCode {
