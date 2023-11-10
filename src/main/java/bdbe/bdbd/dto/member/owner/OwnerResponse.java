@@ -14,6 +14,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,12 +28,21 @@ public class OwnerResponse {
         private List<ReservationCarwashDTO> reservationList;
 
         public SaleResponseDTO(List<Carwash> carwashList, List<Reservation> reservationList) {
-            this.carwashList = carwashList.stream()
-                    .map(CarwashListDTO::new)
-                    .collect(Collectors.toList());
-            this.reservationList = reservationList.stream()
-                    .map(ReservationCarwashDTO::new)
-                    .collect(Collectors.toList());
+            if (carwashList != null) {
+                this.carwashList = carwashList.stream()
+                        .map(CarwashListDTO::new)
+                        .collect(Collectors.toList());
+            } else {
+                this.carwashList = Collections.emptyList(); // 또는 null 할당, 기본값 설정 등
+            }
+
+            if (reservationList != null) {
+                this.reservationList = reservationList.stream()
+                        .map(ReservationCarwashDTO::new)
+                        .collect(Collectors.toList());
+            } else {
+                this.reservationList = Collections.emptyList(); // 또는 null 할당, 기본값 설정 등
+            }
         }
     }
 

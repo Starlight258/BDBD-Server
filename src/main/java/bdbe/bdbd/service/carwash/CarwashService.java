@@ -3,6 +3,7 @@ package bdbe.bdbd.service.carwash;
 
 import bdbe.bdbd._core.exception.BadRequestError;
 import bdbe.bdbd._core.exception.ForbiddenError;
+import bdbe.bdbd._core.exception.NotFoundError;
 import bdbe.bdbd._core.utils.Haversine;
 import bdbe.bdbd.model.Code.DayType;
 import bdbe.bdbd.repository.carwash.CarwashJPARepository;
@@ -81,7 +82,7 @@ public class CarwashService {
     @Transactional
     public void save(CarwashRequest.SaveDTO saveDTO, MultipartFile[] images, Member sessionMember) {
         Location location = saveDTO.toLocationEntity();
-        locationJPARepository.save(location);
+        location = locationJPARepository.save(location);
 
         Carwash carwash = saveDTO.toCarwashEntity(location, sessionMember);
         carwashJPARepository.save(carwash);
@@ -90,20 +91,29 @@ public class CarwashService {
         optimeJPARepository.saveAll(optimes);
 
         List<Long> keywordIdList = saveDTO.getKeywordId();
-        List<CarwashKeyword> carwashKeywordList = new ArrayList<>();
-        for (Long keywordId : keywordIdList) {
-            Keyword keyword = keywordJPARepository.findById(keywordId)
-                    .orElseThrow(() -> new IllegalArgumentException("Keyword not found"));
+        if (keywordIdList != null && !keywordIdList.isEmpty()) {
+            if (keywordIdList.stream().anyMatch(id -> id < 8 || id > 14)) {
+                throw new BadRequestError(
+                        BadRequestError.ErrorCode.VALIDATION_FAILED,
+                        Collections.singletonMap("message", "Carwash Keyword ID must be between 8 and 14")
+                );
+            }
+            List<CarwashKeyword> carwashKeywordList = new ArrayList<>();
+            for (Long keywordId : keywordIdList) {
+                Keyword keyword = keywordJPARepository.findById(keywordId)
+                        .orElseThrow(() -> new NotFoundError(
+                                NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                                Collections.singletonMap("message", "Carwash Keyword ID must be between 8 and 14")));
 
-            CarwashKeyword carwashKeyword = CarwashKeyword.builder().carwash(carwash).keyword(keyword).build();
-            carwashKeywordList.add(carwashKeyword);
+                CarwashKeyword carwashKeyword = CarwashKeyword.builder().carwash(carwash).keyword(keyword).build();
+                carwashKeywordList.add(carwashKeyword);
+            }
+            carwashKeywordJPARepository.saveAll(carwashKeywordList);
         }
-        carwashKeywordJPARepository.saveAll(carwashKeywordList);
 
         if (images != null && images.length > 0) {
             uploadAndSaveFiles(images, carwash);
         }
-
     }
 
     @Transactional
@@ -264,7 +274,10 @@ public class CarwashService {
         Carwash carwash = carwashJPARepository.findById(carwashId)
                 .orElseThrow(() -> new IllegalArgumentException("carwash not found"));
         if (carwash.getMember().getId() != member.getId())
-            throw new ForbiddenError("User is not the owner of the carwash.");
+            throw new ForbiddenError(
+                    ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
+                    Collections.singletonMap("MemberId", "Member is not the owner of the carwash.")
+            );
 
         Location location = locationJPARepository.findById(carwash.getLocation().getId())
                 .orElseThrow(() -> new NoSuchElementException("location not found"));
@@ -279,18 +292,25 @@ public class CarwashService {
 
         List<File> imageFiles = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwashId);
 
-        return new CarwashResponse.carwashDetailsDTO(carwash, location, keywordIds, weekOptime, endOptime,imageFiles);
+        return new CarwashResponse.carwashDetailsDTO(carwash, location, keywordIds, weekOptime, endOptime, imageFiles);
 
     }
+
     private static final Logger logger = LoggerFactory.getLogger(CarwashService.class);
 
     @Transactional
     public CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetails(Long carwashId, CarwashRequest.updateCarwashDetailsDTO updatedto, MultipartFile[] images, Member member) {
         updateCarwashDetailsResponseDTO response = new updateCarwashDetailsResponseDTO();
         Carwash carwash = carwashJPARepository.findById(carwashId)
-                .orElseThrow(() -> new BadRequestError("carwash not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "Carwash not found")
+                ));
         if (carwash.getMember().getId() != member.getId()) {
-            throw new ForbiddenError("User is not the owner of the carwash.");
+            throw new ForbiddenError(
+                    ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
+                    Collections.singletonMap("MemberId", "Member is not the owner of the carwash.")
+            );
         }
         carwash.setName(updatedto.getName());
         carwash.setTel(updatedto.getTel());
@@ -300,11 +320,13 @@ public class CarwashService {
 
         CarwashRequest.updateLocationDTO updateLocationDTO = updatedto.getLocationDTO();
         Location location = locationJPARepository.findById(carwash.getLocation().getId())
-                .orElseThrow(() -> new BadRequestError("location not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("LocationId", "Location not found")
+                ));
 
-
-        location.updateAddress(updateLocationDTO.getAddress(), updateLocationDTO.getPlaceName()
-                , updateLocationDTO.getLatitude(), updateLocationDTO.getLongitude());
+        location.updateAddress(updateLocationDTO.getAddress(),
+                updateLocationDTO.getLatitude(), updateLocationDTO.getLongitude());
         response.updateLocationPart(location);
 
         CarwashRequest.updateOperatingTimeDTO updateOperatingTimeDTO = updatedto.getOptime();
@@ -338,7 +360,10 @@ public class CarwashService {
 
         List<Keyword> keywordList = keywordJPARepository.findAllById(keywordsToAdd);
         if (keywordList.size() != keywordsToAdd.size()) {
-            throw new BadRequestError("Some keywords could not be found");
+            throw new NotFoundError(
+                    NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                    Collections.singletonMap("KeywordId", "Keyword not found")
+            );
         }
 
         List<CarwashKeyword> newCarwashKeywords = new ArrayList<>();
