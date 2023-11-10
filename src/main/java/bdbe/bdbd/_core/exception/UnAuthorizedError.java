@@ -15,8 +15,8 @@ import java.util.Map;
 @Getter
 public class UnAuthorizedError extends ApiException {
 
-    public UnAuthorizedError(ErrorCode errorCode, Map<String, String> errors) {
-        super(errorCode, errors, HttpStatus.UNAUTHORIZED);
+    public UnAuthorizedError(ErrorCode errorCode, Map<String, String> message) {
+        super(errorCode, message, HttpStatus.UNAUTHORIZED);
     }
 
     public enum ErrorCode implements ApiException.ErrorCode {

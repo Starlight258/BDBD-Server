@@ -14,8 +14,8 @@ import java.util.Map;
 @Getter
 public class InternalServerError extends ApiException {
 
-    public InternalServerError(ErrorCode errorCode, Map<String, String> errors) {
-        super(errorCode, errors, HttpStatus.INTERNAL_SERVER_ERROR);
+    public InternalServerError(ErrorCode errorCode, Map<String, String> message) {
+        super(errorCode, message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     public enum ErrorCode implements ApiException.ErrorCode {
