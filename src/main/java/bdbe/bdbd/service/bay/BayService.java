@@ -10,11 +10,15 @@ import bdbe.bdbd.model.carwash.Carwash;
 import bdbe.bdbd.model.member.Member;
 import bdbe.bdbd.repository.bay.BayJPARepository;
 import bdbe.bdbd.repository.carwash.CarwashJPARepository;
+import bdbe.bdbd.repository.reservation.ReservationJPARepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Collections;
+
+import static bdbe.bdbd.dto.bay.BayResponse.BayRevenueResponseDTO;
 
 @Transactional
 @RequiredArgsConstructor
@@ -22,6 +26,7 @@ import java.util.Collections;
 public class BayService {
     private final BayJPARepository bayJPARepository;
     private final CarwashJPARepository carwashJPARepository;
+    private final ReservationJPARepository reservationJPARepository;
 
     public void createBay(BayRequest.SaveDTO dto, Long carwashId, Member member) {
         Carwash carwash = carwashJPARepository.findById(carwashId)
@@ -68,5 +73,18 @@ public class BayService {
             );
         }
         bay.changeStatus(status);
+    }
+
+    public BayRevenueResponseDTO findBayRevenue(Long bayId) {
+        BayRevenueResponseDTO dto = new BayRevenueResponseDTO();
+
+        LocalDate firstDayOfCurrentMonth = LocalDate.now().withDayOfMonth(1);
+        Long monthlyReservationCountByBayIdAndDate = reservationJPARepository.findMonthlyReservationCountByBayIdAndDate(bayId, firstDayOfCurrentMonth);
+        dto.setReservationCnt(monthlyReservationCountByBayIdAndDate);
+
+        Long totalRevenueByBayIdAndDate = reservationJPARepository.findTotalRevenueByBayIdAndDate(bayId, firstDayOfCurrentMonth);
+        dto.setRevenue(totalRevenueByBayIdAndDate);
+
+        return dto;
     }
 }
