@@ -65,10 +65,9 @@ public class UserService {
     public void sameCheckEmail(String email) {
         Optional<Member> userOP = memberJPARepository.findByEmail(email);
         if (userOP.isPresent()) {
-            throw new UnAuthorizedError(
-                    UnAuthorizedError.ErrorCode.AUTHENTICATION_FAILED,
-                    Collections.singletonMap("Password", "Wrong password")
-            );
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.DUPLICATE_RESOURCE,
+                    Collections.singletonMap("Email", "Duplicate email exist : " + email));
         }
     }
 
