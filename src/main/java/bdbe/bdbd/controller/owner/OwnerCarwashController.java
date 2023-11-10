@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,10 +42,11 @@ public class OwnerCarwashController {
     @PostMapping(value = "/carwashes/register")
     public ResponseEntity<?> save(@Valid @RequestPart("carwash") CarwashRequest.SaveDTO saveDTOs,
                                   Errors errors,
-                                  @RequestPart("images") MultipartFile[] images,
+                                  @RequestPart(value = "images", required = false) Optional<MultipartFile[]> images,
                                   @AuthenticationPrincipal CustomUserDetails userDetails) {
-        carwashService.save(saveDTOs, images, userDetails.getMember());
 
+        carwashService.save(saveDTOs, images.orElse(null), userDetails.getMember());
+        
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
@@ -69,16 +71,21 @@ public class OwnerCarwashController {
     @PutMapping("/carwashes/{carwash_id}/details")
     public ResponseEntity<?> updateCarwashDetails(
             @PathVariable("carwash_id") Long carwashId,
-            @Valid @RequestPart("updateData") CarwashRequest.updateCarwashDetailsDTO updatedto,
-            Errors errors,
-            @RequestPart(value = "images", required = true) MultipartFile[] images,
+            @RequestPart(value = "updateData", required = false) Optional<CarwashRequest.updateCarwashDetailsDTO> updateDTO,
+
+            @RequestPart(value = "images", required = false) MultipartFile[] images,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO =
-                carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
+                carwashService.updateCarwashDetails(
+                        carwashId,
+                        updateDTO.orElse(null), // updateDTO가 Optional이므로 orElse(null)을 사용
+                        images,
+                        userDetails.getMember());
 
         return ResponseEntity.ok(ApiUtils.success(updateCarwashDetailsDTO));
     }
+
 
     @GetMapping("/carwashes")
     public ResponseEntity<?> fetchOwnerReservationOverview(
