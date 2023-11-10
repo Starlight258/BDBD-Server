@@ -34,7 +34,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
