@@ -66,7 +66,6 @@ public class CarwashRequest {
         public Location toLocationEntity() {
 
             return Location.builder()
-                    .place(location.placeName)
                     .address(location.address)
                     .latitude(location.latitude)
                     .longitude(location.longitude)

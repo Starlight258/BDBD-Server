@@ -98,7 +98,6 @@ public class CarwashResponse {
         public locationDTO toLocationDTO(Location location) {
             locationDTO locationDTO = new locationDTO();
             locationDTO.setAddress(location.getAddress());
-            locationDTO.setPlaceName(location.getPlace());
             return locationDTO;
         }
     }
@@ -120,7 +119,6 @@ public class CarwashResponse {
     @Getter
     @Setter
     public static class locationDTO {
-        private String placeName;
         private String address;
         private double latitude;
         private double longitude;
@@ -258,7 +256,6 @@ public class CarwashResponse {
 
         public void updateLocationPart(Location location) {
             CarwashResponse.updateLocationDTO dto = new CarwashResponse.updateLocationDTO();
-            dto.setPlaceName(location.getPlace());
             dto.setAddress(location.getAddress());
             dto.setLatitude(location.getLatitude());
             dto.setLongitude(location.getLongitude());
@@ -283,7 +280,6 @@ public class CarwashResponse {
     @Getter
     @Setter
     public static class updateLocationDTO {
-        private String placeName;
         private String address;
         private double latitude;
         private double longitude;

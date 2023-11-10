@@ -325,8 +325,8 @@ public class CarwashService {
                         Collections.singletonMap("LocationId", "Location not found")
                 ));
 
-        location.updateAddress(updateLocationDTO.getAddress(), updateLocationDTO.getPlaceName()
-                , updateLocationDTO.getLatitude(), updateLocationDTO.getLongitude());
+        location.updateAddress(updateLocationDTO.getAddress(),
+                updateLocationDTO.getLatitude(), updateLocationDTO.getLongitude());
         response.updateLocationPart(location);
 
         CarwashRequest.updateOperatingTimeDTO updateOperatingTimeDTO = updatedto.getOptime();
