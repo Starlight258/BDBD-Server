@@ -1,39 +1,86 @@
 package bdbe.bdbd.service.file;
 
-import bdbe.bdbd._core.exception.BadRequestError;
 import bdbe.bdbd._core.exception.ForbiddenError;
+import bdbe.bdbd._core.exception.InternalServerError;
 import bdbe.bdbd._core.exception.NotFoundError;
 import bdbe.bdbd._core.utils.FileUploadUtil;
-import bdbe.bdbd.dto.file.FileResponse;
+import bdbe.bdbd.dto.reservation.ReservationResponse;
+import bdbe.bdbd.model.carwash.Carwash;
 import bdbe.bdbd.model.file.File;
 import bdbe.bdbd.model.member.Member;
 import bdbe.bdbd.repository.file.FileJPARepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 @Transactional
 @Service
+@RequiredArgsConstructor
 public class FileService {
 
+    private final FileJPARepository fileJPARepository;
+
     private final FileUploadUtil fileUploadUtil;
-    @Autowired
-    private FileJPARepository fileJPARepository;
 
-    public FileService(FileUploadUtil fileUploadUtil) {
-        this.fileUploadUtil = fileUploadUtil;
+    @Transactional
+    public List<ReservationResponse.ImageDTO> uploadAndSaveFiles(MultipartFile[] images, Carwash carwash) {
+        List<File> existingFiles = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwash.getId());
+        for (File file : existingFiles) {
+            file.changeDeletedFlag(true);
+        }
+
+        fileJPARepository.saveAll(existingFiles);
+
+        List<ReservationResponse.ImageDTO> updatedImages = new ArrayList<>();
+        try {
+            List<String> imageUrls = fileUploadUtil.uploadFiles(Arrays.asList(images));
+
+            List<File> savedFiles = saveFileEntities(imageUrls, carwash);
+
+            for (File file : savedFiles) {
+                updatedImages.add(new ReservationResponse.ImageDTO(file));
+            }
+
+        } catch (Exception e) {
+            log.error("File upload and save failed: " + e.getMessage(), e);
+            throw new InternalServerError(
+                    InternalServerError.ErrorCode.INTERNAL_SERVER_ERROR,
+                    Collections.singletonMap("File", "File upload and saved failed: " + e.getMessage()));
+        }
+
+        return updatedImages;
     }
+    private List<File> saveFileEntities(List<String> imageUrls, Carwash carwash) {
+        List<File> files = new ArrayList<>();
+        try {
+            for (String imageUrl : imageUrls) {
+                File newFile = File.builder()
+                        .name(imageUrl.substring(imageUrl.lastIndexOf("/") + 1))
+                        .url(imageUrl)
+                        .uploadedAt(LocalDateTime.now())
+                        .carwash(carwash)
+                        .build();
+                files.add(newFile);
+            }
+            files = fileJPARepository.saveAll(files);
+            log.info("File entities saved successfully");
+        } catch (Exception e) {
+            log.error("Saving file entities failed: " + e.getMessage(), e);
+            throw new InternalServerError(
+                    InternalServerError.ErrorCode.INTERNAL_SERVER_ERROR,
+                    Collections.singletonMap("File", "File saved failed: " + e.getMessage()));
+        }
 
-    public FileResponse.SimpleFileResponseDTO uploadFile(MultipartFile multipartFile, Long carwashId) throws Exception {
-        return fileUploadUtil.uploadFile(multipartFile, carwashId);
-    }
-
-    public List<FileResponse.SimpleFileResponseDTO> uploadFiles(MultipartFile[] multipartFile, Long carwashId) throws Exception {
-        return fileUploadUtil.uploadFiles(multipartFile, carwashId);
+        return files;
     }
 
     public void deleteFile(Long fileId, Member member) {
@@ -41,7 +88,7 @@ public class FileService {
         File file = fileJPARepository.findById(fileId)
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                        "file id :" + fileId + " not found"));
+                        Collections.singletonMap("fileId", "File id " + fileId + " not found.")));
         if (file.getCarwash().getMember().getId() != member.getId()){
             throw new ForbiddenError(
                     ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
@@ -52,28 +99,5 @@ public class FileService {
         file.changeDeletedFlag(true); //삭제에 대한 플래그
         fileJPARepository.save(file);
     }
-
-    public void validateFiles(MultipartFile[] files) throws BadRequestError {
-        for (MultipartFile file : files) {
-            String originalFilename = file.getOriginalFilename();
-            String extension = "";
-
-            if (originalFilename != null) {
-                int i = originalFilename.lastIndexOf('.');
-                if (i > 0) {
-                    extension = originalFilename.substring(i).toLowerCase();
-                }
-            }
-
-            if (!S3ProxyUploadService.ALLOWED_EXTENSIONS.contains(extension)) {
-                throw new BadRequestError(
-                        BadRequestError.ErrorCode.VALIDATION_FAILED,
-                        Collections.singletonMap("Invalid file extension for file: " + originalFilename, "Only JPG, JPEG, and PNG are allowed.")
-                );
-            }
-        }
-    }
-
-
 
 }

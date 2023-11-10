@@ -5,31 +5,29 @@ import bdbe.bdbd._core.exception.BadRequestError;
 import bdbe.bdbd._core.exception.ForbiddenError;
 import bdbe.bdbd._core.exception.NotFoundError;
 import bdbe.bdbd._core.utils.Haversine;
-import bdbe.bdbd.model.Code.DayType;
-import bdbe.bdbd.repository.carwash.CarwashJPARepository;
-import bdbe.bdbd.model.carwash.Carwash;
-import bdbe.bdbd.repository.bay.BayJPARepository;
+import bdbe.bdbd.dto.carwash.CarwashRequest;
 import bdbe.bdbd.dto.carwash.CarwashResponse;
 import bdbe.bdbd.dto.carwash.CarwashResponse.updateCarwashDetailsResponseDTO;
-import bdbe.bdbd.dto.carwash.CarwashRequest;
+import bdbe.bdbd.dto.reservation.ReservationResponse;
+import bdbe.bdbd.model.Code.DayType;
+import bdbe.bdbd.model.carwash.Carwash;
 import bdbe.bdbd.model.file.File;
-import bdbe.bdbd.repository.file.FileJPARepository;
-import bdbe.bdbd.service.file.S3ProxyUploadService;
 import bdbe.bdbd.model.keyword.Keyword;
-import bdbe.bdbd.repository.keyword.KeywordJPARepository;
 import bdbe.bdbd.model.keyword.carwashKeyword.CarwashKeyword;
-import bdbe.bdbd.repository.keyword.carwashKeyword.CarwashKeywordJPARepository;
 import bdbe.bdbd.model.location.Location;
-import bdbe.bdbd.repository.location.LocationJPARepository;
 import bdbe.bdbd.model.member.Member;
 import bdbe.bdbd.model.optime.Optime;
+import bdbe.bdbd.repository.bay.BayJPARepository;
+import bdbe.bdbd.repository.carwash.CarwashJPARepository;
+import bdbe.bdbd.repository.file.FileJPARepository;
+import bdbe.bdbd.repository.keyword.KeywordJPARepository;
+import bdbe.bdbd.repository.keyword.carwashKeyword.CarwashKeywordJPARepository;
+import bdbe.bdbd.repository.location.LocationJPARepository;
 import bdbe.bdbd.repository.optime.OptimeJPARepository;
-import bdbe.bdbd.dto.reservation.ReservationResponse;
 import bdbe.bdbd.repository.review.ReviewJPARepository;
+import bdbe.bdbd.service.file.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,8 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,18 +50,24 @@ public class CarwashService {
     private final ReviewJPARepository reviewJPARepository;
     private final BayJPARepository bayJPARepository;
     private final FileJPARepository fileJPARepository;
-    private final S3ProxyUploadService s3ProxyUploadService;
+    private final FileService fileService;
 
     public List<CarwashResponse.FindAllDTO> findAll(int page) {
         if (page < 0) {
-            throw new IllegalArgumentException("Invalid page number.");
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("Page", "Invalid page number")
+            );
         }
 
         Pageable pageable = PageRequest.of(page, 10);
         Page<Carwash> carwashEntities = carwashJPARepository.findAll(pageable);
 
         if (carwashEntities == null || !carwashEntities.hasContent()) {
-            throw new NoSuchElementException("No carwash entities found.");
+            throw new NotFoundError(
+                    NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                    Collections.singletonMap("CarwashEntities", "CarwashEntities not found")
+            );
         }
 
         List<CarwashResponse.FindAllDTO> carwashResponses = carwashEntities.getContent().stream()
@@ -73,7 +75,10 @@ public class CarwashService {
                 .collect(Collectors.toList());
 
         if (carwashResponses == null || carwashResponses.isEmpty()) {
-            throw new NoSuchElementException("No carwash entities transformed.");
+            throw new NotFoundError(
+                    NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                    Collections.singletonMap("CarwashEntities", "No carwash entities transformed")
+            );
         }
 
         return carwashResponses;
@@ -112,66 +117,8 @@ public class CarwashService {
         }
 
         if (images != null && images.length > 0) {
-            uploadAndSaveFiles(images, carwash);
+            fileService.uploadAndSaveFiles(images, carwash);
         }
-    }
-
-    @Transactional
-    public List<ReservationResponse.ImageDTO> uploadAndSaveFiles(MultipartFile[] images, Carwash carwash) {
-        List<File> existingFiles = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwash.getId());
-        for (File file : existingFiles) {
-            file.changeDeletedFlag(true);
-        }
-
-        fileJPARepository.saveAll(existingFiles);
-
-        List<ReservationResponse.ImageDTO> updatedImages = new ArrayList<>();
-        try {
-            List<String> imageUrls = uploadFiles(Arrays.asList(images));
-
-            List<File> savedFiles = saveFileEntities(imageUrls, carwash);
-
-            for (File file : savedFiles) {
-                updatedImages.add(new ReservationResponse.ImageDTO(file));
-            }
-
-        } catch (Exception e) {
-            logger.error("File upload and save failed: " + e.getMessage(), e);
-            throw new RuntimeException("File upload and save failed", e);
-        }
-        return updatedImages;
-    }
-
-
-    private List<String> uploadFiles(List<MultipartFile> files) {
-        try {
-            logger.info("Image upload start");
-            return s3ProxyUploadService.uploadFiles(files);
-        } catch (Exception e) {
-            logger.error("File upload failed: " + e.getMessage(), e);
-            throw new RuntimeException("File upload failed", e);
-        }
-    }
-
-    private List<File> saveFileEntities(List<String> imageUrls, Carwash carwash) {
-        List<File> files = new ArrayList<>();
-        try {
-            for (String imageUrl : imageUrls) {
-                File newFile = File.builder()
-                        .name(imageUrl.substring(imageUrl.lastIndexOf("/") + 1))
-                        .url(imageUrl)
-                        .uploadedAt(LocalDateTime.now())
-                        .carwash(carwash)
-                        .build();
-                files.add(newFile);
-            }
-            files = fileJPARepository.saveAll(files);
-            logger.info("File entities saved successfully");
-        } catch (Exception e) {
-            logger.error("Saving file entities failed: " + e.getMessage(), e);
-            throw new RuntimeException("Saving file entities failed", e);
-        }
-        return files;
     }
 
     public List<CarwashRequest.CarwashDistanceDTO> findNearbyCarwashesByUserLocation(CarwashRequest.UserLocationDTO userLocation) {
@@ -217,7 +164,10 @@ public class CarwashService {
 
         List<Keyword> selectedKeywords = keywordJPARepository.findAllById(searchRequest.getKeywordIds());
         if (searchRequest.getKeywordIds().size() != selectedKeywords.size()) {
-            throw new IllegalArgumentException("Some of the keyword IDs you provided are invalid ");
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("KeywordId", "KeywordId is invalid")
+            );
         }
 
         List<CarwashKeyword> carwashKeywords = carwashKeywordJPARepository.findByKeywordIn(selectedKeywords);
@@ -250,11 +200,17 @@ public class CarwashService {
     public CarwashResponse.findByIdDTO getfindById(Long carwashId) {
 
         Carwash carwash = carwashJPARepository.findById(carwashId)
-                .orElseThrow(() -> new IllegalArgumentException("not found carwash"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "CarwashId not found")
+                ));
         int reviewCnt = reviewJPARepository.findByCarwash_Id(carwashId).size();
         int bayCnt = bayJPARepository.findByCarwashId(carwashId).size();
         Location location = locationJPARepository.findById(carwash.getLocation().getId())
-                .orElseThrow(() -> new NoSuchElementException("location not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("LocationId", "LocationId not found")
+                ));
         List<Long> keywordIds = carwashKeywordJPARepository.findKeywordIdsByCarwashId(carwashId);
 
         List<Optime> optimeList = optimeJPARepository.findByCarwash_Id(carwashId);
@@ -272,7 +228,10 @@ public class CarwashService {
     public CarwashResponse.carwashDetailsDTO findCarwashByDetails(Long carwashId, Member member) {
 
         Carwash carwash = carwashJPARepository.findById(carwashId)
-                .orElseThrow(() -> new IllegalArgumentException("carwash not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "CarwashId not found")
+                ));
         if (carwash.getMember().getId() != member.getId())
             throw new ForbiddenError(
                     ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
@@ -280,7 +239,10 @@ public class CarwashService {
             );
 
         Location location = locationJPARepository.findById(carwash.getLocation().getId())
-                .orElseThrow(() -> new NoSuchElementException("location not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("LocationId", "LocationId not found")
+                ));
         List<Long> keywordIds = carwashKeywordJPARepository.findKeywordIdsByCarwashId(carwashId);
 
         List<Optime> optimeList = optimeJPARepository.findByCarwash_Id(carwashId);
@@ -293,10 +255,7 @@ public class CarwashService {
         List<File> imageFiles = fileJPARepository.findByCarwash_IdAndIsDeletedFalse(carwashId);
 
         return new CarwashResponse.carwashDetailsDTO(carwash, location, keywordIds, weekOptime, endOptime, imageFiles);
-
     }
-
-    private static final Logger logger = LoggerFactory.getLogger(CarwashService.class);
 
     @Transactional
     public CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetails(Long carwashId, CarwashRequest.updateCarwashDetailsDTO updatedto, MultipartFile[] images, Member member) {
@@ -386,7 +345,7 @@ public class CarwashService {
         response.updateKeywordPart(updateKeywordIds);
 
         if (images != null && images.length > 0) {
-            List<ReservationResponse.ImageDTO> updatedImages = uploadAndSaveFiles(images, carwash);
+            List<ReservationResponse.ImageDTO> updatedImages = fileService.uploadAndSaveFiles(images, carwash);
             response.setImages(updatedImages);
         }
         return response;

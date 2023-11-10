@@ -4,6 +4,8 @@ import bdbe.bdbd._core.utils.ApiUtils;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+import java.util.Map;
+
 /**
  * HTTP 상태 코드 400 (Bad Request) : 잘못된 요청
  * 유효성 검사 실패 또는 잘못된 파라미터 요청시 발생합니다.
@@ -12,8 +14,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class BadRequestError extends ApiException {
 
-    public BadRequestError(ErrorCode errorCode, Object errors) {
-        super(errorCode, errors, HttpStatus.BAD_REQUEST);
+    public BadRequestError(ErrorCode errorCode, Map<String, String> message) {
+        super(errorCode, message, HttpStatus.BAD_REQUEST);
     }
 
     public enum ErrorCode implements ApiException.ErrorCode {

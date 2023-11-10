@@ -1,5 +1,6 @@
 package bdbe.bdbd.review;
 
+import bdbe.bdbd._core.exception.NotFoundError;
 import bdbe.bdbd.dto.review.ReviewRequest;
 import bdbe.bdbd.model.Code;
 import bdbe.bdbd.model.Code.KeywordType;
@@ -30,6 +31,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,7 +81,10 @@ public class ReviewRestControllerTest {
     public void createReviewTest() throws Exception {
         // given
         Member member = memberJPARepository.findByEmail("user@nate.com")
-                .orElseThrow(() -> new IllegalArgumentException("user not found"));
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("User", "User not found")
+                ));
 
         PageRequest pageRequest = PageRequest.of(0, 1);
         List<Reservation> reservations = reservationJPARepository.findFirstByMemberIdWithJoinFetch(member.getId(), pageRequest);
