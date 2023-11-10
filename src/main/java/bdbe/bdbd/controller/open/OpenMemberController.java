@@ -2,6 +2,7 @@ package bdbe.bdbd.controller.open;
 
 
 import bdbe.bdbd._core.exception.BadRequestError;
+import bdbe.bdbd._core.exception.UnAuthorizedError;
 import bdbe.bdbd._core.security.JWTProvider;
 import bdbe.bdbd._core.utils.ApiUtils;
 import bdbe.bdbd.dto.member.user.UserRequest;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Collections;
 
 @RequiredArgsConstructor
 @RestController
@@ -42,7 +44,10 @@ public class OpenMemberController {
     public ResponseEntity<?> loginUser(@RequestBody @Valid UserRequest.LoginDTO requestDTO, Errors errors) {
         if (errors.hasErrors()) {
             String errorMessage = errors.getAllErrors().get(0).getDefaultMessage();
-            throw new BadRequestError(errorMessage);
+            throw new UnAuthorizedError(
+            UnAuthorizedError.ErrorCode.ACCESS_DENIED,
+                    Collections.singletonMap("Token", errorMessage)
+            );
         }
         UserResponse.LoginResponse response = userService.login(requestDTO);
         return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(null));
@@ -58,7 +63,10 @@ public class OpenMemberController {
     public ResponseEntity<?> loginOwner(@RequestBody @Valid UserRequest.LoginDTO requestDTO, Errors errors) {
         if (errors.hasErrors()) {
             String errorMessage = errors.getAllErrors().get(0).getDefaultMessage();
-            throw new BadRequestError(errorMessage);
+            throw new UnAuthorizedError(
+                    UnAuthorizedError.ErrorCode.ACCESS_DENIED,
+                    Collections.singletonMap("Token", errorMessage)
+            );
         }
         UserResponse.LoginResponse response = ownerService.login(requestDTO);
         return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(null));

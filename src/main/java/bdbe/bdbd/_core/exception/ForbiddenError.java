@@ -10,16 +10,30 @@ import org.springframework.http.HttpStatus;
  * 인증은 되었지만, 리소스에 접근할 권한이 없을때 발생합니다.
  */
 @Getter
-public class ForbiddenError extends RuntimeException {
-    public ForbiddenError(String message) {
-        super(message);
+public class ForbiddenError extends ApiException {
+
+    public ForbiddenError(ErrorCode errorCode, Object errors) {
+        super(errorCode, errors, HttpStatus.FORBIDDEN);
     }
 
-    public ApiUtils.ApiResult<?> body(){
-        return ApiUtils.error(getMessage(), HttpStatus.FORBIDDEN);
-    }
+    public enum ErrorCode implements ApiException.ErrorCode {
+        ROLE_BASED_ACCESS_ERROR(1101, "Role-Based Access Error"),
+        RESOURCE_ACCESS_FORBIDDEN(1102, "Resource Authorization Error");
 
-    public HttpStatus status(){
-        return HttpStatus.FORBIDDEN;
+        private final int code;
+        private final String message;
+
+        ErrorCode(int code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 }

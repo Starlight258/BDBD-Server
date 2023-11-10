@@ -11,14 +11,17 @@ import bdbe.bdbd.service.member.OwnerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -71,7 +74,6 @@ public class OwnerCarwashController {
             @RequestPart(value = "images", required = true) MultipartFile[] images,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-
         CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO =
                 carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
 
@@ -90,11 +92,15 @@ public class OwnerCarwashController {
 
     @GetMapping("/sales")
     public ResponseEntity<?> findAllOwnerReservation(
-            @RequestParam(value = "carwash-id") List<Long> carwashIds,
+            @RequestParam(value = "carwash-id", required = false) List<Long> carwashIds,
             @RequestParam(value = "selected-date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate,
             @AuthenticationPrincipal CustomUserDetails userDetails
     )
     {
+        if (carwashIds == null || carwashIds.isEmpty()) {
+            OwnerResponse.SaleResponseDTO dto = ownerService.findCarwashList(userDetails.getMember());
+            return ResponseEntity.ok(ApiUtils.success(dto));
+        }
         OwnerResponse.SaleResponseDTO saleResponseDTO = ownerService.findSales(carwashIds, selectedDate, userDetails.getMember());
 
         return ResponseEntity.ok(ApiUtils.success(saleResponseDTO));

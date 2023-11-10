@@ -11,16 +11,30 @@ import org.springframework.http.HttpStatus;
  * 인증이 되지 않았을때 발생합니다.
  */
 @Getter
-public class UnAuthorizedError extends RuntimeException {
-    public UnAuthorizedError(String message) {
-        super(message);
+public class UnAuthorizedError extends ApiException {
+
+    public UnAuthorizedError(ErrorCode errorCode, Object errors) {
+        super(errorCode, errors, HttpStatus.UNAUTHORIZED);
     }
 
-    public ApiUtils.ApiResult<?> body(){
-        return ApiUtils.error(getMessage(), HttpStatus.UNAUTHORIZED);
-    }
+    public enum ErrorCode implements ApiException.ErrorCode {
+        AUTHENTICATION_FAILED(1201, "Authentication Failure"),
+        ACCESS_DENIED(1202, "Insufficient Permissions for Resource Access");
 
-    public HttpStatus status(){
-        return HttpStatus.UNAUTHORIZED;
+        private final int code;
+        private final String message;
+
+        ErrorCode(int code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 }
