@@ -34,10 +34,6 @@ public class BayRequest {
     @ToString
     public static class LocationDTO {
 
-        @NotBlank(message = "Place name is required")
-        @Size(min = 3, max = 30, message = "Place name must be between 3 and 30 characters")
-        private String placeName;
-
         @NotBlank(message = "Address is required")
         @Size(min = 5, max = 50, message = "Address must be between 5 and 200 characters")
         private String address;
