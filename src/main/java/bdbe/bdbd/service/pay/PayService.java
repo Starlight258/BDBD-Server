@@ -147,47 +147,39 @@ public class PayService {
 
             UnAuthorizedError error = new UnAuthorizedError(
                     UnAuthorizedError.ErrorCode.AUTHENTICATION_FAILED,
-                    errorMessage
+                    Collections.singletonMap("error", errorMessage)
             );
-            errorResult = error.body();
 
-            return new ResponseEntity<>(errorResult, status);
+            return new ResponseEntity<>(error.body(), status);
         } catch (HttpServerErrorException e) {
             HttpStatus status = e.getStatusCode();
             String errorMessage = getString(objectMapper, e.getResponseBodyAsString());
 
             InternalServerError error = new InternalServerError(
                     InternalServerError.ErrorCode.INTERNAL_SERVER_ERROR,
-                    errorMessage
+                    Collections.singletonMap("error", errorMessage)
             );
-            errorResult = error.body();
 
-            return new ResponseEntity<>(errorResult, status);
+            return new ResponseEntity<>(error.body(), status);
         } catch (RestClientException e) {
             String errorMessage = getString(objectMapper, e.getMessage());
 
             InternalServerError error = new InternalServerError(
                     InternalServerError.ErrorCode.INTERNAL_SERVER_ERROR,
-                    errorMessage
+                    Collections.singletonMap("error", errorMessage)
             );
-            errorResult = error.body();
 
-            return new ResponseEntity<>(errorResult, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(error.body(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
-    private static String getString(ObjectMapper objectMapper, String response) {
-        String errorMessage;
+    private String getString(ObjectMapper objectMapper, String response) {
         try {
-            // 에러 응답 문자열에서 JSON 객체로 변환
-            JsonNode errorResponse = objectMapper.readTree(response);
-            JsonNode msgNode = errorResponse.get("msg");
-            errorMessage = msgNode != null ? msgNode.asText() : "Unknown error";
-        } catch (IOException ex) {
-            errorMessage = "Error parsing the error response";
+            JsonNode jsonNode = objectMapper.readTree(response);
+            return jsonNode.path("message").asText("Error processing the request");
+        } catch (JsonProcessingException e) {
+            return "Error processing the request";
         }
-        return errorMessage;
     }
 
     @Transactional

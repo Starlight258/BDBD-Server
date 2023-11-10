@@ -24,10 +24,6 @@ logging:
     '[bdbe.bdbd]': INFO
     '[org.hibernate.type]': TRACE
 
-proxy:
-  host: krmp-proxy.9rum.cc
-  port: 3128
-
 cloud:
   aws:
     credentials:
@@ -37,8 +33,12 @@ cloud:
       static: ap-northeast-2
     s3:
       bucket: ${AWS_BUCKET_NAME}
+    proxy:
+      host: krmp-proxy.9rum.cc
+      port: 3128
     stack:
       auto: false
+
 kakao:
   admin:
     key: ${KAKAOPAY_ADMIN_KEY}

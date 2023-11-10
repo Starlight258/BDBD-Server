@@ -4,14 +4,16 @@ import bdbe.bdbd._core.utils.ApiUtils;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+import java.util.Map;
+
 @Getter
 public abstract class ApiException extends RuntimeException {
 
     private final ErrorCode errorCode;
-    private final Object errors;
+    private final Map<String, String> errors;
     private final HttpStatus status;
 
-    public ApiException(ErrorCode errorCode, Object errors, HttpStatus status) {
+    public ApiException(ErrorCode errorCode, Map<String, String> errors, HttpStatus status) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
         this.errors = errors;
@@ -22,7 +24,7 @@ public abstract class ApiException extends RuntimeException {
         return ApiUtils.error(
                 String.valueOf(this.getStatus().value()),
                 String.valueOf(this.errorCode.getCode()),
-                this.getMessage()
+                this.errors
         );
     }
 

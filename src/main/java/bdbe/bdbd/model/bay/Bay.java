@@ -1,5 +1,6 @@
 package bdbe.bdbd.model.bay;
 
+import bdbe.bdbd._core.exception.BadRequestError;
 import bdbe.bdbd.model.carwash.Carwash;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -7,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Collections;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,7 +41,10 @@ public class Bay {
 
     public void changeStatus(int newStatus) {
         if (newStatus != 0 && newStatus != 1) {
-            throw new IllegalArgumentException("Invalid status value: " + newStatus);
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("Status", "Invalid status value: " + newStatus)
+            );
         }
         this.status = newStatus;
     }
