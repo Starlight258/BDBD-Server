@@ -26,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.*;
 
+import static java.lang.String.valueOf;
+
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
@@ -69,7 +71,7 @@ public class OwnerService {
             );
         }
 
-        String userRole = String.valueOf(member.getRole());
+        String userRole = valueOf(member.getRole());
         if (!"ROLE_OWNER".equals(userRole) && !"ROLE_ADMIN".equals(userRole)) {
             throw new UnAuthorizedError(
                     UnAuthorizedError.ErrorCode.ACCESS_DENIED,
@@ -88,7 +90,7 @@ public class OwnerService {
         if (memberOptional.isPresent()) {
             throw new BadRequestError(
                     BadRequestError.ErrorCode.DUPLICATE_RESOURCE,
-                    Collections.singletonMap("Email", "Duplicate email exist : " + email));
+                    Collections.singletonMap("Email", "Duplicate email exist : "));
         }
     }
 
@@ -139,32 +141,31 @@ public class OwnerService {
         Bay bay = bayJPARepository.findById(bayId)
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                        Collections.singletonMap("BayId", "Bay with id " + bayId + " not found")
+                        Collections.singletonMap("BayId", "Bay not found")
                 ));
 
         Long carwashId = bay.getCarwash().getId();
         Carwash carwash = carwashJPARepository.findById(carwashId)
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                        Collections.singletonMap("CarwashId", "Carwash not found" + carwashId)
+                        Collections.singletonMap("CarwashId", "Carwash not found")
                 ));
 
         if (carwash.getMember().getId() != sessionMember.getId()) {
             throw new ForbiddenError(
                     ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
-                    Collections.singletonMap("MemberId", "Member is not the owner of the carwash.")
+                    Collections.singletonMap("CarwashId", "Member is not the owner of the carwash.")
             );
         }
     }
 
 
     public Map<String, Long> findMonthRevenue(List<Long> carwashIds, LocalDate selectedDate, Member sessionMember) {
-        // 해당 유저가 운영하는 세차장의 id인지 확인
         List<Carwash> carwashList = carwashJPARepository.findAllByIdInAndMember_Id(carwashIds, sessionMember.getId());
         if (carwashIds.size() != carwashList.size())
             throw new ForbiddenError(
                     ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
-                    Collections.singletonMap("MemberId", "Member is not the owner of the carwash.")
+                    Collections.singletonMap("CarwashIds", "Member is not the owner of the carwash.")
             );
 
         Map<String, Long> response = new HashMap<>();
@@ -197,9 +198,9 @@ public class OwnerService {
 
     public OwnerResponse.CarwashManageDTO findCarwashReservationOverview(Long carwashId, Member sessionMember) {
         Carwash carwash = carwashJPARepository.findByIdAndMember_Id(carwashId, sessionMember.getId())
-                .orElseThrow(() -> new NotFoundError(
-                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                        Collections.singletonMap("CarwashId", "Carwash not found" + carwashId)
+                .orElseThrow(() -> new ForbiddenError(
+                        ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
+                        Collections.singletonMap("CarwashId", "Member is not the owner of the carwash.")
                 ));
 
         LocalDate firstDayOfCurrentMonth = LocalDate.now().withDayOfMonth(1);
@@ -248,7 +249,7 @@ public class OwnerService {
             Carwash carwash = carwashJPARepository.findById(carwashId)
                     .orElseThrow(() -> new NotFoundError(
                             NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                            Collections.singletonMap("CarwashId", "Carwash not found" + carwashId)
+                            Collections.singletonMap("carwashId", "Carwash not found")
                     ));
             Long monthlySales = reservationJPARepository.findTotalRevenueByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
 
