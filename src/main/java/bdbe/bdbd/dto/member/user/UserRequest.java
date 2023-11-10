@@ -28,7 +28,6 @@ public class UserRequest {
         private String username;
 
         @NotBlank(message = "Tel is required.")
-        @Pattern(regexp = "^010\\d{8}$", message = "The telephone number format is invalid.")
         private String tel;
 
         public Member toUserEntity(String encodedPassword) {

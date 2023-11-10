@@ -37,4 +37,11 @@ public class BayResponse {
             this.keywordName = keywordName;
         }
     }
+
+    @Getter
+    @Setter
+    public static class BayRevenueResponseDTO {
+        private Long revenue;
+        private Long reservationCnt;
+    }
 }

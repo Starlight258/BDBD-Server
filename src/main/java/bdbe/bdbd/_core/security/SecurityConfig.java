@@ -4,6 +4,7 @@ package bdbe.bdbd._core.security;
 import bdbe.bdbd._core.exception.ForbiddenError;
 import bdbe.bdbd._core.exception.UnAuthorizedError;
 import bdbe.bdbd._core.utils.FilterResponseUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -26,6 +27,15 @@ import java.util.Collections;
 
 @Configuration
 public class SecurityConfig {
+
+    @Value("${frontend.localurl}")
+    private String frontlocalurl;
+
+    @Value("${frontend.prod.userurl}")
+    private String prodfrontuserurl;
+
+    @Value("${frontend.prod.ownerurl}")
+    private String prodfrontownerurl;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -112,7 +122,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
-        configuration.addAllowedOrigin("http://localhost:5173");
+        configuration.addAllowedOrigin(frontlocalurl);
         configuration.setAllowCredentials(true);
         configuration.addExposedHeader("Authorization");
 
@@ -130,8 +140,8 @@ public class SecurityConfig {
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         // USER, OWNER 배포 주소 (React)
-        configuration.addAllowedOriginPattern("https://k92309e2e8ca6a.user-app.krampoline.com");
-        configuration.addAllowedOriginPattern("https://kd1d9a4cf1cdea.user-app.krampoline.com");
+        configuration.addAllowedOriginPattern(prodfrontuserurl);
+        configuration.addAllowedOriginPattern(prodfrontownerurl);
         configuration.setAllowCredentials(true);
         configuration.addExposedHeader("Authorization");
 

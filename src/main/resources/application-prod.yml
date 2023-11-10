@@ -47,6 +47,11 @@ payment:
   cancel-url: https://k923062c3c512a.user-app.krampoline.com/paymentfail
   fail-url: https://k923062c3c512a.user-app.krampoline.com/paymentfail
 
+frontend:
+  localurl: http://localhost:5173
+  prod:
+    userurl: https://k92309e2e8ca6a.user-app.krampoline.com
+    ownerurl: https://kae2e326be433a.user-app.krampoline.com
 
 # 파일 저장 경로
 #file:
