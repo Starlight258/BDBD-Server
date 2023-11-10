@@ -103,7 +103,7 @@ public class CarwashService {
                 Keyword keyword = keywordJPARepository.findById(keywordId)
                         .orElseThrow(() -> new NotFoundError(
                                 NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                                Collections.singletonMap("message", "Carwash Keyword ID must be between 8 and 14")));
+                                Collections.singletonMap("message", "Carwash Keyword not found")));
 
                 CarwashKeyword carwashKeyword = CarwashKeyword.builder().carwash(carwash).keyword(keyword).build();
                 carwashKeywordList.add(carwashKeyword);
@@ -312,76 +312,78 @@ public class CarwashService {
                     Collections.singletonMap("MemberId", "Member is not the owner of the carwash.")
             );
         }
+        carwash.setName(updatedto.getName());
+        carwash.setTel(updatedto.getTel());
+        carwash.setDes(updatedto.getDescription());
+        carwash.setPrice(updatedto.getPrice());
+        response.updateCarwashPart(carwash);
 
-        if (updatedto != null){
-            carwash.setName(updatedto.getName());
-            carwash.setTel(updatedto.getTel());
-            carwash.setDes(updatedto.getDescription());
-            carwash.setPrice(updatedto.getPrice());
-            response.updateCarwashPart(carwash);
-
-            CarwashRequest.updateLocationDTO updateLocationDTO = updatedto.getLocationDTO();
-            Location location = locationJPARepository.findById(carwash.getLocation().getId())
-                    .orElseThrow(() -> new NotFoundError(
-                            NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                            Collections.singletonMap("LocationId", "Location not found")
-                    ));
-
-            location.updateAddress(updateLocationDTO.getAddress(),
-                    updateLocationDTO.getLatitude(), updateLocationDTO.getLongitude());
-            response.updateLocationPart(location);
-
-            CarwashRequest.updateOperatingTimeDTO updateOperatingTimeDTO = updatedto.getOptime();
-
-            List<Optime> optimeList = optimeJPARepository.findByCarwash_Id(carwashId);
-            Map<DayType, Optime> optimeByDayType = new EnumMap<>(DayType.class);
-            optimeList.forEach(ol -> optimeByDayType.put(ol.getDayType(), ol));
-
-            Optime weekOptime = optimeByDayType.get(DayType.WEEKDAY);
-            Optime endOptime = optimeByDayType.get(DayType.WEEKEND);
-
-            weekOptime.setStartTime(updateOperatingTimeDTO.getWeekday().getStart());
-            weekOptime.setEndTime(updateOperatingTimeDTO.getWeekday().getEnd());
-            endOptime.setStartTime(updateOperatingTimeDTO.getWeekend().getStart());
-            endOptime.setEndTime(updateOperatingTimeDTO.getWeekend().getEnd());
-
-            response.updateOptimePart(weekOptime, endOptime);
-
-            List<Long> newKeywordIds = updatedto.getKeywordId();
-
-            List<Long> existingKeywordIds = carwashKeywordJPARepository.findKeywordIdsByCarwashId(carwashId);
-
-            List<Long> keywordsToDelete = existingKeywordIds.stream()
-                    .filter(id -> !newKeywordIds.contains(id))
-                    .collect(Collectors.toList());
-            carwashKeywordJPARepository.deleteByCarwashIdAndKeywordIds(carwashId, keywordsToDelete);
-
-            List<Long> keywordsToAdd = newKeywordIds.stream()
-                    .filter(id -> !existingKeywordIds.contains(id))
-                    .collect(Collectors.toList());
-
-            List<Keyword> keywordList = keywordJPARepository.findAllById(keywordsToAdd);
-            if (keywordList.size() != keywordsToAdd.size()) {
-                throw new NotFoundError(
+        CarwashRequest.updateLocationDTO updateLocationDTO = updatedto.getLocationDTO();
+        Location location = locationJPARepository.findById(carwash.getLocation().getId())
+                .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                        Collections.singletonMap("KeywordId", "Keyword not found")
-                );
-            }
+                        Collections.singletonMap("LocationId", "Location not found")
+                ));
 
-            List<CarwashKeyword> newCarwashKeywords = new ArrayList<>();
-            for (Keyword keyword : keywordList) {
-                CarwashKeyword carwashKeyword = CarwashKeyword.builder()
-                        .carwash(carwash)
-                        .keyword(keyword)
-                        .build();
-                newCarwashKeywords.add(carwashKeyword);
-            }
-            carwashKeywordJPARepository.saveAll(newCarwashKeywords);
+        location.updateAddress(updateLocationDTO.getAddress(),
+                updateLocationDTO.getLatitude(), updateLocationDTO.getLongitude());
+        response.updateLocationPart(location);
 
-            List<Long> updateKeywordIds = carwashKeywordJPARepository.findKeywordIdsByCarwashId(carwashId);
-            response.updateKeywordPart(updateKeywordIds);
+        CarwashRequest.updateOperatingTimeDTO updateOperatingTimeDTO = updatedto.getOptime();
+
+        List<Optime> optimeList = optimeJPARepository.findByCarwash_Id(carwashId);
+        Map<DayType, Optime> optimeByDayType = new EnumMap<>(DayType.class);
+        optimeList.forEach(ol -> optimeByDayType.put(ol.getDayType(), ol));
+
+        Optime weekOptime = optimeByDayType.get(DayType.WEEKDAY);
+        Optime endOptime = optimeByDayType.get(DayType.WEEKEND);
+
+        weekOptime.setStartTime(updateOperatingTimeDTO.getWeekday().getStart());
+        weekOptime.setEndTime(updateOperatingTimeDTO.getWeekday().getEnd());
+        endOptime.setStartTime(updateOperatingTimeDTO.getWeekend().getStart());
+        endOptime.setEndTime(updateOperatingTimeDTO.getWeekend().getEnd());
+
+        response.updateOptimePart(weekOptime, endOptime);
+
+        List<Long> newKeywordIds = updatedto.getKeywordId();
+        if (newKeywordIds.stream().anyMatch(id -> id < 8 || id > 14)) {
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("message", "Carwash Keyword ID must be between 8 and 14")
+            );
         }
 
+        List<Long> existingKeywordIds = carwashKeywordJPARepository.findKeywordIdsByCarwashId(carwashId);
+
+        List<Long> keywordsToDelete = existingKeywordIds.stream()
+                .filter(id -> !newKeywordIds.contains(id))
+                .collect(Collectors.toList());
+        carwashKeywordJPARepository.deleteByCarwashIdAndKeywordIds(carwashId, keywordsToDelete);
+
+        List<Long> keywordsToAdd = newKeywordIds.stream()
+                .filter(id -> !existingKeywordIds.contains(id))
+                .collect(Collectors.toList());
+
+        List<Keyword> keywordList = keywordJPARepository.findAllById(keywordsToAdd);
+        if (keywordList.size() != keywordsToAdd.size()) {
+            throw new NotFoundError(
+                    NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                    Collections.singletonMap("KeywordId", "Keyword not found")
+            );
+        }
+
+        List<CarwashKeyword> newCarwashKeywords = new ArrayList<>();
+        for (Keyword keyword : keywordList) {
+            CarwashKeyword carwashKeyword = CarwashKeyword.builder()
+                    .carwash(carwash)
+                    .keyword(keyword)
+                    .build();
+            newCarwashKeywords.add(carwashKeyword);
+        }
+        carwashKeywordJPARepository.saveAll(newCarwashKeywords);
+
+        List<Long> updateKeywordIds = carwashKeywordJPARepository.findKeywordIdsByCarwashId(carwashId);
+        response.updateKeywordPart(updateKeywordIds);
 
         if (images != null && images.length > 0) {
             List<ReservationResponse.ImageDTO> updatedImages = uploadAndSaveFiles(images, carwash);
