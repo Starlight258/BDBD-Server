@@ -103,7 +103,7 @@ public class CarwashService {
                 Keyword keyword = keywordJPARepository.findById(keywordId)
                         .orElseThrow(() -> new NotFoundError(
                                 NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                                Collections.singletonMap("message", "Carwash Keyword ID must be between 8 and 14")));
+                                Collections.singletonMap("message", "Carwash Keyword not found")));
 
                 CarwashKeyword carwashKeyword = CarwashKeyword.builder().carwash(carwash).keyword(keyword).build();
                 carwashKeywordList.add(carwashKeyword);
@@ -346,6 +346,12 @@ public class CarwashService {
         response.updateOptimePart(weekOptime, endOptime);
 
         List<Long> newKeywordIds = updatedto.getKeywordId();
+        if (newKeywordIds.stream().anyMatch(id -> id < 8 || id > 14)) {
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("message", "Carwash Keyword ID must be between 8 and 14")
+            );
+        }
 
         List<Long> existingKeywordIds = carwashKeywordJPARepository.findKeywordIdsByCarwashId(carwashId);
 
