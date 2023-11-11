@@ -113,7 +113,7 @@ public class OwnerService {
     public OwnerResponse.ReservationCarwashListDTO findBayReservation(Long bayId, Member sessionMember, LocalDate selectedDate) {
         validateBayOwnership(bayId, sessionMember);
 
-        List<Reservation> reservationList = reservationJPARepository.findByBay_IdWithJoinsAndIsDeletedFalseAndMonth(bayId, selectedDate);
+        List<Reservation> reservationList = reservationJPARepository.findByBay_IdWithJoinsAndIsDeletedFalseAndMonthOrderByStartTimeDesc(bayId, selectedDate);
         Bay bay = bayJPARepository.findById(bayId)
                 .orElseThrow(() -> {
                     throw new NotFoundError(

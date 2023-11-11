@@ -23,8 +23,9 @@ public interface ReservationJPARepository extends JpaRepository<Reservation, Lon
             "join fetch b.carwash c " +
             "where b.id = :bayId and r.isDeleted = false " +
             "and FUNCTION('YEAR', r.startTime) = FUNCTION('YEAR', :selectedDate) " +
-            "and FUNCTION('MONTH', r.startTime) = FUNCTION('MONTH', :selectedDate)")
-    List<Reservation> findByBay_IdWithJoinsAndIsDeletedFalseAndMonth(@Param("bayId") Long bayId, @Param("selectedDate") LocalDate selectedDate);
+            "and FUNCTION('MONTH', r.startTime) = FUNCTION('MONTH', :selectedDate) " +
+            "order by r.startTime DESC")
+    List<Reservation> findByBay_IdWithJoinsAndIsDeletedFalseAndMonthOrderByStartTimeDesc(@Param("bayId") Long bayId, @Param("selectedDate") LocalDate selectedDate);
 
     List<Reservation> findByBay_IdAndIsDeletedFalse(Long bayId);
 
