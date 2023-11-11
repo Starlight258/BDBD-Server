@@ -43,8 +43,8 @@ public class ReservationRequest {
             LocalDateTime endTime = this.endTime;
 
             int perPrice = carwash.getPrice();
-            int minutesDifference = (int) ChronoUnit.MINUTES.between(startTime, endTime); //시간 차 계산
-            int blocksOf30Minutes = minutesDifference / 30; //30분 단위로 계산
+            int minutesDifference = (int) ChronoUnit.MINUTES.between(startTime, endTime);
+            int blocksOf30Minutes = minutesDifference / 30;
             int price = perPrice * blocksOf30Minutes;
 
             return Reservation.builder()
