@@ -29,7 +29,6 @@ public class OwnerBayRestController {
     public ResponseEntity<?> createBay(
             @PathVariable("carwash-id") Long carwashId,
             @Valid @RequestBody BayRequest.SaveDTO saveDTO,
-            Errors errors,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         bayService.createBay(saveDTO, carwashId, userDetails.getMember());
 
@@ -48,8 +47,9 @@ public class OwnerBayRestController {
 
     @GetMapping("/bays/{bay-id}/revenue")
     public ResponseEntity<?> findBayRevenue(
-            @PathVariable("bay-id") Long bayId) {
-        BayResponse.BayRevenueResponseDTO dto = bayService.findBayRevenue(bayId);
+            @PathVariable("bay-id") Long bayId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        BayResponse.BayRevenueResponseDTO dto = bayService.findBayRevenue(bayId, userDetails.getMember());
 
         return ResponseEntity.ok(ApiUtils.success(dto));
     }

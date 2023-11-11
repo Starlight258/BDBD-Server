@@ -65,9 +65,6 @@ public class PayRequest {
         @Valid
         private ReservationRequest.SaveDTO saveDTO;
 
-        @NotNull(message = "BayId is required")
-        private Long bayId;
-
     }
 
     @Getter
@@ -78,10 +75,10 @@ public class PayRequest {
         @Valid
         private ReservationRequest.SaveDTO saveDTO;
 
-        @NotNull(message = "CarwashId is required")
-        private Long carwashId;
-
-        @NotNull(message = "BayId is required")
-        private Long bayId;
+//        @NotNull(message = "CarwashId is required")
+//        private Long carwashId;
+//
+//        @NotNull(message = "BayId is required")
+//        private Long bayId;
     }
 }

@@ -2,6 +2,7 @@ package bdbe.bdbd.controller.user;
 
 import bdbe.bdbd._core.security.CustomUserDetails;
 import bdbe.bdbd.dto.pay.PayRequest;
+import bdbe.bdbd.dto.reservation.ReservationRequest;
 import bdbe.bdbd.dto.reservation.ReservationResponse;
 import bdbe.bdbd.service.pay.PayService;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +27,10 @@ public class UserPayController {
             @Valid @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest,
             Errors errors
     ) {
-        Long bayId = paymentReadyRequest.getBayId();
-
+        ReservationRequest.SaveDTO saveDTO = paymentReadyRequest.getSaveDTO();
         return payService.requestPaymentReady(
                 paymentReadyRequest.getRequestDto(),
-                paymentReadyRequest.getSaveDTO(),
-                bayId
+                saveDTO
         );
     }
 
@@ -39,15 +38,12 @@ public class UserPayController {
     @PostMapping("/payment/approve")
     public ResponseEntity<ReservationResponse.findLatestOneResponseDTO> requestPaymentApproval(
             @Valid @RequestBody PayRequest.PaymentApprovalRequestDTO requestDTO,
-            Errors errors,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        Long carwashId = requestDTO.getCarwashId();
-        Long bayId = requestDTO.getBayId();
+        Long bayId = requestDTO.getSaveDTO().getBayId();
 
         return payService.requestPaymentApproval(
                 requestDTO.getPayApprovalRequestDTO(),
-                carwashId,
                 bayId,
                 userDetails.getMember(),
                 requestDTO.getSaveDTO()
