@@ -357,7 +357,7 @@ public class CarwashService {
 
         if (images != null && images.length > 0) {
             List<ReservationResponse.ImageDTO> updatedImages = fileService.uploadAndSaveFiles(images, carwash);
-            response.setImages(updatedImages);
+            response.setImageFileList(updatedImages);
         }
 
         return response;
