@@ -288,7 +288,7 @@ public class CarwashService {
         carwash.setPrice(updatedto.getPrice());
         response.updateCarwashPart(carwash);
 
-        CarwashRequest.updateLocationDTO updateLocationDTO = updatedto.getLocationDTO();
+        CarwashRequest.updateLocationDTO updateLocationDTO = updatedto.getLocation();
         Location location = locationJPARepository.findById(carwash.getLocation().getId())
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,

@@ -1,10 +1,8 @@
 package bdbe.bdbd.carwash;
 
 import bdbe.bdbd.dto.carwash.CarwashRequest;
-import bdbe.bdbd.model.Code;
 import bdbe.bdbd.model.Code.KeywordType;
 import bdbe.bdbd.model.keyword.Keyword;
-import bdbe.bdbd.model.member.Member;
 import bdbe.bdbd.repository.carwash.CarwashJPARepository;
 import bdbe.bdbd.repository.keyword.KeywordJPARepository;
 import bdbe.bdbd.repository.location.LocationJPARepository;
@@ -276,7 +274,7 @@ public class CarwashRestControllerTest {
         updateLocationDTO.setAddress("풍영 주소");
         updateLocationDTO.setLatitude(1.121);
         updateLocationDTO.setLongitude(2.232);
-        updateCarwashDetailsDTO.setLocationDTO(updateLocationDTO);
+        updateCarwashDetailsDTO.setLocation(updateLocationDTO);
 
         CarwashRequest.updateOperatingTimeDTO optimeDTO = new CarwashRequest.updateOperatingTimeDTO();
 
