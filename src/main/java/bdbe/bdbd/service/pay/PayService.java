@@ -69,14 +69,14 @@ public class PayService {
         Bay bay = bayJPARepository.findById(bayId)
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                        Collections.singletonMap("BayId", "Bay not found" + bayId)
+                        Collections.singletonMap("BayId", "Bay not found")
                 ));
 
         Long carwashId = bay.getCarwash().getId();
         Carwash carwash = carwashJpaRepository.findById(carwashId)
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                        Collections.singletonMap("CarwashId", "Carwash not found" + carwashId)
+                        Collections.singletonMap("CarwashId", "Carwash not found")
                 ));
 
         LocalDateTime startTime = saveDTO.getStartTime();
