@@ -98,7 +98,7 @@ public class OwnerService {
 
         List<Carwash> carwashList = carwashJPARepository.findCarwashesByMemberId(sessionMember.getId());
 
-        List<Reservation> reservationList = reservationJPARepository.findAllByCarwash_IdInOrderByStartTimeDesc(carwashIds, selectedDate);
+        List<Reservation> reservationList = reservationJPARepository.findAllByCarwash_IdInOrderByStartTimeDesc(carwashIds, LocalDate.of(selectedDate.getYear(), selectedDate.getMonth(), selectedDate.getDayOfMonth()));
         if (reservationList.isEmpty()) return new OwnerResponse.SaleResponseDTO(carwashList, new ArrayList<>());
 
         return new OwnerResponse.SaleResponseDTO(carwashList, reservationList);
