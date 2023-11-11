@@ -79,8 +79,8 @@ public class ReservationRestControllerTest {
 
         UpdateDTO updateDTO = new UpdateDTO();
         LocalDate date = LocalDate.now();
-        updateDTO.setStartTime(LocalDateTime.of(date, LocalTime.of(21, 30)));
-        updateDTO.setEndTime(LocalDateTime.of(date, LocalTime.of(22, 0)));
+        updateDTO.setStartTime(LocalDateTime.of(date, LocalTime.of(14, 30)));
+        updateDTO.setEndTime(LocalDateTime.of(date, LocalTime.of(15, 0)));
 
         String requestBody = om.writeValueAsString(updateDTO);
         System.out.println("요청 데이터 : " + requestBody);
@@ -88,7 +88,7 @@ public class ReservationRestControllerTest {
         //when
         Long reservationId = reservation.getId();
         ResultActions resultActions = mvc.perform(
-                put(String.format("/api/reservations/%d", reservationId))
+                put(String.format("/api/user/reservations/%d", reservationId))
                         .content(om.writeValueAsString(updateDTO))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
         );
@@ -122,7 +122,7 @@ public class ReservationRestControllerTest {
         Long reservationId = reservation.getId();
         System.out.println("reservation id: " +reservationId);
         ResultActions resultActions = mvc.perform(
-                delete(String.format("/api/reservations/%d", reservationId))
+                delete(String.format("/api/user/reservations/%d", reservationId))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
         );
         // eye
@@ -171,7 +171,7 @@ public class ReservationRestControllerTest {
 
         //when
         ResultActions resultActions = mvc.perform(
-                get(String.format("/api/carwashes/%d/bays", carwash.getId()))
+                get(String.format("/api/open/carwashes/%d/bays", carwash.getId()))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
         );
         // eye
