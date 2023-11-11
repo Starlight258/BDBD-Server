@@ -160,19 +160,29 @@ public class CarwashService {
     }
 
     public List<CarwashRequest.CarwashDistanceDTO> findCarwashesByKeywords(CarwashRequest.SearchRequestDTO searchRequest) {
+        // 키워드 ID 범위 검증
+        List<Long> keywordIds = searchRequest.getKeywordIds();
+        if (keywordIds.stream().anyMatch(id -> id < 8 || id > 14)) {
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("message", "Carwash Keyword ID must be between 8 and 14")
+            );
+        }
+
         List<Carwash> carwashesWithin10Km = carwashJPARepository.findCarwashesWithin10Kilometers(searchRequest.getLatitude(), searchRequest.getLongitude());
 
-        List<Keyword> selectedKeywords = keywordJPARepository.findAllById(searchRequest.getKeywordIds());
-        if (searchRequest.getKeywordIds().size() != selectedKeywords.size()) {
+        List<Keyword> selectedKeywords = keywordJPARepository.findAllById(keywordIds);
+        if (keywordIds.size() != selectedKeywords.size()) {
             throw new BadRequestError(
                     BadRequestError.ErrorCode.VALIDATION_FAILED,
                     Collections.singletonMap("KeywordId", "KeywordId is invalid")
             );
         }
+
         List<CarwashRequest.CarwashDistanceDTO> result = carwashesWithin10Km.stream()
                 .filter(carwash -> {
                     List<Long> keywordIdsForCarwash = findKeywordIdsByCarwashId(carwash.getId());
-                    return searchRequest.getKeywordIds().stream()
+                    return keywordIds.stream()
                             .allMatch(keywordIdsForCarwash::contains);
                 })
                 .map(carwash -> {

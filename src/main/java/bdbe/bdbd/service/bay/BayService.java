@@ -65,6 +65,8 @@ public class BayService {
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
                         Collections.singletonMap("Bay", "Bay not found")
                 ));
+        System.out.println("bay id = " + bay.getCarwash().getMember().getId());
+        System.out.println("member = " + member.getId());
 
         if (bay.getCarwash().getMember().getId() != member.getId()) {
             throw new ForbiddenError(
