@@ -253,8 +253,8 @@ public class CarwashResponse {
             this.optime = dto;
         }
 
-        public void updateKeywordPart(List<Long> keywordId) {
-            this.keywordIdList = keywordId;
+        public void updateKeywordPart(List<Long> keywordIdList) {
+            this.keywordIdList = keywordIdList;
         }
 
         public void updateLocationPart(Location location) {

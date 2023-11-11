@@ -95,7 +95,7 @@ public class CarwashService {
         List<Optime> optimes = saveDTO.toOptimeEntities(carwash);
         optimeJPARepository.saveAll(optimes);
 
-        List<Long> keywordIdList = saveDTO.getKeywordId();
+        List<Long> keywordIdList = saveDTO.getKeywordIdList();
         if (keywordIdList != null && !keywordIdList.isEmpty()) {
             if (keywordIdList.stream().anyMatch(id -> id < 8 || id > 14)) {
                 throw new BadRequestError(
@@ -356,8 +356,8 @@ public class CarwashService {
         response.updateKeywordPart(updateKeywordIds);
 
         if (images != null && images.length > 0) {
-            List<ReservationResponse.ImageDTO> updatedImages = fileService.uploadAndSaveFiles(images, carwash);
-            response.setImageFileList(updatedImages);
+            List<ReservationResponse.ImageDTO> updatedImageList = fileService.uploadAndSaveFiles(images, carwash);
+            response.setImageFileList(updatedImageList);
         }
 
         return response;
