@@ -47,7 +47,6 @@ public class OwnerCarwashController {
 
     @PostMapping(value = "/carwashes/register")
     public ResponseEntity<?> saveCarwash(@Valid @RequestPart("carwash") CarwashRequest.SaveDTO saveDTOs,
-                                         Errors errors,
                                          @RequestPart(value = "images", required = false) Optional<MultipartFile[]> images,
                                          @AuthenticationPrincipal CustomUserDetails userDetails) {
         if (images.isPresent()) {
