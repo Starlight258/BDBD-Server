@@ -85,10 +85,10 @@ public class OwnerCarwashController {
     public ResponseEntity<?> updateCarwashDetails(
             @PathVariable("carwash-id") Long carwashId,
             @Valid @RequestPart("updateData") CarwashRequest.updateCarwashDetailsDTO updatedto,
-            @RequestPart(value = "images") MultipartFile[] images,
+            @RequestPart(value = "imageFileList") MultipartFile[] imageFileList,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        for (MultipartFile file : images) {
+        for (MultipartFile file : imageFileList) {
             if (file.isEmpty()) {
                 throw new BadRequestError(
                         BadRequestError.ErrorCode.MISSING_PART,
@@ -97,7 +97,7 @@ public class OwnerCarwashController {
             }
         }
         CarwashResponse.updateCarwashDetailsResponseDTO updateCarwashDetailsDTO =
-                carwashService.updateCarwashDetails(carwashId, updatedto, images, userDetails.getMember());
+                carwashService.updateCarwashDetails(carwashId, updatedto, imageFileList, userDetails.getMember());
 
         return ResponseEntity.ok(ApiUtils.success(updateCarwashDetailsDTO));
     }
