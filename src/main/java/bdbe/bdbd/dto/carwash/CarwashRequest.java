@@ -39,7 +39,7 @@ public class CarwashRequest {
         @NotNull(message = "optime is required.")
         private OperatingTimeDTO optime;
 
-        private List<Long> keywordId;
+        private List<Long> keywordIdList;
 
         @NotBlank(message = "Description is required.")
         @Size(max = 200, message = "Description cannot be longer than 200 characters.")
