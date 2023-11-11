@@ -289,7 +289,7 @@ public class CarwashRestControllerTest {
         optimeDTO.setWeekend(weekend);
         updateCarwashDetailsDTO.setOptime(optimeDTO);
 
-        updateCarwashDetailsDTO.setKeywordId(Arrays.asList(1L));
+        updateCarwashDetailsDTO.setKeywordIdList(Arrays.asList(1L));
 
         MockMultipartFile image1 = new MockMultipartFile("images", "image1.jpg", "image/jpeg", "image1 content".getBytes());
         MockMultipartFile image2 = new MockMultipartFile("images", "image2.jpg", "image/jpeg", "image2 content".getBytes());

@@ -315,7 +315,7 @@ public class CarwashService {
 
         response.updateOptimePart(weekOptime, endOptime);
 
-        List<Long> newKeywordIds = updatedto.getKeywordId();
+        List<Long> newKeywordIds = updatedto.getKeywordIdList();
         if (newKeywordIds.stream().anyMatch(id -> id < 8 || id > 14)) {
             throw new BadRequestError(
                     BadRequestError.ErrorCode.VALIDATION_FAILED,
