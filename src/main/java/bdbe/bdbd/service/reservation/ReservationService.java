@@ -293,7 +293,7 @@ public class ReservationService {
         return new ReservationResponse.fetchCurrentStatusReservationDTO(current, upcoming, completed);
     }
 
-    public ReservationResponse.fetchRecentReservationDTO fetchRecentReservation(Member sessionMember) {
+    public ReservationResponse.fetchRecentReservationDTO findRecentReservation(Member sessionMember) {
 
         Pageable pageable = PageRequest.of(0, 5); // 최대 5개까지만 가져오기
         List<Reservation> reservationList = reservationJPARepository.findByMemberIdJoinFetch(sessionMember.getId(), pageable);
