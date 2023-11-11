@@ -8,7 +8,6 @@ import bdbe.bdbd.service.reservation.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -65,11 +64,13 @@ public class UserReservationController {
     }
 
     @GetMapping("/reservations/recent")
-    public ResponseEntity<?> updateReservation(
+    public ResponseEntity<?> findRecentReservation(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        ReservationResponse.fetchRecentReservationDTO dto = reservationService.fetchRecentReservation(userDetails.getMember());
+        ReservationResponse.fetchRecentReservationDTO dto = reservationService.findRecentReservation(userDetails.getMember());
 
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
+
+    // 예약 생성은 결제 성공 후 진행
 }
