@@ -87,7 +87,7 @@ public class CarwashRestControllerTest {
                 .type(KeywordType.CARWASH)
                 .build();
         Keyword savedKeyword = keywordJPARepository.save(keyword);
-        dto.setKeywordIdList(Arrays.asList(savedKeyword.getId()));
+        dto.setKeywordId(Arrays.asList(savedKeyword.getId()));
         dto.setName("test 세차장");
 
         dto.setTel("01012345678");
