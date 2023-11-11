@@ -48,8 +48,9 @@ public class OwnerBayRestController {
 
     @GetMapping("/bays/{bay-id}/revenue")
     public ResponseEntity<?> findBayRevenue(
-            @PathVariable("bay-id") Long bayId) {
-        BayResponse.BayRevenueResponseDTO dto = bayService.findBayRevenue(bayId);
+            @PathVariable("bay-id") Long bayId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        BayResponse.BayRevenueResponseDTO dto = bayService.findBayRevenue(bayId, userDetails.getMember());
 
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
