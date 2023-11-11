@@ -220,18 +220,18 @@ public class CarwashResponse {
         private String name;
         private int price;
         private String tel;
-        private CarwashResponse.updateLocationDTO locationDTO;
+        private CarwashResponse.updateLocationDTO location;
         private CarwashResponse.updateOperatingTimeDTO optime;
-        private List<Long> keywordId;
+        private List<Long> keywordIdList;
         private String description;
-        private List<ReservationResponse.ImageDTO> images;
+        private List<ReservationResponse.ImageDTO> imageFileList;
 
         public void updateCarwashPart(Carwash carwash) {
             this.id = carwash.getId();
             this.name = carwash.getName();
             this.price = carwash.getPrice();
             this.tel = carwash.getTel();
-            this.images = carwash.getFileList().stream()
+            this.imageFileList = carwash.getFileList().stream()
                     .filter(file -> !file.isDeleted())
                     .map(ReservationResponse.ImageDTO::new)
                     .collect(Collectors.toList());
@@ -254,7 +254,7 @@ public class CarwashResponse {
         }
 
         public void updateKeywordPart(List<Long> keywordId) {
-            this.keywordId = keywordId;
+            this.keywordIdList = keywordId;
         }
 
         public void updateLocationPart(Location location) {
@@ -263,7 +263,7 @@ public class CarwashResponse {
             dto.setLatitude(location.getLatitude());
             dto.setLongitude(location.getLongitude());
 
-            this.locationDTO = dto;
+            this.location = dto;
         }
     }
 
