@@ -1,7 +1,11 @@
 package bdbe.bdbd.service.member;
 
-import bdbe.bdbd._core.exception.*;
+import bdbe.bdbd._core.exception.ForbiddenError;
+import bdbe.bdbd._core.exception.InternalServerError;
+import bdbe.bdbd._core.exception.NotFoundError;
+import bdbe.bdbd._core.exception.UnAuthorizedError;
 import bdbe.bdbd._core.security.JWTProvider;
+import bdbe.bdbd._core.utils.MemberUtils;
 import bdbe.bdbd.dto.member.owner.OwnerResponse;
 import bdbe.bdbd.dto.member.owner.OwnerResponse.OwnerDashboardDTO;
 import bdbe.bdbd.dto.member.user.UserRequest;
@@ -40,10 +44,11 @@ public class OwnerService {
     private final OptimeJPARepository optimeJPARepository;
     private final BayJPARepository bayJPARepository;
     private final FileJPARepository fileJPARepository;
+    private final MemberUtils memberUtils;
 
     @Transactional
     public void joinOwner(UserRequest.JoinDTO requestDTO) {
-        checkSameEmail(requestDTO.getEmail());
+        memberUtils.checkSameEmail(requestDTO.getEmail());
         String encodedPassword = passwordEncoder.encode(requestDTO.getPassword());
 
         try {
@@ -81,16 +86,6 @@ public class OwnerService {
         String redirectUrl = "/owner/home";
 
         return new UserResponse.LoginResponse(jwt, redirectUrl);
-    }
-
-
-    public void checkSameEmail(String email) {
-        Optional<Member> memberOptional = memberJPARepository.findByEmail(email);
-        if (memberOptional.isPresent()) {
-            throw new BadRequestError(
-                    BadRequestError.ErrorCode.DUPLICATE_RESOURCE,
-                    Collections.singletonMap("Email", "Duplicate email exist : "));
-        }
     }
 
     public OwnerResponse.SaleResponseDTO findSales(List<Long> carwashIds, LocalDate selectedDate, Member sessionMember) {

@@ -29,6 +29,9 @@ public class ReservationRequest {
     @Setter
     @ToString
     public static class SaveDTO {
+        @NotNull(message = "BayId is required")
+        private Long bayId;
+
         @NotNull(message = "Start time is required")
         private LocalDateTime startTime;
 

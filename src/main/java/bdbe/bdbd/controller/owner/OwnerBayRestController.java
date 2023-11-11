@@ -29,7 +29,6 @@ public class OwnerBayRestController {
     public ResponseEntity<?> createBay(
             @PathVariable("carwash-id") Long carwashId,
             @Valid @RequestBody BayRequest.SaveDTO saveDTO,
-            Errors errors,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         bayService.createBay(saveDTO, carwashId, userDetails.getMember());
 

@@ -2,6 +2,7 @@ package bdbe.bdbd.controller.user;
 
 import bdbe.bdbd._core.security.CustomUserDetails;
 import bdbe.bdbd.dto.pay.PayRequest;
+import bdbe.bdbd.dto.reservation.ReservationRequest;
 import bdbe.bdbd.dto.reservation.ReservationResponse;
 import bdbe.bdbd.service.pay.PayService;
 import lombok.RequiredArgsConstructor;
@@ -21,28 +22,28 @@ public class UserPayController {
 
     private final PayService payService;
 
-    @PostMapping("/payment/ready/{bay-id}")
+    @PostMapping("/payment/ready")
     public ResponseEntity<?> requestPaymentReady(
-            @PathVariable("bay-id") Long bayId,
-            @Valid @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest
+            @Valid @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest,
+            Errors errors
     ) {
+        ReservationRequest.SaveDTO saveDTO = paymentReadyRequest.getSaveDTO();
         return payService.requestPaymentReady(
                 paymentReadyRequest.getRequestDto(),
-                paymentReadyRequest.getSaveDTO(),
-                bayId
+                saveDTO
         );
     }
 
 
-    @PostMapping("/payment/approve/{carwash-id}/{bay-id}")
+    @PostMapping("/payment/approve")
     public ResponseEntity<ReservationResponse.findLatestOneResponseDTO> requestPaymentApproval(
-            @PathVariable("carwash-id") Long carwashId,
-            @PathVariable("bay-id") Long bayId,
             @Valid @RequestBody PayRequest.PaymentApprovalRequestDTO requestDTO,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        Long bayId = requestDTO.getSaveDTO().getBayId();
+
         return payService.requestPaymentApproval(
                 requestDTO.getPayApprovalRequestDTO(),
-                carwashId,
                 bayId,
                 userDetails.getMember(),
                 requestDTO.getSaveDTO()

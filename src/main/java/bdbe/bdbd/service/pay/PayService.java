@@ -63,8 +63,9 @@ public class PayService {
 
     private final BayJPARepository bayJPARepository;
 
-    public ResponseEntity<?> requestPaymentReady(PayRequest.PayReadyRequestDTO requestDto, ReservationRequest.SaveDTO saveDTO, Long bayId) {
+    public ResponseEntity<?> requestPaymentReady(PayRequest.PayReadyRequestDTO requestDto, ReservationRequest.SaveDTO saveDTO) {
 
+        Long bayId = saveDTO.getBayId();
         Bay bay = bayJPARepository.findById(bayId)
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
@@ -179,16 +180,22 @@ public class PayService {
     @Transactional
     public ResponseEntity<ReservationResponse.findLatestOneResponseDTO> requestPaymentApproval(
             PayRequest.PayApprovalRequestDTO requestDto,
-            Long carwashId,
             Long bayId,
             Member member,
             ReservationRequest.SaveDTO saveDTO) {
 
-        Carwash carwash = carwashJpaRepository.findById(carwashId)
+        Bay bay = bayJPARepository.findById(bayId)
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
-                        Collections.singletonMap("CarwashId", "Carwash not found" + carwashId)
+                        Collections.singletonMap("BayId", "BayId not found")
                 ));
+
+        Carwash carwash = carwashJpaRepository.findById(bay.getCarwash().getId())
+                .orElseThrow(() -> new NotFoundError(
+                        NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                        Collections.singletonMap("CarwashId", "Carwash not found")
+                ));
+
         LocalDateTime startTime = saveDTO.getStartTime();
         LocalDateTime endTime = saveDTO.getEndTime();
         Optime optime = reservationService.findOptime(carwash, startTime);
@@ -215,7 +222,7 @@ public class PayService {
         Reservation reservation;
 
         if (paymentApprovalResponse.getStatusCode().is2xxSuccessful()) {
-            reservation = reservationService.save(saveDTO, carwashId, bayId, member);  // 변수 이름 변경
+            reservation = reservationService.save(saveDTO, carwash.getId(), bayId, member);  // 변수 이름 변경
         } else {
             log.error("Payment approval failed: " + paymentApprovalResponse.getBody());
             throw new BadRequestError(
