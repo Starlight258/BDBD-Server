@@ -95,7 +95,7 @@ public class CarwashService {
         List<Optime> optimes = saveDTO.toOptimeEntities(carwash);
         optimeJPARepository.saveAll(optimes);
 
-        List<Long> keywordIdList = saveDTO.getKeywordIdList();
+        List<Long> keywordIdList = saveDTO.getKeywordId();
         if (keywordIdList != null && !keywordIdList.isEmpty()) {
             if (keywordIdList.stream().anyMatch(id -> id < 8 || id > 14)) {
                 throw new BadRequestError(
