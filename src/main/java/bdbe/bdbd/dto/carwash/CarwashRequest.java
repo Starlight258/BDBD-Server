@@ -245,7 +245,7 @@ public class CarwashRequest {
 
         @Valid
         @NotNull(message = "Location is required")
-        private updateLocationDTO locationDTO;
+        private updateLocationDTO location;
 
         @Valid
         @NotNull(message = "Optime is required")
