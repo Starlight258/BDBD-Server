@@ -27,8 +27,7 @@ public class UserReservationController {
     @PostMapping("/carwashes/{bay-id}/payment")
     public ResponseEntity<?> findPayAmount(
             @PathVariable("bay-id") Long bayId,
-            @Valid @RequestBody ReservationRequest.ReservationTimeDTO dto,
-            Errors errors
+            @Valid @RequestBody ReservationRequest.ReservationTimeDTO dto
     ) {
         ReservationResponse.PayAmountDTO responseDTO = reservationService.findPayAmount(dto, bayId);
 
@@ -39,7 +38,6 @@ public class UserReservationController {
     public ResponseEntity<?> updateReservation(
             @PathVariable("reservation-id") Long reservationId,
             @Valid @RequestBody ReservationRequest.UpdateDTO dto,
-            Errors errors,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         reservationService.update(dto, reservationId, userDetails.getMember());
