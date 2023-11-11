@@ -64,6 +64,10 @@ public class PayRequest {
         private PayRequest.PayReadyRequestDTO requestDto;
         @Valid
         private ReservationRequest.SaveDTO saveDTO;
+
+        @NotNull(message = "BayId is required")
+        private Long bayId;
+
     }
 
     @Getter
