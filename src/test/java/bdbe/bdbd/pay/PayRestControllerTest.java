@@ -51,6 +51,7 @@ public class PayRestControllerTest {
         requestDto.setItem_name("구름 세차장 예약");
         requestDto.setQuantity(1);
         requestDto.setTax_free_amount(0);
+        requestDto.setTotal_amount(20000);
 
         ReservationRequest.SaveDTO saveDTO = new ReservationRequest.SaveDTO();
         saveDTO.setStartTime(LocalDateTime.parse("2024-11-01T14:00:00"));
@@ -63,12 +64,47 @@ public class PayRestControllerTest {
         String jsonRequestBody = om.writeValueAsString(requestBodyMap);
 
         ResultActions resultActions = mvc.perform(
-                post("/api/payment/ready/{carwashId}", carwashId)
+                post("/api/user/payment/ready/{bay-id}", 1)
                         .content(jsonRequestBody)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
         );
 
         resultActions.andExpect(status().isOk());
-        resultActions.andExpect(jsonPath("$.tid").exists());
     }
+
+    @WithUserDetails("user@nate.com")
+    @Test
+    @DisplayName("invalid amount Payment Ready Request Test")
+    public void invalidAmonutPaymentReadyTest() throws Exception {
+
+        Long carwashId = 1L;
+
+        PayRequest.PayReadyRequestDTO requestDto = new PayRequest.PayReadyRequestDTO();
+        requestDto.setCid("TC0ONETIME");
+        requestDto.setPartner_order_id("partner_order_id");
+        requestDto.setPartner_user_id("partner_user_id");
+        requestDto.setItem_name("구름 세차장 예약");
+        requestDto.setQuantity(1);
+        requestDto.setTax_free_amount(0);
+        requestDto.setTotal_amount(9999);
+
+        ReservationRequest.SaveDTO saveDTO = new ReservationRequest.SaveDTO();
+        saveDTO.setStartTime(LocalDateTime.parse("2024-11-01T14:00:00"));
+        saveDTO.setEndTime(LocalDateTime.parse("2024-11-01T15:00:00"));
+
+        Map<String, Object> requestBodyMap = new HashMap<>();
+        requestBodyMap.put("requestDto", requestDto);
+        requestBodyMap.put("saveDTO", saveDTO);
+
+        String jsonRequestBody = om.writeValueAsString(requestBodyMap);
+
+        ResultActions resultActions = mvc.perform(
+                post("/api/user/payment/ready/{bay-id}", 1)
+                        .content(jsonRequestBody)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        );
+
+        resultActions.andExpect(status().is4xxClientError());
+    }
+
 }

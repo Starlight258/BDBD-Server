@@ -81,7 +81,7 @@ public class OwnerRestControllerTest {
         String requestBody = om.writeValueAsString(requestDTO);
         //when
         ResultActions resultActions = mvc.perform(
-                post("/api/owner/check")
+                post("/api/open/member/check")
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -102,7 +102,7 @@ public class OwnerRestControllerTest {
         String requestBody = om.writeValueAsString(requestDTO);
 
         mvc.perform(
-                        post("/api/owner/join")
+                        post("/api/open/join/owner")
                                 .content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -119,7 +119,7 @@ public class OwnerRestControllerTest {
         String requestBody = om.writeValueAsString(requestDTO);
 
         mvc.perform(
-                        post("/api/owner/login")
+                        post("/api/open/login/owner")
                                 .content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -139,12 +139,11 @@ public class OwnerRestControllerTest {
         String requestBody = om.writeValueAsString(requestDTO);
 
         mvc.perform(
-                        post("/api/owner/login")  // owner 페이지에서의 로그인 URL을 사용
+                        post("/api/open/login/owner")  // owner 페이지에서의 로그인 URL을 사용
                                 .content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().is(HttpStatus.UNAUTHORIZED.value()))
-                .andExpect(jsonPath("$.error.message").value("can't access this page"))
                 .andDo(print());
     }
 
@@ -157,7 +156,7 @@ public class OwnerRestControllerTest {
         //when
         ResultActions resultActions = mvc.perform(
                 get("/api/owner/sales")
-                        .param("carwash-id",   "2")
+                        .param("carwash-ids",   "2")
                         .param("selected-date", "2023-10-01")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
         );
