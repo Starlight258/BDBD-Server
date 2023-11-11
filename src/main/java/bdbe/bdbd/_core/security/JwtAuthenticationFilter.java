@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -29,45 +30,45 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         String jwt = request.getHeader(JWTProvider.HEADER);
 
-        if (jwt == null) {
-            chain.doFilter(request, response);
-
-            return;
-        }
-
         try {
-            DecodedJWT decodedJWT = JWTProvider.verify(jwt);
-            Long id = decodedJWT.getClaim("id").asLong();
-            String role = decodedJWT.getClaim("role").asString();
-            log.info("role: {}", role);
+            if (jwt != null && !isNonProtectedUrl(request)) {
+                DecodedJWT decodedJWT = JWTProvider.verify(jwt);
+                Long id = decodedJWT.getClaim("id").asLong();
+                String role = decodedJWT.getClaim("role").asString();
+                log.info("role: {}", role);
 
-            MemberRole roleEnum = MemberRole.valueOf(role);
-            Member member = Member.builder().id(id).role(roleEnum).build();
+                MemberRole roleEnum = MemberRole.valueOf(role);
+                Member member = Member.builder().id(id).role(roleEnum).build();
 
-            CustomUserDetails myUserDetails = new CustomUserDetails(member);
-            Authentication authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            myUserDetails,
-                            myUserDetails.getPassword(),
-                            myUserDetails.getAuthorities()
-                    );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
+                CustomUserDetails myUserDetails = new CustomUserDetails(member);
+                Authentication authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                myUserDetails,
+                                myUserDetails.getPassword(),
+                                myUserDetails.getAuthorities()
+                        );
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         } catch (SignatureVerificationException sve) {
             sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid token signature");
-
             return;
         } catch (TokenExpiredException tee) {
-            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "JWT has expired");
-
-            return;
+            if (!isNonProtectedUrl(request)) {
+                sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "JWT has expired");
+                return;
+            }
+            // If the URL is non-protected, ignore the expired token and continue
         } catch (Exception e) {
             sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An unexpected error occurred");
-
             return;
         }
 
         chain.doFilter(request, response);
+    }
+
+    private boolean isNonProtectedUrl(HttpServletRequest request) {
+        AntPathRequestMatcher openMatcher = new AntPathRequestMatcher("/api/open/**");
+        return openMatcher.matches(request);
     }
 
     private void sendErrorResponse(HttpServletResponse response, int status, String message) {

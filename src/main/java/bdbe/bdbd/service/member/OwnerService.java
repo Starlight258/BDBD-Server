@@ -44,7 +44,6 @@ public class OwnerService {
     @Transactional
     public void joinOwner(UserRequest.JoinDTO requestDTO) {
         checkSameEmail(requestDTO.getEmail());
-
         String encodedPassword = passwordEncoder.encode(requestDTO.getPassword());
 
         try {
