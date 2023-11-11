@@ -111,10 +111,10 @@ public class OwnerService {
         return new OwnerResponse.SaleResponseDTO(carwashList, null);
     }
 
-    public OwnerResponse.ReservationCarwashListDTO findBayReservation(Long bayId, Member sessionMember) {
+    public OwnerResponse.ReservationCarwashListDTO findBayReservation(Long bayId, Member sessionMember, LocalDate selectedDate) {
         validateBayOwnership(bayId, sessionMember);
 
-        List<Reservation> reservationList = reservationJPARepository.findByBay_IdWithJoinsAndIsDeletedFalse(bayId);
+        List<Reservation> reservationList = reservationJPARepository.findByBay_IdWithJoinsAndIsDeletedFalseAndMonth(bayId, selectedDate);
         Bay bay = bayJPARepository.findById(bayId)
                 .orElseThrow(() -> {
                     throw new NotFoundError(
@@ -169,7 +169,7 @@ public class OwnerService {
             );
 
         Map<String, Long> response = new HashMap<>();
-        Long revenue = reservationJPARepository.findTotalRevenueByCarwashIdsAndDate(carwashIds, selectedDate);
+        Long revenue = reservationJPARepository.findTotalRevenueByCarwashIdsAndDate(carwashIds, LocalDate.of(selectedDate.getYear(), selectedDate.getMonth(), selectedDate.getDayOfMonth()));
         response.put("revenue", revenue);
 
         return response;
