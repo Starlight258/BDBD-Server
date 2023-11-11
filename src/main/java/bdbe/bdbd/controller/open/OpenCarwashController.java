@@ -49,14 +49,14 @@ public class OpenCarwashController {
     }
 
     @GetMapping("/carwashes/search")
-    public ResponseEntity<?> findCarwashesByKeywords(@RequestParam List<Long> keywordIds,
+    public ResponseEntity<?> findCarwashesByKeywords(@RequestParam List<Long> keywordIdList,
                                                      @RequestParam double latitude,
                                                      @RequestParam double longitude) {
         validateLatitudeAndLongitude(latitude, longitude);
-        validateKeywordIds(keywordIds);
+        validateKeywordIds(keywordIdList);
 
         CarwashRequest.SearchRequestDTO searchRequest = new CarwashRequest.SearchRequestDTO();
-        searchRequest.setKeywordIds(keywordIds);
+        searchRequest.setKeywordIds(keywordIdList);
         searchRequest.setLatitude(latitude);
         searchRequest.setLongitude(longitude);
 
