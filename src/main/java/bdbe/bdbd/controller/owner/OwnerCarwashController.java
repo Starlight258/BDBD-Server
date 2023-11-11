@@ -141,7 +141,7 @@ public class OwnerCarwashController {
 
     @GetMapping("/revenue")
     public ResponseEntity<?> findMonthRevenueByCarwash(
-            @RequestParam(value = "carwash-id") List<Long> carwashIds,
+            @RequestParam(value = "carwash-ids") List<Long> carwashIds,
             @RequestParam(value = "selected-date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
@@ -153,9 +153,10 @@ public class OwnerCarwashController {
     @GetMapping("/reservations/{bay-id}")
     public ResponseEntity<?> fetchOwnerReservation(
             @PathVariable("bay-id") Long bayId,
+            @RequestParam(value = "selected-date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        OwnerResponse.ReservationCarwashListDTO dto = ownerService.findBayReservation(bayId, userDetails.getMember());
+        OwnerResponse.ReservationCarwashListDTO dto = ownerService.findBayReservation(bayId, userDetails.getMember(), selectedDate);
 
         return ResponseEntity.ok(ApiUtils.success(dto));
     }
