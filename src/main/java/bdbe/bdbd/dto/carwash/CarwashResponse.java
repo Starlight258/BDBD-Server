@@ -220,7 +220,7 @@ public class CarwashResponse {
         private String name;
         private int price;
         private String tel;
-        private CarwashResponse.updateLocationDTO locationDTO;
+        private CarwashResponse.updateLocationDTO location;
         private CarwashResponse.updateOperatingTimeDTO optime;
         private List<Long> keywordId;
         private String description;
@@ -263,7 +263,7 @@ public class CarwashResponse {
             dto.setLatitude(location.getLatitude());
             dto.setLongitude(location.getLongitude());
 
-            this.locationDTO = dto;
+            this.location = dto;
         }
     }
 
