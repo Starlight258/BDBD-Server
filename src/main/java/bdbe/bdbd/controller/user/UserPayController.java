@@ -21,12 +21,13 @@ public class UserPayController {
 
     private final PayService payService;
 
-    @PostMapping("/payment/ready/{bay-id}")
+    @PostMapping("/payment/ready")
     public ResponseEntity<?> requestPaymentReady(
-            @PathVariable("bay-id") Long bayId,
             @Valid @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest,
             Errors errors
     ) {
+        Long bayId = paymentReadyRequest.getBayId();
+
         return payService.requestPaymentReady(
                 paymentReadyRequest.getRequestDto(),
                 paymentReadyRequest.getSaveDTO(),
@@ -35,13 +36,15 @@ public class UserPayController {
     }
 
 
-    @PostMapping("/payment/approve/{carwash-id}/{bay-id}")
+    @PostMapping("/payment/approve")
     public ResponseEntity<ReservationResponse.findLatestOneResponseDTO> requestPaymentApproval(
-            @PathVariable("carwash-id") Long carwashId,
-            @PathVariable("bay-id") Long bayId,
             @Valid @RequestBody PayRequest.PaymentApprovalRequestDTO requestDTO,
             Errors errors,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        Long carwashId = requestDTO.getCarwashId();
+        Long bayId = requestDTO.getBayId();
+
         return payService.requestPaymentApproval(
                 requestDTO.getPayApprovalRequestDTO(),
                 carwashId,

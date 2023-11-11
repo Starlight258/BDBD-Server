@@ -1,5 +1,10 @@
 package bdbe.bdbd._core.security;
 
+import bdbe.bdbd._core.exception.ApiException;
+import bdbe.bdbd._core.exception.BadRequestError;
+import bdbe.bdbd._core.exception.InternalServerError;
+import bdbe.bdbd._core.exception.UnAuthorizedError;
+import bdbe.bdbd._core.utils.ApiUtils;
 import bdbe.bdbd.model.Code.MemberRole;
 import bdbe.bdbd.model.member.Member;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
@@ -18,6 +23,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collections;
 
 @Slf4j
 public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
@@ -35,7 +41,6 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
                 DecodedJWT decodedJWT = JWTProvider.verify(jwt);
                 Long id = decodedJWT.getClaim("id").asLong();
                 String role = decodedJWT.getClaim("role").asString();
-                log.info("role: {}", role);
 
                 MemberRole roleEnum = MemberRole.valueOf(role);
                 Member member = Member.builder().id(id).role(roleEnum).build();
@@ -44,22 +49,19 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
                 Authentication authentication =
                         new UsernamePasswordAuthenticationToken(
                                 myUserDetails,
-                                myUserDetails.getPassword(),
+                                null,
                                 myUserDetails.getAuthorities()
                         );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (SignatureVerificationException sve) {
-            sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid token signature");
+            handleException(response, new BadRequestError(BadRequestError.ErrorCode.WRONG_REQUEST_TRANSMISSION, Collections.singletonMap("defaultMessage", "Invalid token signature")));
             return;
         } catch (TokenExpiredException tee) {
-            if (!isNonProtectedUrl(request)) {
-                sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "JWT has expired");
-                return;
-            }
-            // If the URL is non-protected, ignore the expired token and continue
+            handleException(response, new UnAuthorizedError(UnAuthorizedError.ErrorCode.AUTHENTICATION_FAILED, Collections.singletonMap("defaultMessage", "JWT has expired")));
+            return;
         } catch (Exception e) {
-            sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+            handleException(response, new InternalServerError(InternalServerError.ErrorCode.INTERNAL_SERVER_ERROR, Collections.singletonMap("defaultMessage", "An unexpected error occurred")));
             return;
         }
 
@@ -71,12 +73,11 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
         return openMatcher.matches(request);
     }
 
-    private void sendErrorResponse(HttpServletResponse response, int status, String message) {
-        response.setStatus(status);
-        try {
-            response.getWriter().write(message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void handleException(HttpServletResponse response, ApiException exception) throws IOException {
+        ApiUtils.ApiResult<?> apiResult = exception.body();
+        response.setStatus(exception.getStatus().value());
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(apiResult.toString());
     }
 }
