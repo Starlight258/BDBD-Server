@@ -29,35 +29,35 @@ public class OpenMemberController {
     private final OwnerService ownerService;
 
     @PostMapping("/member/check")
-    public ResponseEntity<?> checkMember(@RequestBody @Valid UserRequest.EmailCheckDTO emailCheckDTO, Errors errors) {
+    public ResponseEntity<?> checkMember(@RequestBody @Valid UserRequest.EmailCheckDTO emailCheckDTO) {
         userService.checkSameEmail(emailCheckDTO.getEmail());
 
         return ResponseEntity.ok(ApiUtils.success(null));
     }
 
     @PostMapping("/join/user")
-    public ResponseEntity<?> joinUser(@RequestBody @Valid UserRequest.JoinDTO requestDTO, Errors errors) {
+    public ResponseEntity<?> joinUser(@RequestBody @Valid UserRequest.JoinDTO requestDTO) {
         userService.join(requestDTO);
 
         return ResponseEntity.ok().body(ApiUtils.success(null));
     }
 
     @PostMapping("/login/user")
-    public ResponseEntity<?> loginUser(@RequestBody @Valid UserRequest.LoginDTO requestDTO, Errors errors) {
+    public ResponseEntity<?> loginUser(@RequestBody @Valid UserRequest.LoginDTO requestDTO) {
         UserResponse.LoginResponse response = userService.login(requestDTO);
 
         return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(null));
     }
 
     @PostMapping("/join/owner")
-    public ResponseEntity<?> joinOwner(@RequestBody @Valid UserRequest.JoinDTO requestDTO, Errors errors) {
+    public ResponseEntity<?> joinOwner(@RequestBody @Valid UserRequest.JoinDTO requestDTO) {
         ownerService.joinOwner(requestDTO);
 
         return ResponseEntity.ok().body(ApiUtils.success(null));
     }
 
     @PostMapping("/login/owner")
-    public ResponseEntity<?> loginOwner(@RequestBody @Valid UserRequest.LoginDTO requestDTO, Errors errors) {
+    public ResponseEntity<?> loginOwner(@RequestBody @Valid UserRequest.LoginDTO requestDTO) {
         UserResponse.LoginResponse response = ownerService.loginOwner(requestDTO);
 
         return ResponseEntity.ok().header(JWTProvider.HEADER, response.getJwtToken()).body(ApiUtils.success(null));

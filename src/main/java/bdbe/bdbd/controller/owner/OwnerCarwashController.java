@@ -85,7 +85,6 @@ public class OwnerCarwashController {
     public ResponseEntity<?> updateCarwashDetails(
             @PathVariable("carwash-id") Long carwashId,
             @Valid @RequestPart("updateData") CarwashRequest.updateCarwashDetailsDTO updatedto,
-            Errors errors,
             @RequestPart(value = "images") MultipartFile[] images,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {

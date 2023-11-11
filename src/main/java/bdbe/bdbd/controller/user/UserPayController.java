@@ -24,8 +24,7 @@ public class UserPayController {
     @PostMapping("/payment/ready/{bay-id}")
     public ResponseEntity<?> requestPaymentReady(
             @PathVariable("bay-id") Long bayId,
-            @Valid @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest,
-            Errors errors
+            @Valid @RequestBody PayRequest.PaymentReadyRequest paymentReadyRequest
     ) {
         return payService.requestPaymentReady(
                 paymentReadyRequest.getRequestDto(),
@@ -40,7 +39,6 @@ public class UserPayController {
             @PathVariable("carwash-id") Long carwashId,
             @PathVariable("bay-id") Long bayId,
             @Valid @RequestBody PayRequest.PaymentApprovalRequestDTO requestDTO,
-            Errors errors,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return payService.requestPaymentApproval(
                 requestDTO.getPayApprovalRequestDTO(),

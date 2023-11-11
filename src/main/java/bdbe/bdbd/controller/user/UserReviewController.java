@@ -25,7 +25,7 @@ public class UserReviewController {
     private final ReviewService reviewService;
 
     @PostMapping("/reviews")
-    public ResponseEntity<?> createReview(@RequestBody @Valid ReviewRequest.SaveDTO saveDTO, Errors errors, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<?> createReview(@RequestBody @Valid ReviewRequest.SaveDTO saveDTO, @AuthenticationPrincipal CustomUserDetails userDetails) {
         reviewService.createReview(saveDTO, userDetails.getMember());
 
         return ResponseEntity.ok(ApiUtils.success(null));
