@@ -65,7 +65,7 @@ public class CarwashRestControllerTest {
 
         // when
         ResultActions resultActions = mvc.perform(
-                get("/api/public/carwashes")
+                get("/api/open/carwashes")
         );
 
         // eye
@@ -151,7 +151,7 @@ public class CarwashRestControllerTest {
 
         // when
         ResultActions resultActions = mvc.perform(
-                get("/api/public/carwashes/nearby")
+                get("/api/open/carwashes/nearby")
                         .param("latitude", String.valueOf(testLatitude))
                         .param("longitude", String.valueOf(testLongitude))
         );
@@ -175,7 +175,7 @@ public class CarwashRestControllerTest {
 
         // when
         ResultActions resultActions = mvc.perform(
-                get("/api/carwashes/recommended")
+                get("/api/open/carwashes/recommended")
                         .param("latitude", String.valueOf(testLatitude))
                         .param("longitude", String.valueOf(testLongitude))
         );
@@ -200,7 +200,7 @@ public class CarwashRestControllerTest {
 
         // when
         ResultActions resultActions = mvc.perform(
-                get("/api/carwashes/search")
+                get("/api/open/carwashes/search")
                         .param("keywordIds", keywordId)
                         .param("latitude", testLatitude)
                         .param("longitude", testLongitude)
@@ -223,7 +223,7 @@ public class CarwashRestControllerTest {
         System.out.println("carwashId:" + carwashId);
 
         ResultActions resultActions = mvc.perform(
-                get(String.format("/api/carwashes/%d/info", carwashId))
+                get(String.format("/api/open/carwashes/%d/info", carwashId))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
         );
 

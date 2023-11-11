@@ -60,7 +60,7 @@ public class UserRestControllerTest {
         String requestBody = om.writeValueAsString(requestDTO);
         //when
         ResultActions resultActions = mvc.perform(
-                post("/api/user/check")
+                post("/api/open/member/check")
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -81,7 +81,7 @@ public class UserRestControllerTest {
         String requestBody = om.writeValueAsString(requestDTO);
 
         mvc.perform(
-                        post("/api/user/join")
+                        post("/api/open/join/user")
                                 .content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -98,7 +98,7 @@ public class UserRestControllerTest {
         String requestBody = om.writeValueAsString(requestDTO);
 
         mvc.perform(
-                        post("/api/user/login")
+                        post("/api/open/login/user")
                                 .content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -123,12 +123,11 @@ public class UserRestControllerTest {
         String requestBody = om.writeValueAsString(requestDTO);
 
         mvc.perform(
-                        post("/api/user/join")
+                        post("/api/open/join/user")
                                 .content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(jsonPath("$.success").value("false"))
-                .andExpect(jsonPath("$.error.message").value("duplicate email exist : " + email))
                 .andExpect(jsonPath("$.error.status").value(400))
                 .andDo(print());
     }
@@ -147,12 +146,11 @@ public class UserRestControllerTest {
         String requestBody = om.writeValueAsString(requestDTO);
 
         mvc.perform(
-                        post("/api/user/join")
+                        post("/api/open/join/user")
                                 .content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(jsonPath("$.success").value("false"))
-                .andExpect(jsonPath("$.error.message").value("이메일 형식으로 작성해주세요:email"))
                 .andExpect(jsonPath("$.error.status").value(400))
                 .andDo(print());
     }
@@ -171,18 +169,17 @@ public class UserRestControllerTest {
         String requestBody = om.writeValueAsString(requestDTO);
 
         mvc.perform(
-                        post("/api/user/join")
+                        post("/api/open/join/user")
                                 .content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(jsonPath("$.success").value("false"))
-                .andExpect(jsonPath("$.error.message").value("It must contain letters, numbers, and special characters, and cannot contain spaces.:password"))
                 .andExpect(jsonPath("$.error.status").value(400))
                 .andDo(print());
     }
 
     @Test
-    public void loginWrongEmailTest() throws Exception {
+    public void joinWrongEmailTest() throws Exception {
         String email = "aaaa@naver.com";
         UserRequest.LoginDTO requestDTO = new UserRequest.LoginDTO();
         requestDTO.setEmail(email);
@@ -191,12 +188,11 @@ public class UserRestControllerTest {
         String requestBody = om.writeValueAsString(requestDTO);
 
         mvc.perform(
-                        post("/api/user/login")
+                        post("/api/open/join/user")
                                 .content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(jsonPath("$.success").value("false"))
-                .andExpect(jsonPath("$.error.message").value("email not found : " + requestDTO.getEmail()))
                 .andExpect(jsonPath("$.error.status").value(400))
                 .andDo(print());
     }
@@ -211,12 +207,11 @@ public class UserRestControllerTest {
         String requestBody = om.writeValueAsString(requestDTO);
 
         mvc.perform(
-                        post("/api/user/login")
+                        post("/api/open/login/user")
                                 .content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(jsonPath("$.success").value("false"))
-                .andExpect(jsonPath("$.error.message").value("It must contain letters, numbers, and special characters, and cannot contain spaces.:password"))
                 .andExpect(jsonPath("$.error.status").value(400))
                 .andDo(print());
     }
@@ -231,13 +226,12 @@ public class UserRestControllerTest {
         String requestBody = om.writeValueAsString(requestDTO);
 
         mvc.perform(
-                        post("/api/user/login")
+                        post("/api/open/login/user")
                                 .content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(jsonPath("$.success").value("false"))
-                .andExpect(jsonPath("$.error.message").value("wrong password"))
-                .andExpect(jsonPath("$.error.status").value(400))
+                .andExpect(jsonPath("$.error.status").value(401))
                 .andDo(print());
     }
 

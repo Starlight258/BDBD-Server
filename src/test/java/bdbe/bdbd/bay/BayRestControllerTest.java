@@ -57,7 +57,7 @@ public class BayRestControllerTest {
         String requestBody = om.writeValueAsString(saveDTO);
 
         ResultActions resultActions = mvc.perform(
-                post("/api/owner/carwashes/{carwash_id}/bays", carwashId)
+                post("/api/owner/carwashes/{carwash-id}/bays", carwashId)
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
         );
