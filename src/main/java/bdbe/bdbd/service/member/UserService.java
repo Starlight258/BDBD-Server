@@ -1,11 +1,11 @@
 package bdbe.bdbd.service.member;
 
 
-import bdbe.bdbd._core.exception.BadRequestError;
 import bdbe.bdbd._core.exception.InternalServerError;
 import bdbe.bdbd._core.exception.NotFoundError;
 import bdbe.bdbd._core.exception.UnAuthorizedError;
 import bdbe.bdbd._core.security.JWTProvider;
+import bdbe.bdbd._core.utils.MemberUtils;
 import bdbe.bdbd.dto.member.owner.OwnerResponse;
 import bdbe.bdbd.dto.member.user.UserRequest;
 import bdbe.bdbd.dto.member.user.UserResponse;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
-import java.util.Optional;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -25,10 +24,11 @@ import java.util.Optional;
 public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final MemberJPARepository memberJPARepository;
+    private final MemberUtils memberUtils;
 
     @Transactional
     public void join(UserRequest.JoinDTO requestDTO) {
-        checkSameEmail(requestDTO.getEmail());
+        memberUtils.checkSameEmail(requestDTO.getEmail());
 
         String encodedPassword = passwordEncoder.encode(requestDTO.getPassword());
 
@@ -61,15 +61,6 @@ public class UserService {
         return new UserResponse.LoginResponse(jwt, redirectUrl);
     }
 
-
-    public void checkSameEmail(String email) {
-        Optional<Member> memberOptional = memberJPARepository.findByEmail(email);
-        if (memberOptional.isPresent()) {
-            throw new BadRequestError(
-                    BadRequestError.ErrorCode.DUPLICATE_RESOURCE,
-                    Collections.singletonMap("Email", "Duplicate email exist : " + email));
-        }
-    }
 
     public OwnerResponse.UserInfoDTO findUserInfo(Member member) {
         Member findMember = memberJPARepository.findById(member.getId())

@@ -47,7 +47,6 @@ public class OwnerCarwashController {
 
     @PostMapping(value = "/carwashes/register")
     public ResponseEntity<?> saveCarwash(@Valid @RequestPart("carwash") CarwashRequest.SaveDTO saveDTOs,
-                                         Errors errors,
                                          @RequestPart(value = "images", required = false) Optional<MultipartFile[]> images,
                                          @AuthenticationPrincipal CustomUserDetails userDetails) {
         if (images.isPresent()) {
@@ -86,7 +85,6 @@ public class OwnerCarwashController {
     public ResponseEntity<?> updateCarwashDetails(
             @PathVariable("carwash-id") Long carwashId,
             @Valid @RequestPart("updateData") CarwashRequest.updateCarwashDetailsDTO updatedto,
-            Errors errors,
             @RequestPart(value = "images") MultipartFile[] images,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {

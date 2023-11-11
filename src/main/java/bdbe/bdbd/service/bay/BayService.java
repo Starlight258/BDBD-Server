@@ -65,8 +65,6 @@ public class BayService {
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
                         Collections.singletonMap("Bay", "Bay not found")
                 ));
-        System.out.println("bay id = " + bay.getCarwash().getMember().getId());
-        System.out.println("member = " + member.getId());
 
         if (bay.getCarwash().getMember().getId() != member.getId()) {
             throw new ForbiddenError(
@@ -77,7 +75,20 @@ public class BayService {
         bay.changeStatus(status);
     }
 
-    public BayRevenueResponseDTO findBayRevenue(Long bayId) {
+    public BayRevenueResponseDTO findBayRevenue(Long bayId, Member member) {
+        Bay bay = bayJPARepository.findById(bayId)
+                .orElseThrow(() -> {
+                    throw new NotFoundError(
+                            NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
+                            Collections.singletonMap("BayId", "Bay not found"));
+                });
+
+        if (bay.getCarwash().getMember().getId() != member.getId()) {
+            throw new ForbiddenError(
+                        ForbiddenError.ErrorCode.RESOURCE_ACCESS_FORBIDDEN,
+                        Collections.singletonMap("MemberId", "Member is not the owner of the carwash."));
+        }
+
         BayRevenueResponseDTO dto = new BayRevenueResponseDTO();
 
         LocalDate firstDayOfCurrentMonth = LocalDate.now().withDayOfMonth(1);

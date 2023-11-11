@@ -3,6 +3,7 @@ package bdbe.bdbd.controller.open;
 
 import bdbe.bdbd._core.security.JWTProvider;
 import bdbe.bdbd._core.utils.ApiUtils;
+import bdbe.bdbd._core.utils.MemberUtils;
 import bdbe.bdbd.dto.member.user.UserRequest;
 import bdbe.bdbd.dto.member.user.UserResponse;
 import bdbe.bdbd.service.member.OwnerService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+
 /**
  * USER와 OWNER의 가입 및 로그인 기능을 포함하는 공개 API
  */
@@ -25,12 +27,12 @@ import javax.validation.Valid;
 public class OpenMemberController {
 
     private final UserService userService;
-
     private final OwnerService ownerService;
+    private final MemberUtils memberUtils;
 
     @PostMapping("/member/check")
     public ResponseEntity<?> checkMember(@RequestBody @Valid UserRequest.EmailCheckDTO emailCheckDTO, Errors errors) {
-        userService.checkSameEmail(emailCheckDTO.getEmail());
+        memberUtils.checkSameEmail(emailCheckDTO.getEmail());
 
         return ResponseEntity.ok(ApiUtils.success(null));
     }

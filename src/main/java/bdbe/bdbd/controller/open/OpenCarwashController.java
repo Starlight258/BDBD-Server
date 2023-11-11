@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 /**
  * 세차장 관련 기능을 제공하는 공개 API
  */
@@ -52,6 +53,7 @@ public class OpenCarwashController {
                                                      @RequestParam double latitude,
                                                      @RequestParam double longitude) {
         validateLatitudeAndLongitude(latitude, longitude);
+        validateKeywordIds(keywordIds);
 
         CarwashRequest.SearchRequestDTO searchRequest = new CarwashRequest.SearchRequestDTO();
         searchRequest.setKeywordIds(keywordIds);
@@ -61,6 +63,15 @@ public class OpenCarwashController {
         List<CarwashRequest.CarwashDistanceDTO> carwashes = carwashService.findCarwashesByKeywords(searchRequest);
 
         return ResponseEntity.ok(ApiUtils.success(carwashes));
+    }
+
+    private static void validateKeywordIds(List<Long> keywordIds) {
+        if (keywordIds.stream().anyMatch(id -> id < 8 || id > 14)) {
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.VALIDATION_FAILED,
+                    Collections.singletonMap("message", "Carwash Keyword ID must be between 8 and 14")
+            );
+        }
     }
 
     @GetMapping("/carwashes/nearby")
