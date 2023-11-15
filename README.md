@@ -5,21 +5,21 @@
 
 ## 서비스 주요 기능
 
-- 예약 시스템
+- **예약 시스템**
   - 예약 생성, 조회, 수정, 삭제 기능 구현
   - 등록을 하면 자동으로 관리할 수 있는 방법을 예약시스템의 도입으로 해소
   - 세차장을 영업시간과 가격을 등록하고 세차장에서 가용가능한 베이를 지정한 하면 세차장 예약관리의 자동화가 가능
-- 세차장 검색 시스템
+- **세차장 검색 시스템**
   - 위치기반 검색, 키워드 기반 검색 기능 구현
   - 세차장을 찾을때 한눈에 들어오지 않던 키포인트들 -> 키워드 검색을 통해 각 세차장마다
     어떤 키포인트들이 있고, 이를 검색할 수 있음
   - 위치기반한 세차장 찾기 시스템 도입으로, 세차장과 나와의 거리를 파악할 수 있도록 작성
-- 리뷰 시스템
+- **리뷰 시스템**
   - 각 세차 예약 건수마다 리뷰를 작성할 수 있음. 해당 리뷰에 대한 키워드로 해당 세차장에 대한 사용자 입장의 평가가 어떠한지 한눈에 파악 가능
   - 별점 시스템을 통해 해당 세차장의 평균 평점이 어떤지 확인할 수 있음
-- 세차장 관리 시스템
+- **세차장 관리 시스템**
   - 세차장을 등록을 손쉽게 하고, 보유하고 있는 모든 세차장들의 매출을 한눈에 확인할 수 있고, 개별 세차장의 예약 현황과 매출 관리를 쉽게 확인할 수 있도록 만듦
-- 결제하기
+- **결제하기**
   - 카카오페이 api를 사용하여 mock 결제 절차를 구현
   - 결제 금액에 관련한 신뢰성있는 로직을 구현하여 결제 신뢰성 확보
 
@@ -150,7 +150,21 @@
 
 - **프론트엔드 금액 검증**: 프론트엔드에서 요청한 결제 금액(**`total_amount`**)과 서버 측에서 계산한 금액을 비교하여 결제 오류를 미연에 방지합니다.
 - 프론트엔드와 서버 측의 계산 금액이 다를 경우, **`BadRequestError`**(`400`) 예외 (**`1001 VALIDATION_FAILED`** 에러 코드)를 발생시킵니다.
+```java
+// 금액 계산
+int perPrice = carwash.getPrice();
+int minutesDifference = (int) ChronoUnit.MINUTES.between(startTime, endTime);
+int blocksOf30Minutes = minutesDifference / 30;
+int price = perPrice * blocksOf30Minutes;
+int totalAmount = price;
 
+// 검증
+if (totalAmount != requestDto.getTotal_amount())
+    throw new BadRequestError(
+            BadRequestError.ErrorCode.WRONG_REQUEST_TRANSMISSION,
+            Collections.singletonMap("pay", "Invalid pay amount")
+    );
+```
 ## 검증
 
 - **AOP를 사용한 유효성 검증**
@@ -191,8 +205,33 @@ public enum ErrorCode implements ApiException.ErrorCode {
 ```
 
 - 예외 발생시 `status`(상태 코드), `code`(사용자 정의 에러코드), `message`(에러 메세지) 형식을 지켜 일관된 응답이 전송되도록 만들었습니다.
+<img width="444" alt="image" src="https://github.com/Step3-kakao-tech-campus/Team10_BE/assets/78211281/abe61e0f-9a86-4529-852e-e5edbe2cf1ed">
+
 - **`GlobalExceptionHandler`** 에서 다양한 유형의 예외를 잡고 적절한 HTTP 응답을 반환하도록 했습니다.
-- `**DefaultErrorAttributes**` 클래스를 확장한 **`CustomErrorAttributes` 를** 구현하여 핸들러가 잡지 못한 모든 예외에 대해서도 일관된 응답 형식을 보장했습니다.
+- `DefaultErrorAttributes` 클래스를 확장한 **`CustomErrorAttributes` 를** 구현하여 핸들러가 잡지 못한 모든 예외에 대해서도 일관된 응답 형식을 보장했습니다.
+
+```java
+@Override
+public Map<String, Object> getErrorAttributes(
+        WebRequest webRequest, ErrorAttributeOptions options) {
+    Map<String, Object> defaultErrorAttributes = super.getErrorAttributes(webRequest, options);
+
+    Map<String, Object> customErrorAttributes = new LinkedHashMap<>();
+    boolean errorOccurred = !defaultErrorAttributes.get("status").equals(200);
+    int status = (int) defaultErrorAttributes.get("status");
+
+    if (errorOccurred) {
+        Map<String, Object> errorDetails = new LinkedHashMap<>();
+
+        Object defaultMessage = defaultErrorAttributes.get("message");
+        String customMessage = (status == 404) ? "Not Found" : String.valueOf(defaultMessage);
+
+        errorDetails.put("status", String.valueOf(status));
+        errorDetails.put("code", NotFoundError.ErrorCode.RESOURCE_NOT_FOUND.getCode());
+       ...
+    return customErrorAttributes;
+}
+```
 - 새로운 예외 유형을 추가할 수 있도록 확장 가능하게 설계했습니다.
 
 ## 보안
@@ -264,12 +303,9 @@ static final List<String uniqueFilename = UUID.randomUUID().toString() + extensi
 - 보안을 강화하기위해 **`@Value` 을 통해** 구성값을 소스 코드 내에 하드코딩하지 않고 외부 구성 파일과 Kubernetes의 Secret을 활용하여 관리합니다.
 - 변경 가능성이 있는 key들을 환경 변수로 관리하여 재사용성을 높였습니다.
 
-## \***\*권한 중심의 사용자 및 관리자 경험 최적화\*\***
+## **권한 중심의 사용자 및 관리자 경험 최적화**
 
-### **사용자 권한과 보안 강화**
-
-- `역할 기반` 접근 권한 분리와 `토큰의 유무`에 따른 권한 분리를 제공합니다.
-- `역할 기반` 권한관리 :\*\* Role에 따른 권한 분리를 스프링 시큐리티의 `SecurityConfig`에서 제공합니다.
+- `역할 기반` 권한관리 : Role에 따른 권한 분리(Spring Security)
 
 ```java
 http.authorizeRequests(authorize -> authorize
@@ -277,18 +313,34 @@ http.authorizeRequests(authorize -> authorize
                 .antMatchers("/api/user/**").access("hasAnyRole('USER', 'OWNER')")
                 .antMatchers("/api/owner/**").access("hasRole('OWNER')")
                 .anyRequest().authenticated());
+
 ```
 
-- **`토큰 유무` 권한 관리 :** 서비스 가입 전 둘러보기에서, open 컨트롤러에 있는 기능을 권한없이 접근할 수 있도록 합니다.
-
-```java
-private boolean isNonProtectedUrl(HttpServletRequest request) {
+- `사용자 인증 및 JWT 토큰 처리` **:** JWT 토큰을 검증하고 권한 검사를 수행합니다.
+    
+    ```java
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+        String jwt = request.getHeader(JWTProvider.HEADER);
+    
+        try {
+            if (jwt != null && !isNonProtectedUrl(request)) {
+                DecodedJWT decodedJWT = JWTProvider.verify(jwt);
+                Long id = decodedJWT.getClaim("id").asLong();
+                String role = decodedJWT.getClaim("role").asString();
+                ..
+        chain.doFilter(request, response);
+    }
+    
+    private boolean isNonProtectedUrl(HttpServletRequest request) {
         AntPathRequestMatcher openMatcher = new AntPathRequestMatcher("/api/open/**");
         return openMatcher.matches(request);
     }
-```
+    ```
+    
 
-- **`권한`에 따른 컨트롤러 구조 :** 권한에 따라 Controller를 분리하여 권한 관리를 명확하게 했습니다.
+- **컨트롤러 분리 :** 공통(유저, 사장님) / 유저 / 사장님 / 둘러보기 권한으로 분류했습니다.
+
 
 ![Untitled](readme_images/Untitled%202.png)
 
@@ -460,12 +512,12 @@ private boolean isNonProtectedUrl(HttpServletRequest request) {
 
 ### 이미지 파일 관리
 
-- 파일 저장 시스템을 개선하여, 모든 이미지 파일은 지정된 경로에 저장
+- S3에 다운로드된 모든 이미지 파일은 지정된 경로에 저장
 - 파일 전송의 정확성을 검증하기 위한 로직을 구현하여, 파일 전달 과정에서의 오류 최소화
 
 ### 예약 시스템 최적화
 
-- 예약 데이터에 대한 날짜 및 상태 관리를 철저히 하여 시스템의 정확석을 향상
+- 예약 데이터에 대한 날짜 및 상태 관리를 철저히 하여 시스템의 무결성을 보장
 - 예약 시스템의 로직을 구조화하여, 관리 및 유지보수의 용이성을 강화
 
 ### 지도 통합 및 상호작용
