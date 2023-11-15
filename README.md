@@ -75,19 +75,70 @@
 
 ## 예약 신뢰성
 
-- 사용자가 요청한 예약이 운영 시간을 준수하고 중복 예약을 방지하는 등 예약 오류를
-  최소화하였습니다.
+- 사용자가 요청한 예약이 운영 시간을 준수하고 중복 예약이 방지되도록 예약 검증을 철저히 하였습니다.
   - **`운영 시간` 내 예약 검증** : 운영시간 내에 예약이 이루어지는지 확인합니다.
-  - **`중복 예약` 검증** : 기존 시간과 겹치지 않는지 확인합니다.
+    - **24시간 영업** 및 **새벽 영업**(11:00~2:00)을 지원합니다.
+
+    ```java
+    if (!((opStartTime.equals(LocalTime.MIDNIGHT) && opEndTime.equals(LocalTime.MIDNIGHT)) ||
+          (opStartTime.isBefore(requestStartTimePart) || opStartTime.equals(requestStartTimePart)) &&
+          (opEndTime.isAfter(requestEndTimePart) || opEndTime.equals(requestEndTimePart)))) {
+        throw new BadRequestError(
+                BadRequestError.ErrorCode.VALIDATION_FAILED,
+                Collections.singletonMap("operatingHours", "Reservation time is out of operating hours")
+        );
+    }
+    ```
+
+  - **`중복 예약` 검증** : 다른 회원의 예약 시간과 겹치지 않는지 확인합니다.
+    - 새로운 예약의 종료 시간이 `기존 예약의 시작 시간 이전`이고, 새로운 예약의 시작 시간이 `기존 예약의 종료 시간 이후`인 경우 정상 예약됩니다.
+
+    ```java
+    boolean isOverlapping = reservationList.stream()
+            .anyMatch(existingReservation -> {
+                LocalDateTime existingStartTime = existingReservation.getStartTime();
+                LocalDateTime existingEndTime = existingReservation.getEndTime();
+    
+                // endTime이 다음 날로 넘어가는 경우를 고려하여 조정
+                LocalDateTime extendedEndTime = (endTime.toLocalTime().isBefore(startTime.toLocalTime()))
+                        ? endTime.plusDays(1) : endTime;
+    
+                // 겹치는 예약 확인
+                return !(extendedEndTime.isBefore(existingStartTime) || startTime.isAfter(existingEndTime));
+            });
+    
+    if (isOverlapping) {
+        throw new BadRequestError(
+                BadRequestError.ErrorCode.DUPLICATE_RESOURCE,
+                Collections.singletonMap("Reservation time", "Reservation time overlaps with an existing reservation.")
+        );
+    }
+    ```
+
+  - **`날짜가 넘어가는 예약`**(23:00~01:00) 지원 :  종료 시간에 하루를 더함으로써 정상적으로 예약을 처리합니다.
+
+      ```java
+      LocalDateTime adjustedEndTime = endTime;
+      if (endTime.toLocalTime().isBefore(startTime.toLocalTime())) {
+          adjustedEndTime = endTime.plusDays(1);
+      }
+      long minutesBetween = Duration.between(startTime, adjustedEndTime).toMinutes();
+      ```
+
   - **`예약 시간` 배수 검증** : 예약 시간이 30분의 배수인지 확인합니다.
-  - **`최소 예약`** **시간 검증** **:** 예약 시간이 최소 30분 이상인지 검사합니다.
+  - `최소 예약` **시간 검증** **:** 예약 시간이 최소 30분 이상인지 검사합니다.
 - 예약 권한별 가이드라인
-  - \***\*예약 조회\*\***
+  - **예약 조회**
     - 사용자는 자신의 예약 내역만 조회할 수 있습니다.
+    - 사장님은 소유한 매장의 모든 예약을 조회할 수 있습니다.
   - **예약 수정**
     - 사용자는 자신의 예약만 수정할 수 있습니다.
-  - \***\*예약 취소\*\***
+  - **예약 취소**
     - 사용자는 자신의 예약만 취소할 수 있습니다.
+  - **예약 차단**
+    - 사장님은 소유한 매장의 베이(예약공간)에 대해, 예약을 일시적으로 받지 못하도록 예약 차단 및 해제가 가능합니다.
+  - **예약 통계**
+    - 사장님은 소유한 매장에 대해 **총 매출 및 판매 수익**, **예약 현황**을 관리자 페이지에서 손쉽게 파악할 수 있습니다.
 
 ## **결제 신뢰성**
 

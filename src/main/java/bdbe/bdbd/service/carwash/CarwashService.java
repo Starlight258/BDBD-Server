@@ -216,7 +216,7 @@ public class CarwashService {
                         Collections.singletonMap("CarwashId", "CarwashId not found")
                 ));
         int reviewCnt = reviewJPARepository.findByCarwash_Id(carwashId).size();
-        int bayCnt = bayJPARepository.findByCarwashId(carwashId).size();
+        int bayCnt = bayJPARepository.findByCarwashIdAndStatus(carwashId).size();
         Location location = locationJPARepository.findById(carwash.getLocation().getId())
                 .orElseThrow(() -> new NotFoundError(
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
