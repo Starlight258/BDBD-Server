@@ -176,7 +176,7 @@ public static class FileUpdateDTO {
 
 - `HTTP 상태 코드`에 따라 예외 클래스를 정의하여 예외를 분류할 수 있습니다.
 
-![Untitled](README%20md%204002eaae140145a59993ba950ce3fe3e/Untitled.png)
+![Untitled](readme_images/Untitled.png)
 
 - 상태 코드 내에서 `사용자 정의 에러 코드`를 정의하여 명확하게 오류의 세부 사항을 쉽게 파악할 수 있습니다.
 
@@ -259,7 +259,7 @@ static final List<String uniqueFilename = UUID.randomUUID().toString() + extensi
 
 ### 환경 변수 설정 및 **Kubernetes Secret 사용**
 
-![Untitled](README%20md%204002eaae140145a59993ba950ce3fe3e/Untitled%201.png)
+![Untitled](readme_images/Untitled%201.png)
 
 - 보안을 강화하기위해 **`@Value` 을 통해** 구성값을 소스 코드 내에 하드코딩하지 않고 외부 구성 파일과 Kubernetes의 Secret을 활용하여 관리합니다.
 - 변경 가능성이 있는 key들을 환경 변수로 관리하여 재사용성을 높였습니다.
@@ -290,13 +290,13 @@ private boolean isNonProtectedUrl(HttpServletRequest request) {
 
 - **`권한`에 따른 컨트롤러 구조 :** 권한에 따라 Controller를 분리하여 권한 관리를 명확하게 했습니다.
 
-![Untitled](README%20md%204002eaae140145a59993ba950ce3fe3e/Untitled%202.png)
+![Untitled](readme_images/Untitled%202.png)
 
 ## 리팩토링
 
 - **재사용성** : 반복되어 사용되는 메서드들을 추출해 utils로 분리하여 코드 재사용성을 높였습니다.
 
-![Untitled](README%20md%204002eaae140145a59993ba950ce3fe3e/Untitled%203.png)
+![Untitled](readme_images/Untitled%203.png)
 
 - **코딩 컨벤션** : 코딩 컨벤션에 따라 클래스, 메서드명, 변수명등을 작성하고 띄어쓰기 및 중괄호
   스타일등을 지켜 코드 통일성을 높였습니다.
@@ -492,7 +492,7 @@ private boolean isNonProtectedUrl(HttpServletRequest request) {
 
 ## ERD 설계서
 
-![Untitled](README%20md%204002eaae140145a59993ba950ce3fe3e/Untitled%204.png)
+![Untitled](readme_images/Untitled%204.png)
 
 
 ## 시퀀스 다이어그램\_사용자 관점
