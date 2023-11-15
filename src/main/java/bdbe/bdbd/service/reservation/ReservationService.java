@@ -180,17 +180,16 @@ public class ReservationService {
 
         List<Reservation> reservationList = reservationJPARepository.findByBay_IdAndIsDeletedFalse(bayId);
 
-        boolean isOverlapping = reservationList.stream()
-                .anyMatch(existingReservation -> {
-                    LocalDateTime existingStartTime = existingReservation.getStartTime();
-                    LocalDateTime existingEndTime = existingReservation.getEndTime();
-
-                    // 새 예약이 기존 예약과 중복되는지 확인합니다.
-                    // 새 예약이 기존 예약이 끝나기 전에 시작하거나,
-                    // 새 예약이 기존 예약이 시작한 후에 끝나면 중복으로 간주합니다.
-                    return !endTime.isBefore(existingStartTime) && startTime.isBefore(existingEndTime);
-                });
-
+            boolean isOverlapping = reservationList.stream()
+        .anyMatch(existingReservation -> {
+            LocalDateTime existingStartTime = existingReservation.getStartTime();
+            LocalDateTime existingEndTime = existingReservation.getEndTime();
+    
+            // 새 예약이 기존 예약과 중복되는지 확인합니다.
+            // 중복은 새 예약이 기존 예약의 시간과 겹칠 때 발생합니다.
+            return !(endTime.isEqual(existingStartTime) || startTime.isEqual(existingEndTime)) &&
+                   !(endTime.isBefore(existingStartTime) || startTime.isAfter(existingEndTime));
+        });
         if (isOverlapping) {
             throw new BadRequestError(
                     BadRequestError.ErrorCode.DUPLICATE_RESOURCE,
