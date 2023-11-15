@@ -185,8 +185,10 @@ public class ReservationService {
                     LocalDateTime existingStartTime = existingReservation.getStartTime();
                     LocalDateTime existingEndTime = existingReservation.getEndTime();
 
-                    // 예약 시간이 겹치더라도 종료 시간이 같거나 시작 시간이 같으면 중복으로 처리하지 않음
-                    return !(endTime.isBefore(existingStartTime) || (startTime.isAfter(existingEndTime) && !endTime.equals(existingEndTime)) || startTime.equals(existingStartTime));
+                    // 새 예약이 기존 예약과 중복되는지 확인합니다.
+                    // 새 예약이 기존 예약이 끝나기 전에 시작하거나,
+                    // 새 예약이 기존 예약이 시작한 후에 끝나면 중복으로 간주합니다.
+                    return !endTime.isBefore(existingStartTime) && startTime.isBefore(existingEndTime);
                 });
 
         if (isOverlapping) {
