@@ -185,12 +185,8 @@ public class ReservationService {
                     LocalDateTime existingStartTime = existingReservation.getStartTime();
                     LocalDateTime existingEndTime = existingReservation.getEndTime();
 
-                    // endTime이 다음 날로 넘어가는 경우를 고려하여 조정
-                    LocalDateTime extendedEndTime = (endTime.toLocalTime().isBefore(startTime.toLocalTime()))
-                            ? endTime.plusDays(1) : endTime;
-
-                    // 겹치는 예약 확인
-                    return !(extendedEndTime.isBefore(existingStartTime) || startTime.isAfter(existingEndTime));
+                    // 예약 시간이 겹치더라도 종료 시간이 같거나 시작 시간이 같으면 중복으로 처리하지 않음
+                    return !(endTime.isBefore(existingStartTime) || (startTime.isAfter(existingEndTime) && !endTime.equals(existingEndTime)) || startTime.equals(existingStartTime));
                 });
 
         if (isOverlapping) {
