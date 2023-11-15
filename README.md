@@ -497,4 +497,4 @@ private boolean isNonProtectedUrl(HttpServletRequest request) {
 
 ## 시퀀스 다이어그램\_사용자 관점
 
-![Untitled](README%20md%204002eaae140145a59993ba950ce3fe3e/Untitled%205.png)
+![Untitled](readme_images/Untitled%205.png)
