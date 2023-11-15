@@ -161,8 +161,9 @@ public class ReservationService {
             );
         }
 
-        if (!((opStartTime.isBefore(requestStartTimePart) || opStartTime.equals(requestStartTimePart)) &&
-                (opEndTime.isAfter(requestEndTimePart) || opEndTime.equals(requestEndTimePart)))) {
+        if (!(opStartTime.equals(opEndTime) ||
+                (opStartTime.isBefore(requestStartTimePart) || opStartTime.equals(requestStartTimePart)) &&
+                        (opEndTime.isAfter(requestEndTimePart) || opEndTime.equals(requestEndTimePart)))) {
             throw new BadRequestError(
                     BadRequestError.ErrorCode.VALIDATION_FAILED,
                     Collections.singletonMap("operatingHours", "Reservation time is out of operating hours")
