@@ -175,7 +175,7 @@ public class OwnerService {
         OwnerResponse.ReservationOverviewResponseDTO response = new OwnerResponse.ReservationOverviewResponseDTO();
 
         for (Carwash carwash : carwashList) {
-            List<Bay> bayList = bayJPARepository.findByCarwashIdAndStatus(carwash.getId());
+            List<Bay> bayList = bayJPARepository.findByCarwashId(carwash.getId());
             List<Optime> optimeList = optimeJPARepository.findByCarwash_Id(carwash.getId());
 
             Date today = java.sql.Date.valueOf(LocalDate.now());
@@ -202,7 +202,7 @@ public class OwnerService {
         Long monthlySales = reservationJPARepository.findTotalRevenueByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
         Long monthlyReservations = reservationJPARepository.findMonthlyReservationCountByCarwashIdAndDate(carwashId, firstDayOfCurrentMonth);
 
-        List<Bay> bayList = bayJPARepository.findByCarwashIdAndStatus(carwash.getId());
+        List<Bay> bayList = bayJPARepository.findByCarwashId(carwash.getId());
         List<Optime> optimeList = optimeJPARepository.findByCarwash_Id(carwash.getId());
 
         Date today = java.sql.Date.valueOf(LocalDate.now());

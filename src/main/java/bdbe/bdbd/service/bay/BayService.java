@@ -43,7 +43,7 @@ public class BayService {
         }
 
         int bayNum = dto.getBayNum();
-        boolean exists = bayJPARepository.findByCarwashIdAndStatus(carwashId)
+        boolean exists = bayJPARepository.findByCarwashId(carwashId)
                 .stream()
                 .anyMatch(bay -> bay.getBayNum() == bayNum);
 
