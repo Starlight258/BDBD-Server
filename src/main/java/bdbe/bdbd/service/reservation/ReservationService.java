@@ -217,7 +217,7 @@ public class ReservationService {
                         NotFoundError.ErrorCode.RESOURCE_NOT_FOUND,
                         Collections.singletonMap("CarwashId", "Carwash not found")
                 ));
-        List<Bay> bayList = bayJPARepository.findByCarwashId(carwashId);
+        List<Bay> bayList = bayJPARepository.findByCarwashIdAndStatus(carwashId);
         List<Long> bayIdList = bayJPARepository.findIdsByCarwashId(carwashId);
         List<Reservation> reservationList = reservationJPARepository.findByBayIdInAndIsDeletedFalse(bayIdList);
 

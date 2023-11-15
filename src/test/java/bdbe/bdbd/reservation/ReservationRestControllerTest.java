@@ -141,7 +141,7 @@ public class ReservationRestControllerTest {
         //given
         Carwash carwash = carwashJPARepository.findFirstBy();
         System.out.println("carwashId : " + carwash.getId());
-        Bay bay = bayJPARepository.findByCarwashId(carwash.getId()).get(0);
+        Bay bay = bayJPARepository.findByCarwashIdAndStatus(carwash.getId()).get(0);
         System.out.println("bayId : " + bay.getId());
 
         Member member = memberJPARepository.findByEmail("user@nate.com")
