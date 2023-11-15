@@ -520,20 +520,44 @@ http.authorizeRequests(authorize -> authorize
 - 예약 데이터에 대한 날짜 및 상태 관리를 철저히 하여 시스템의 무결성을 보장
 - 예약 시스템의 로직을 구조화하여, 관리 및 유지보수의 용이성을 강화
 
-### 지도 통합 및 상호작용
+### 지도 검색 개선
 
-- 카카오 지도 API와의 연동 상태를 지속적으로 모니터링하고, 지도 표시 기능의 정확성을 개선
-- 사용자 인터페이스를 통해 지도 상호작용을 더욱 직관적이고 효율적으로 만듦
+- 사용자 위치기반 세차장 조회 서비스를 구현하기 위해 각각의 위도, 경도를 location entity로 저장하고, Haversine공식을 사용해 사용자와 세차장들간의 거리 계산
+```java
+public List<CarwashRequest.CarwashDistanceDTO> findNearbyCarwashesByUserLocation(CarwashRequest.UserLocationDTO userLocation) {
+    List<Carwash> carwashes = carwashJPARepository.findCarwashesWithin10Kilometers(userLocation.getLatitude(), userLocation.getLongitude());
 
+    return carwashes.stream()
+            .map(carwash -> {
+                double distance = Haversine.distance(userLocation.getLatitude(), userLocation.getLongitude(),
+                        carwash.getLocation().getLatitude(), carwash.getLocation().getLongitude());
+            ...
+.sorted(Comparator.comparingDouble(CarwashRequest.CarwashDistanceDTO::getDistance))
+            .collect(Collectors.toList());
+}
+```
+- 반경 10km 내의 세차장을 검색하는 JPQL Query 작성
+```java
+@Query(value = "SELECT cw.* FROM carwash cw JOIN location l ON cw.l_id = l.id WHERE ST_Distance_Sphere(point(l.longitude, l.latitude), point(:longitude, :latitude)) <= 10000", nativeQuery = true)
+List<Carwash> findCarwashesWithin10Kilometers(@Param("latitude") double latitude, @Param("longitude") double longitude);
+```
+  
 ### 보안 및 권한 관리
 
 - Spring Security를 사용하여 사용자 권한 관리를 강화
 - 보안 프로토콜을 업데이트하고, 접근 제어 메커니즘을 통해 시스템의 안전을 보장
 
-### 검색 기능 향상
+### 검색 기능 개선
 
-- 검색 알고리즘을 최적화하고, 인덱싱 메커니즘을 통해 검색 속도와 정확성을 개선
-- 사용자의 검색 경험을 향상시키기 위해 검색 인터페이스를 재구성
+- 사용자가 선택한 세차장 키워드들의 교집합에 해당하는 세차장을 조회
+```java
+List<CarwashRequest.CarwashDistanceDTO> result = carwashesWithin10Km.stream()
+                .filter(carwash -> {
+                    List<Long> keywordIdsForCarwash = findKeywordIdsByCarwashId(carwash.getId());
+                    return keywordIds.stream()
+                            .allMatch(keywordIdsForCarwash::contains);
+                }) 
+```  
 
 ### 에러 코드 관리
 
