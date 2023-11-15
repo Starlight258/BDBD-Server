@@ -339,7 +339,7 @@ http.authorizeRequests(authorize -> authorize
     ```
     
 
-- **컨트롤러 분리 :** 공통(유저, 사장님) / 유저 / 사장님 / 둘러보기 권한으로 분류했습니다.
+- **컨트롤러 분리 :** **공통(유저, 사장님) / 유저 / 사장님 / 둘러보기** 권한으로 분류했습니다.
 
 
 ![Untitled](readme_images/Untitled%202.png)
