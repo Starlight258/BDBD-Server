@@ -95,24 +95,21 @@
 
     ```java
     boolean isOverlapping = reservationList.stream()
-            .anyMatch(existingReservation -> {
-                LocalDateTime existingStartTime = existingReservation.getStartTime();
-                LocalDateTime existingEndTime = existingReservation.getEndTime();
-    
-                // endTime이 다음 날로 넘어가는 경우를 고려하여 조정
-                LocalDateTime extendedEndTime = (endTime.toLocalTime().isBefore(startTime.toLocalTime()))
-                        ? endTime.plusDays(1) : endTime;
-    
-                // 겹치는 예약 확인
-                return !(extendedEndTime.isBefore(existingStartTime) || startTime.isAfter(existingEndTime));
-            });
-    
-    if (isOverlapping) {
-        throw new BadRequestError(
-                BadRequestError.ErrorCode.DUPLICATE_RESOURCE,
-                Collections.singletonMap("Reservation time", "Reservation time overlaps with an existing reservation.")
-        );
-    }
+                .anyMatch(existingReservation -> {
+                    LocalDateTime existingStartTime = existingReservation.getStartTime();
+                    LocalDateTime existingEndTime = existingReservation.getEndTime();
+
+                    // 새 예약이 기존 예약이 끝나기 전에 시작하거나,
+                    // 새 예약이 기존 예약이 시작한 후에 끝나면 중복으로 간주합니다.
+                    return !endTime.isBefore(existingStartTime) && startTime.isBefore(existingEndTime);
+                });
+  
+        if (isOverlapping) {
+            throw new BadRequestError(
+                    BadRequestError.ErrorCode.DUPLICATE_RESOURCE,
+                    Collections.singletonMap("Reservation time", "Reservation time overlaps with an existing reservation.")
+            );
+        }
     ```
 
   - **`날짜가 넘어가는 예약`**(23:00~01:00) 지원 :  종료 시간에 하루를 더함으로써 정상적으로 예약을 처리합니다.
