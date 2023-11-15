@@ -146,7 +146,15 @@ public class ReservationService {
             );
         }
 
-        long minutesBetween = Duration.between(startTime, endTime).toMinutes();
+        // 원래의 endTime을 저장하고 조정된 값을 새 변수에 저장
+        LocalDateTime adjustedEndTime = endTime;
+        if (endTime.toLocalTime().isBefore(startTime.toLocalTime())) {
+            adjustedEndTime = endTime.plusDays(1);
+        }
+
+        long minutesBetween = Duration.between(startTime, adjustedEndTime).toMinutes();
+
+        // 예약 시간에 대한 검증 로직
         if (minutesBetween < 30) {
             throw new BadRequestError(
                     BadRequestError.ErrorCode.VALIDATION_FAILED,
@@ -161,7 +169,7 @@ public class ReservationService {
             );
         }
 
-        if (!(opStartTime.equals(opEndTime) ||
+        if (!((opStartTime.equals(LocalTime.MIDNIGHT) && opEndTime.equals(LocalTime.MIDNIGHT)) ||
                 (opStartTime.isBefore(requestStartTimePart) || opStartTime.equals(requestStartTimePart)) &&
                         (opEndTime.isAfter(requestEndTimePart) || opEndTime.equals(requestEndTimePart)))) {
             throw new BadRequestError(
@@ -177,10 +185,12 @@ public class ReservationService {
                     LocalDateTime existingStartTime = existingReservation.getStartTime();
                     LocalDateTime existingEndTime = existingReservation.getEndTime();
 
-                    return !(
-                            (endTime.isBefore(existingStartTime) || endTime.isEqual(existingStartTime)) ||
-                                    (startTime.isAfter(existingEndTime) || startTime.isEqual(existingEndTime))
-                    );
+                    // endTime이 다음 날로 넘어가는 경우를 고려하여 조정
+                    LocalDateTime extendedEndTime = (endTime.toLocalTime().isBefore(startTime.toLocalTime()))
+                            ? endTime.plusDays(1) : endTime;
+
+                    // 겹치는 예약 확인
+                    return !(extendedEndTime.isBefore(existingStartTime) || startTime.isAfter(existingEndTime));
                 });
 
         if (isOverlapping) {
