@@ -575,3 +575,55 @@ List<CarwashRequest.CarwashDistanceDTO> result = carwashesWithin10Km.stream()
 ## 시퀀스 다이어그램\_사용자 관점
 
 ![Untitled](readme_images/Untitled%205.png)
+
+
+## 시연 화면(사용자)
+| 내 주변 세차장 둘러보기 |
+|------------|
+
+https://github.com/Starlight258/BDBD/assets/78211281/19cc67af-99de-497b-a8ec-62f6e1d493ee
+
+| 예약하기 |
+|------------|
+
+https://github.com/Starlight258/BDBD/assets/78211281/dd416360-1916-4a1b-8454-2f90ea7a4c9a
+
+
+| 결제하기 |
+|------------|
+
+https://github.com/Starlight258/BDBD/assets/78211281/d6d3f387-e0ae-49af-a852-524bae2f0cf4
+
+
+| 예약 내역 확인 및 리뷰 작성 |
+|------------|
+
+https://github.com/Starlight258/BDBD/assets/78211281/d981c258-9958-4a2e-b341-7a06cbdd4d4a
+
+<br/>
+
+## 시연 화면(사장님)
+| 홈페이지 |
+|------------|
+| ![홈페이지](https://github.com/Starlight258/BDBD/assets/78211281/a7568cde-5293-497f-892f-0a13908cdcf6)|
+
+| 입점하기 |
+|------------|
+
+https://github.com/Starlight258/BDBD/assets/78211281/4d54e48d-1322-4fea-b02c-2fca240b82cf
+
+| 이번달 매출보기 |
+|------------|
+
+https://github.com/Starlight258/BDBD/assets/78211281/f271a66d-1959-4032-aa72-5393b81cf363
+
+| 매장 관리하기 |
+|------------|
+
+https://github.com/Starlight258/BDBD/assets/78211281/c3ef1e57-d713-46c7-bee0-75b94935e6f4
+
+| 매장 정보 수정하기 |
+|------------|
+
+https://github.com/Starlight258/BDBD/assets/78211281/e3609422-9e69-4dd4-b229-36e0ba65a3bc
+
